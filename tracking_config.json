@@ -1,0 +1,21 @@
+{
+  "storm": "WP90",
+  "stormInfo": {
+    "id": "90W",
+    "status": "invest",
+    "candidateNumber": 11
+  },
+  "seed": {
+    "lat": 5.0,
+    "lon": 160.0
+  },
+  "domain": {
+    "leftlon": 105,
+    "rightlon": 220,
+    "toplat": 55,
+    "bottomlat": -10
+  },
+  "initialSearchRadiusKm": 1800,
+  "stepSearchRadiusKm": 1000,
+  "clusterThresholdKm": 650
+}
