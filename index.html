@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>西太平洋台風進路予測観測所</title>
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=20260716-1208">
 </head>
 <body>
 <header>
@@ -32,9 +32,9 @@
   <section class="situationPanel" aria-labelledby="situationTitle">
     <div class="situationHeader">
       <div><p class="eyebrow">TODAY'S SITUATION</p><h2 id="situationTitle">現在の見え方</h2></div>
-      <span id="situationUpdated" class="updatedBadge"></span>
+      <span id="situationUpdated" class="updatedBadge">計算中…</span>
     </div>
-    <div id="situationCards" class="situationCards"></div>
+    <div id="situationCards" class="situationCards"><article class="situationCard"><small>状況カード</small><strong>計算中…</strong><span>最新データを読み込んでいます</span></article></div>
     <p class="situationNote">「日本に来そうな予感」は、Noiseを除いた進路が日本周辺の広い監視範囲へ入る割合から算出する遊び指標です。上陸確率・接近確率ではありません。</p>
   </section>
   <section id="metrics" class="metrics"></section>
@@ -50,5 +50,5 @@
   <section><h2>What this view does</h2><div class="explain"><div><b>1. Preserve uncertainty</b><span>Tracks are not forced into one artificial average.</span></div><div><b>2. Separate scenarios</b><span>Physically similar paths are grouped and given representative median tracks.</span></div><div><b>3. Quarantine noise</b><span>Likely tracker jumps are displayed separately instead of silently deleted.</span></div></div></section>
 </main>
 <footer>Unofficial analysis • Not for operational or safety use</footer>
-<script src="app.js"></script>
+<script src="app.js?v=20260716-1208"></script>
 </body></html>
