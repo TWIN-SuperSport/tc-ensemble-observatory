@@ -1,24 +1,32 @@
-name: Update latest GEFS run
+name: Update GEFS analysis
 
 on:
   schedule:
-    - cron: "17 * * * *"
+    - cron: "37 * * * *"
   workflow_dispatch:
+    inputs:
+      force_init:
+        description: "Optional GEFS init in YYYYMMDDHH format"
+        required: false
+        type: string
   push:
     paths:
-      - "scripts/update_latest_gefs_run.py"
+      - "scripts/build_gefs_data.py"
+      - "tracking_config.json"
+      - "requirements.txt"
       - ".github/workflows/update-latest-gefs.yml"
 
 permissions:
   contents: write
 
 concurrency:
-  group: update-latest-gefs
-  cancel-in-progress: true
+  group: update-gefs-analysis
+  cancel-in-progress: false
 
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 55
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -27,18 +35,50 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
 
-      - name: Detect latest available GEFS cycle
-        run: python scripts/update_latest_gefs_run.py
-
-      - name: Commit changed metadata
+      - name: Install analysis dependencies
         run: |
-          if git diff --quiet -- latest_run.json; then
-            echo "latest_run.json is unchanged"
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run offline pipeline self-test
+        run: python scripts/build_gefs_data.py --self-test
+
+      - name: Build latest complete 31-member GEFS analysis
+        env:
+          GEFS_DOWNLOAD_WORKERS: "8"
+        run: |
+          if [ -n "${{ inputs.force_init }}" ]; then
+            python scripts/build_gefs_data.py --force-init "${{ inputs.force_init }}"
+          else
+            python scripts/build_gefs_data.py
+          fi
+
+      - name: Validate generated site payload
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('data.json').read_text())
+          latest = json.loads(Path('latest_run.json').read_text())
+          assert data['summary']['members'] == 31
+          assert len(data['tracks']) == 31
+          assert data['meta']['init'] == latest['init']
+          assert latest['status'] == 'analysis_complete'
+          assert Path('history', latest['init'] + '.json').exists()
+          print('Validated init', latest['init'])
+          PY
+
+      - name: Commit completed analysis
+        run: |
+          if git diff --quiet -- data.json latest_run.json history; then
+            echo "No new complete GEFS analysis"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add latest_run.json
-          git commit -m "Update latest GEFS run metadata"
+          git add data.json latest_run.json history
+          git commit -m "Update complete GEFS ensemble analysis"
+          git pull --rebase
           git push
