@@ -50,3 +50,7 @@ python -m http.server 8000
 ```
 
 ブラウザで `http://localhost:8000/` を開きます。
+
+---
+
+GitHub Pages deployment re-triggered after Pages was enabled.
