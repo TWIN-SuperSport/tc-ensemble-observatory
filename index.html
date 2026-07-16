@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>西太平洋台風進路予測観測所</title>
-<link rel="stylesheet" href="styles.css?v=20260716-1215">
+<link rel="stylesheet" href="styles.css?v=20260716-1230">
 </head>
 <body>
 <header>
@@ -35,6 +35,22 @@
     <div class="disclaimerBody"><p id="discJa"></p><p id="discEn"></p></div>
     <div class="disclaimerActions"><button id="disclaimerDismiss" type="button" aria-expanded="true">わかりました / I understand</button></div>
   </section>
+
+  <section class="targetPanel" aria-labelledby="targetHeading">
+    <div><p class="eyebrow">TARGET SYSTEM</p><h2 id="targetHeading">解析対象</h2></div>
+    <div><strong id="targetName">読み込み中…</strong><span id="targetMeta"></span></div>
+  </section>
+
+  <section class="layout mapFirst">
+    <div class="plotPanel">
+      <div class="mapHeader"><strong>進路シナリオ地図</strong><span id="mapStatus">海岸線を読み込み中…</span></div>
+      <svg id="plot" viewBox="0 0 900 560" role="img" aria-label="Western Pacific ensemble tracks over a geographic basemap"></svg>
+      <div class="legend" id="legend"></div>
+      <p class="mapHint">線をタップすると、そのメンバーの判定と最新位置を確認できます。</p>
+    </div>
+    <aside><h2>Scenario groups</h2><div id="clusters"></div><h2>Selected member</h2><div id="detail" class="detail">地図上の線をタップしてください。</div></aside>
+  </section>
+
   <section class="situationPanel" aria-labelledby="situationTitle">
     <div class="situationHeader">
       <div><p class="eyebrow">TODAY'S SITUATION</p><h2 id="situationTitle">現在の見え方</h2></div>
@@ -44,17 +60,8 @@
     <p class="situationNote">「日本に来そうな予感」は、Noiseを除いた進路が日本周辺の広い監視範囲へ入る割合から算出する実験的な参考表示です。公式の発表ではありません。</p>
   </section>
   <section id="metrics" class="metrics"></section>
-  <section class="layout">
-    <div class="plotPanel">
-      <div class="mapHeader"><strong>進路シナリオ地図</strong><span id="mapStatus">海岸線を読み込み中…</span></div>
-      <svg id="plot" viewBox="0 0 900 560" role="img" aria-label="Western Pacific ensemble tracks over a geographic basemap"></svg>
-      <div class="legend" id="legend"></div>
-      <p class="mapHint">線をタップすると、そのメンバーの判定と最新位置を確認できます。</p>
-    </div>
-    <aside><h2>Scenario groups</h2><div id="clusters"></div><h2>Selected member</h2><div id="detail" class="detail">地図上の線をタップしてください。</div></aside>
-  </section>
   <section><h2>What this view does</h2><div class="explain"><div><b>1. Preserve uncertainty</b><span>Tracks are not forced into one artificial average.</span></div><div><b>2. Separate scenarios</b><span>Physically similar paths are grouped and given representative median tracks.</span></div><div><b>3. Quarantine noise</b><span>Likely tracker jumps are displayed separately instead of silently deleted.</span></div></div></section>
 </main>
 <footer>Experimental, unofficial analysis • Not for operational or safety use</footer>
-<script src="app.js?v=20260716-1215"></script>
+<script src="app.js?v=20260716-1230"></script>
 </body></html>
