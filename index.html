@@ -8,17 +8,35 @@
 <body>
 <header>
   <div><p class="eyebrow">EXPERIMENTAL MODEL PLAYGROUND</p><h1 id="title">Western Pacific Ensemble Observatory</h1><p id="subtitle"></p></div>
-  <div class="controls"><label>View<select id="view"><option value="clustered">Clustered scenarios</option><option value="raw">Raw spaghetti</option><option value="noise">Noise diagnostics</option></select></label><label>Forecast hour<input id="hour" type="range" min="0" max="240" step="6" value="240"><span id="hourLabel">+240h</span></label></div>
+  <div class="controls">
+    <label>表示モード / View
+      <select id="view">
+        <option value="clustered">Clustered scenarios</option>
+        <option value="raw">Raw spaghetti</option>
+        <option value="noise">Noise diagnostics</option>
+      </select>
+    </label>
+    <label>表示する予報時刻 / Forecast hour
+      <input id="hour" type="range" min="0" max="240" step="6" value="240">
+      <span id="hourLabel">+240h</span>
+    </label>
+  </div>
 </header>
 <main>
+  <section id="controlHelp" class="controlHelp" aria-live="polite"></section>
   <section class="disclaimer"><strong>注意 / Notice</strong><p id="discJa"></p><p id="discEn"></p></section>
   <section id="metrics" class="metrics"></section>
   <section class="layout">
-    <div class="plotPanel"><svg id="plot" viewBox="0 0 900 560" role="img" aria-label="Ensemble track plot"></svg><div class="legend" id="legend"></div></div>
-    <aside><h2>Scenario groups</h2><div id="clusters"></div><h2>Selected member</h2><div id="detail" class="detail">Click a track.</div></aside>
+    <div class="plotPanel">
+      <div class="mapHeader"><strong>進路シナリオ地図</strong><span id="mapStatus">海岸線を読み込み中…</span></div>
+      <svg id="plot" viewBox="0 0 900 560" role="img" aria-label="Western Pacific ensemble tracks over a geographic basemap"></svg>
+      <div class="legend" id="legend"></div>
+      <p class="mapHint">線をタップすると、そのメンバーの判定と最新位置を確認できます。</p>
+    </div>
+    <aside><h2>Scenario groups</h2><div id="clusters"></div><h2>Selected member</h2><div id="detail" class="detail">地図上の線をタップしてください。</div></aside>
   </section>
   <section><h2>What this view does</h2><div class="explain"><div><b>1. Preserve uncertainty</b><span>Tracks are not forced into one artificial average.</span></div><div><b>2. Separate scenarios</b><span>Physically similar paths are grouped and given representative median tracks.</span></div><div><b>3. Quarantine noise</b><span>Likely tracker jumps are displayed separately instead of silently deleted.</span></div></div></section>
 </main>
 <footer>Unofficial analysis • Not for operational or safety use</footer>
-<script src="app.js"></script>
+<script type="module" src="app.js"></script>
 </body></html>
