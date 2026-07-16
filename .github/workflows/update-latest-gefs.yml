@@ -19,6 +19,7 @@ on:
 
 permissions:
   contents: write
+  pages: write
 
 concurrency:
   group: update-gefs-analysis
@@ -83,3 +84,12 @@ jobs:
           git commit -m "Update complete GEFS ensemble analysis"
           git pull --rebase
           git push
+
+      - name: Request GitHub Pages rebuild
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "/repos/${{ github.repository }}/pages/builds"
