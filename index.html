@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>西太平洋台風進路予測観測所</title>
-<link rel="stylesheet" href="styles.css?v=20260716-1240">
-<link rel="stylesheet" href="target-layout.css?v=20260716-1240">
+<link rel="stylesheet" href="styles.css?v=20260716-1245">
+<link rel="stylesheet" href="target-layout.css?v=20260716-1245">
 </head>
 <body>
 <header>
@@ -18,9 +18,9 @@
   <div class="controls">
     <label>表示モード / View
       <select id="view">
-        <option value="clustered">Clustered scenarios</option>
-        <option value="raw">Raw spaghetti</option>
-        <option value="noise">Noise diagnostics</option>
+        <option value="clustered">シナリオ別 / Clustered scenarios</option>
+        <option value="raw">全進路 / Raw spaghetti</option>
+        <option value="noise">ノイズ診断 / Noise diagnostics</option>
       </select>
     </label>
     <label>表示する予報時刻 / Forecast hour
@@ -64,5 +64,5 @@
   <section><h2>What this view does</h2><div class="explain"><div><b>1. Preserve uncertainty</b><span>Tracks are not forced into one artificial average.</span></div><div><b>2. Separate scenarios</b><span>Physically similar paths are grouped and given representative median tracks.</span></div><div><b>3. Quarantine noise</b><span>Likely tracker jumps are displayed separately instead of silently deleted.</span></div></div></section>
 </main>
 <footer>Experimental, unofficial analysis • Not for operational or safety use</footer>
-<script src="app.js?v=20260716-1240"></script>
+<script src="app.js?v=20260716-1245"></script>
 </body></html>
