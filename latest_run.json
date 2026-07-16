@@ -1,8 +1,31 @@
 {
   "model": "GEFS",
-  "init": "2026071600",
-  "checkedAt": "2026-07-16T07:56:50.598926Z",
-  "source": "NOAA Open Data / noaa-gefs-pds",
-  "status": "available",
-  "probeUrl": "https://noaa-gefs-pds.s3.amazonaws.com/gefs.20260716/00/atmos/pgrb2ap5/gec00.t00z.pgrb2a.0p50.f000.idx"
+  "init": "2026071612",
+  "checkedAt": "2026-07-16T20:57:09.734543Z",
+  "source": "NOAA GEFS / NOMADS",
+  "status": "analysis_complete",
+  "members": 31,
+  "forecastHours": [
+    0,
+    12,
+    24,
+    36,
+    48,
+    60,
+    72,
+    84,
+    96,
+    108,
+    120,
+    132,
+    144,
+    156,
+    168,
+    180,
+    192,
+    204,
+    216,
+    228,
+    240
+  ]
 }
