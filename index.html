@@ -2,12 +2,12 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Western Pacific Ensemble Observatory</title>
+<title>西太平洋台風進路予測観測所</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <header>
-  <div><p class="eyebrow">EXPERIMENTAL MODEL PLAYGROUND</p><h1 id="title">Western Pacific Ensemble Observatory</h1><p id="subtitle"></p></div>
+  <div><p class="eyebrow">EXPERIMENTAL MODEL PLAYGROUND</p><h1 id="title">西太平洋台風進路予測観測所</h1><p id="subtitle"></p></div>
   <div class="controls">
     <label>表示モード / View
       <select id="view">
@@ -24,7 +24,11 @@
 </header>
 <main>
   <section id="controlHelp" class="controlHelp" aria-live="polite"></section>
-  <section class="disclaimer"><strong>注意 / Notice</strong><p id="discJa"></p><p id="discEn"></p></section>
+  <section id="disclaimer" class="disclaimer">
+    <strong>注意 / Notice</strong>
+    <div class="disclaimerBody"><p id="discJa"></p><p id="discEn"></p></div>
+    <div class="disclaimerActions"><button id="disclaimerDismiss" type="button" aria-expanded="true">わかりました / I understand</button></div>
+  </section>
   <section id="metrics" class="metrics"></section>
   <section class="layout">
     <div class="plotPanel">
@@ -38,5 +42,5 @@
   <section><h2>What this view does</h2><div class="explain"><div><b>1. Preserve uncertainty</b><span>Tracks are not forced into one artificial average.</span></div><div><b>2. Separate scenarios</b><span>Physically similar paths are grouped and given representative median tracks.</span></div><div><b>3. Quarantine noise</b><span>Likely tracker jumps are displayed separately instead of silently deleted.</span></div></div></section>
 </main>
 <footer>Unofficial analysis • Not for operational or safety use</footer>
-<script type="module" src="app.js"></script>
+<script src="app.js"></script>
 </body></html>
