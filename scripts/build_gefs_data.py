@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
-import io
 import json
 import math
 import os
@@ -28,7 +27,7 @@ from pathlib import Path
 from typing import Iterable
 
 import numpy as np
-from eccodes import codes_get, codes_get_array, codes_grib_new_from_file, codes_release
+from eccodes import codes_get, codes_get_array, codes_new_from_message, codes_release
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "data.json"
@@ -126,7 +125,7 @@ def filter_url(init: datetime, member: str, fhour: int, box: dict[str, float]) -
 
 
 def decode_prmsl(blob: bytes) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    handle = codes_grib_new_from_file(io.BytesIO(blob))
+    handle = codes_new_from_message(blob)
     if handle is None:
         raise RuntimeError("No GRIB message decoded")
     try:
