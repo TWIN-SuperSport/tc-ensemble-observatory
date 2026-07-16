@@ -14,11 +14,11 @@ function formatInit(init){const m=String(init).match(/^(\d{4})(\d{2})(\d{2})(\d{
 function japanVibe(){const clean=data.tracks.filter(t=>t.cluster!=='NOISE');if(!clean.length)return{pct:0,label:'判定不能'};const hits=clean.filter(t=>t.points.some(p=>p.lat>=24&&p.lat<=46&&p.lon>=128&&p.lon<=150)).length;const pct=Math.round(hits/clean.length*100);const label=pct>=75?'かなりある':pct>=55?'あるかも':pct>=35?'ちょっとある':pct>=15?'低め':'かなり低め';return{pct,label}}
 function confidence(){const largest=Math.max(0,...data.clusters.map(c=>c.share));const cleanRatio=data.summary.members?data.summary.cleanMembers/data.summary.members:0;const score=Math.round(largest*cleanRatio);const stars=Math.max(1,Math.min(5,Math.ceil(score/20)));return{score,stars:`${'★'.repeat(stars)}${'☆'.repeat(5-stars)}`}}
 function renderSituation(){const largest=[...data.clusters].sort((a,b)=>b.share-a.share)[0];const noisePct=data.summary.members?data.summary.noiseMembers/data.summary.members*100:0;const vibe=japanVibe(),conf=confidence();situationUpdated.textContent=formatInit(data.meta.init);const cards=[
-  ['最大シナリオ',largest?`${largest.id} ${largest.label}`:'—',largest?`${largest.share}% / ${largest.count} members`:''],
+  ['最大シナリオ',largest?`${largest.id} ${largest.label}`:'—',largest?`${largest.share}% / ${largest.count} members`:'' ],
   ['シナリオ数',String(data.summary.clusterCount),'物理的な進路群'],
   ['Noise率',`${noisePct.toFixed(1)}%`,`${data.summary.noiseMembers} / ${data.summary.members} members`],
   ['まとまり具合',conf.stars,`簡易スコア ${conf.score}/100`],
-  ['日本に来そうな予感',`${vibe.label} (${vibe.pct}%)`,'遊び指標・公式予報ではありません']
+  ['日本に来そうな予感',`${vibe.label} (${vibe.pct}%)`,'実験的な解析結果です。公式の発表ではありません。']
 ];
   situationCards.innerHTML=cards.map(([label,value,note],i)=>`<article class="situationCard ${i===4?'japanVibe':''}"><small>${label}</small><strong>${value}</strong><span>${note}</span></article>`).join('')
 }
