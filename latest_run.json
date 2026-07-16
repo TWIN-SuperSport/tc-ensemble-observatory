@@ -1,0 +1,7 @@
+{
+  "model": "GEFS",
+  "init": "2026071518",
+  "checkedAt": null,
+  "source": "NOAA Open Data / noaa-gefs-pds",
+  "status": "bootstrap"
+}
