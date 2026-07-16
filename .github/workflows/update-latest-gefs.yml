@@ -19,7 +19,7 @@ on:
 
 permissions:
   contents: write
-  pages: write
+  actions: write
 
 concurrency:
   group: update-gefs-analysis
@@ -73,9 +73,11 @@ jobs:
           PY
 
       - name: Commit completed analysis
+        id: commit
         run: |
           if git diff --quiet -- data.json latest_run.json history; then
             echo "No new complete GEFS analysis"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name "github-actions[bot]"
@@ -84,12 +86,10 @@ jobs:
           git commit -m "Update complete GEFS ensemble analysis"
           git pull --rebase
           git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
 
-      - name: Request GitHub Pages rebuild
+      - name: Dispatch GitHub Pages deployment
+        if: steps.commit.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          gh api --method POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "/repos/${{ github.repository }}/pages/builds"
+        run: gh workflow run pages.yml --ref main
