@@ -12,6 +12,7 @@ on:
   push:
     paths:
       - "scripts/build_gefs_data.py"
+      - "scripts/run_gefs_analysis.py"
       - "tracking_config.json"
       - "requirements.txt"
       - ".github/workflows/update-latest-gefs.yml"
@@ -43,16 +44,16 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run offline pipeline self-test
-        run: python scripts/build_gefs_data.py --self-test
+        run: python scripts/run_gefs_analysis.py --self-test
 
       - name: Build latest complete 31-member GEFS analysis
         env:
           GEFS_DOWNLOAD_WORKERS: "8"
         run: |
           if [ -n "${{ inputs.force_init }}" ]; then
-            python scripts/build_gefs_data.py --force-init "${{ inputs.force_init }}"
+            python scripts/run_gefs_analysis.py --force-init "${{ inputs.force_init }}"
           else
-            python scripts/build_gefs_data.py
+            python scripts/run_gefs_analysis.py
           fi
 
       - name: Validate generated site payload
