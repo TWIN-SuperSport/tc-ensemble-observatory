@@ -17,6 +17,7 @@ This is an **unofficial, experimental visualization** made for exploring weather
 - メンバー個別診断
 - 予報時間スライダー
 - モバイル対応
+- AI解析室（結論・検討経緯・未確定事項・使用素材）
 - 現在は合成デモデータを表示
 
 ## データ更新
@@ -43,13 +44,46 @@ member,fhour,lat,lon
 mslp_hpa,vmax_kt
 ```
 
+## AI解析室
+
+`analysis.html` は、人間向けダッシュボードへ全資料を詰め込まず、AIが複数ラン・複数モデル・スクリーンショットを比較して言語化するための別室です。
+
+ページ上部から順に以下を表示します。
+
+1. 解析の結論
+2. 結論に至った経緯
+3. 未確定事項と反証条件
+4. 使用素材の証拠カード
+
+解析セッション一覧は `analysis/index.json`、各セッション本体は `analysis/sessions/*.json` に保存します。過去セッションを上書きせず、新しいJSONを追加してindexの `latest` を更新します。
+
+素材画像はセッションJSONから相対パスで参照できます。画像だけでなく、対応する解析JSONや元データも `data` フィールドへ登録してください。
+
+```json
+{
+  "id": "A-01",
+  "title": "ECMWF 500hPa",
+  "role": "リッジ再建の確認",
+  "image": "../materials/ecmwf-500-f180.png",
+  "data": "../materials/ecmwf-500-f180.json",
+  "model": "ECMWF",
+  "validTime": "2026-07-31T00:00:00Z",
+  "tags": ["500hPa", "ridge-rebuild"]
+}
+```
+
+この構造により、同じvalid timeを予測した複数ランの比較、特定タグが初めて現れた時刻の検索、過去の分岐判断と実況の照合をGit履歴込みで行えます。
+
 ## ローカル確認
 
 ```bash
 python -m http.server 8000
 ```
 
-ブラウザで `http://localhost:8000/` を開きます。
+ブラウザで以下を開きます。
+
+- 観測所: `http://localhost:8000/`
+- AI解析室: `http://localhost:8000/analysis.html`
 
 ---
 

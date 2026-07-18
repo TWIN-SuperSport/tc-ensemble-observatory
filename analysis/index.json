@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "latest": "./analysis/sessions/2026-07-19-90w-branching.json",
+  "sessions": [
+    {
+      "id": "2026-07-19-90w-branching",
+      "label": "2026-07-19｜90W・後続擾乱・リッジ再建",
+      "path": "./analysis/sessions/2026-07-19-90w-branching.json",
+      "target": ["90W", "後続擾乱"],
+      "status": "provisional"
+    }
+  ]
+}

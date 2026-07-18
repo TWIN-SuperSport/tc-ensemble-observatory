@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI解析室 | 西太平洋台風進路予測観測所</title>
+<link rel="stylesheet" href="styles.css?v=20260719-analysis-room">
+<link rel="stylesheet" href="analysis-room.css?v=20260719-analysis-room">
+</head>
+<body>
+<header class="analysisHeader">
+  <div>
+    <p class="eyebrow">AI ANALYSIS ROOM</p>
+    <h1>AI解析室</h1>
+    <p class="tagline">複数ラン・複数モデル・画像資料を突き合わせ、結論と検討経緯を固定するための別室</p>
+    <p class="taglineEn">A machine-oriented evidence room for forecast comparison, reasoning summaries, and audit trails.</p>
+  </div>
+  <nav class="pageNav" aria-label="ページ移動">
+    <a href="./">観測所へ戻る</a>
+  </nav>
+</header>
+<main>
+  <section class="analysisToolbar" aria-label="解析セッション選択">
+    <label>解析セッション
+      <select id="sessionSelect"><option>読み込み中…</option></select>
+    </label>
+    <span id="loadStatus" class="updatedBadge">indexを読み込み中…</span>
+  </section>
+
+  <section id="analysisSummary" class="analysisSummary" aria-live="polite">
+    <div class="analysisTitleRow">
+      <div>
+        <p class="eyebrow">LATEST CONCLUSION</p>
+        <h2 id="analysisTitle">解析データを読み込み中…</h2>
+      </div>
+      <div class="confidenceBlock"><small>信頼度</small><strong id="confidence">—</strong></div>
+    </div>
+    <div id="analysisMeta" class="analysisMeta"></div>
+    <div class="conclusionBlock">
+      <h3>解析の結論</h3>
+      <div id="conclusion"></div>
+    </div>
+  </section>
+
+  <section class="reasoningPanel">
+    <div class="sectionHeading">
+      <div><p class="eyebrow">REASONING TRACE</p><h2>結論に至った経緯</h2></div>
+      <span>比較・検討順を保存</span>
+    </div>
+    <ol id="reasoningSteps" class="reasoningSteps"></ol>
+  </section>
+
+  <section class="uncertaintyGrid">
+    <article>
+      <p class="eyebrow">OPEN QUESTIONS</p>
+      <h2>未確定事項</h2>
+      <ul id="uncertainties"></ul>
+    </article>
+    <article>
+      <p class="eyebrow">FALSIFIERS</p>
+      <h2>結論を弱める条件</h2>
+      <ul id="falsifiers"></ul>
+    </article>
+  </section>
+
+  <section class="materialsPanel">
+    <div class="sectionHeading">
+      <div><p class="eyebrow">EVIDENCE MANIFEST</p><h2>使用素材</h2></div>
+      <span id="materialCount">0件</span>
+    </div>
+    <p class="materialIntro">文章が主役です。画像・JSON・外部資料は、結論の根拠を追跡するための証拠カードとして列挙します。</p>
+    <div id="materials" class="materialsGrid"></div>
+  </section>
+</main>
+<footer>Experimental, unofficial analysis • Not for operational or safety use</footer>
+<script src="analysis-room.js?v=20260719-analysis-room"></script>
+</body>
+</html>
