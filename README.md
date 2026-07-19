@@ -8,7 +8,15 @@
 
 This is an **unofficial, experimental visualization** made for exploring weather-model ensembles. For accurate forecasts and safety decisions, consult official information from JMA, JTWC, and the relevant national meteorological agencies.
 
-## 現在の状態
+## 現在の監視状態
+
+- JTWC ABPW: 90Wは消散し監視対象から除外
+- 西太平洋にほかの疑わしい領域なし（NO OTHER SUSPECT AREAS）
+- TCFAなし / JTWC警報なし
+- 90W個別監視を終了し、西太平洋全域の新規Invest監視モードへ移行
+- 90W監視時の進路データと解析セッションは履歴として保存
+
+## 実装済み機能
 
 - Raw spaghetti
 - Clustered scenarios

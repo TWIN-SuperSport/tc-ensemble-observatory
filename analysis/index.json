@@ -1,12 +1,25 @@
 {
   "schemaVersion": 1,
-  "latest": "./analysis/sessions/2026-07-19-90w-branching.json",
+  "latest": "./analysis/sessions/2026-07-19-90w-monitoring-ended.json",
   "sessions": [
+    {
+      "id": "2026-07-19-90w-monitoring-ended",
+      "label": "2026-07-19｜90W監視終了・新規Invest監視",
+      "path": "./analysis/sessions/2026-07-19-90w-monitoring-ended.json",
+      "target": [
+        "90W",
+        "新規Invest"
+      ],
+      "status": "monitoring-ended"
+    },
     {
       "id": "2026-07-19-90w-branching",
       "label": "2026-07-19｜90W・後続擾乱・リッジ再建",
       "path": "./analysis/sessions/2026-07-19-90w-branching.json",
-      "target": ["90W", "後続擾乱"],
+      "target": [
+        "90W",
+        "後続擾乱"
+      ],
       "status": "provisional"
     }
   ]

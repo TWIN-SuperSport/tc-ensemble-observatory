@@ -1,0 +1,13 @@
+.monitorStatus{margin:16px 0;padding:18px;border:1px solid #3f7b62;border-radius:16px;background:linear-gradient(135deg,rgba(16,57,49,.96),rgba(12,31,46,.96));box-shadow:0 14px 38px rgba(0,0,0,.18)}
+.monitorStatusHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.monitorStatusHeader h2{margin:.2rem 0 0;font-size:clamp(1.2rem,3vw,1.55rem)}
+.monitorStateBadge{display:inline-flex;align-items:center;min-height:34px;padding:6px 11px;border:1px solid #59b98e;border-radius:999px;background:#143f35;color:#bff7dc;font-size:.78rem;font-weight:800;white-space:nowrap}
+.monitorStateBadge::before{content:"";width:8px;height:8px;margin-right:7px;border-radius:50%;background:#6de2a3;box-shadow:0 0 0 4px rgba(109,226,163,.14)}
+.monitorConclusion{margin:.9rem 0;color:#f0fff8;font-size:1.02rem;line-height:1.75}
+.monitorSignals{display:flex;flex-wrap:wrap;gap:8px;margin:.85rem 0}
+.monitorSignals span{padding:7px 10px;border:1px solid #356a5a;border-radius:999px;background:rgba(8,31,31,.7);color:#d9f5e8;font-size:.76rem}
+.monitorSignals strong{color:#7ce8b5}
+.monitorMeta,.monitorNext{margin:.55rem 0;color:#b9d7cf;font-size:.8rem;line-height:1.6}
+.monitorStatus .analysisRoomLink{margin-top:.25rem;border-color:#3f8066;background:#164d3e;color:#e5fff4}
+.archivedRunNotice{margin:16px 0 0;padding:11px 14px;border:1px solid #6c5b36;border-radius:12px;background:#2a2419;color:#f5dfb6;font-size:.82rem;line-height:1.55}
+@media(max-width:800px){.monitorStatusHeader{flex-direction:column}.monitorStateBadge{align-self:flex-start}}
