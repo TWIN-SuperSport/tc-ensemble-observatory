@@ -5,6 +5,7 @@
 <title>西太平洋台風進路予測観測所</title>
 <link rel="stylesheet" href="styles.css?v=20260719-analysis-room">
 <link rel="stylesheet" href="target-layout.css?v=20260716-1748">
+<link rel="stylesheet" href="monitor-status.css?v=20260719-monitoring-ended">
 </head>
 <body>
 <header>
@@ -37,6 +38,27 @@
     <div class="disclaimerBody"><p id="discJa"></p><p id="discEn"></p></div>
     <div class="disclaimerActions"><button id="disclaimerDismiss" type="button" aria-expanded="true">わかりました / I understand</button></div>
   </section>
+  <section class="monitorStatus" aria-labelledby="monitorStatusTitle">
+    <div class="monitorStatusHeader">
+      <div>
+        <p class="eyebrow">ACTIVE MONITORING STATUS</p>
+        <h2 id="monitorStatusTitle">新規Invest監視モード</h2>
+      </div>
+      <span class="monitorStateBadge">監視継続中</span>
+    </div>
+    <p class="monitorConclusion">現在、JTWC監視対象（Invest）はありません。90Wの監視は終了しました。現在は西太平洋全域の新規Invest発生を監視しています。</p>
+    <div class="monitorSignals" aria-label="JTWC発表状況">
+      <span><strong>ABPW</strong> 90W DISSIPATED / NO OTHER SUSPECT AREAS</span>
+      <span><strong>TCFA</strong> なし</span>
+      <span><strong>JTWC警報</strong> なし</span>
+    </div>
+    <p class="monitorMeta">確認基準: JTWC ABPW 181800Z（有効期間 181800Z–190600Z JUL 2026）</p>
+    <p class="monitorNext">次の個別解析は、新規Invest掲載・TCFA発表・複数全球モデルによる同一擾乱の連続表現、または閉じた低層循環と深い対流の持続を確認した時点で開始します。</p>
+    <p><a class="analysisRoomLink" href="analysis.html">90W監視終了の解析記録を開く →</a></p>
+  </section>
+  <aside class="archivedRunNotice" aria-label="保存済み解析データについて">
+    以下の進路図は、90W監視時の保存済みGEFS解析データです。現在のJTWC監視対象を示すものではありません。
+  </aside>
   <section class="layout mapFirst">
     <div class="plotPanel">
       <div class="mapHeader">
