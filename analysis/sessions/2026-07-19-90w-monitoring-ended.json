@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "analysisId": "2026-07-19-90w-monitoring-ended",
+  "title": "90W監視終了・新規Invest監視モード移行",
+  "target": [
+    "90W",
+    "西太平洋全域",
+    "新規Invest"
+  ],
+  "generatedAt": "2026-07-19T11:12:00+09:00",
+  "status": "監視終了・全域監視へ移行",
+  "confidence": {
+    "label": "高",
+    "score": 0.96
+  },
+  "conclusion": [
+    "JTWC ABPWはInvest 90Wについて、対流域が消散し、今後24時間以内に顕著な熱帯低気圧へ発達する疑わしい領域ではなくなったと評価した。90WはJTWCの監視対象から除外された。",
+    "ABPWは90W以外についても「NO OTHER SUSPECT AREAS」としている。TCFAおよびJTWC熱帯低気圧警報も発表されていないため、90Wを初期渦とした発達・進路解析を終了する。",
+    "監視自体は終了せず、西太平洋全域を対象とする新規Invest監視モードへ移行する。7月下旬に別の後続擾乱が形成される可能性は、90W本体とは切り分けて継続評価する。"
+  ],
+  "reasoning": [
+    "90Wでは、深い対流と低層循環の組織化が持続せず、発達シナリオを支える実況側の根拠が弱まった。",
+    "JTWC ABPW 181800Zは、90Wが消散し、顕著な熱帯低気圧へ発達する疑わしい領域ではなくなったと明記した。",
+    "同じABPWで西太平洋にほかの疑わしい領域はないとされ、現時点で具体的に追跡すべき後続Investは存在しない。",
+    "90Wに対するTCFAおよびJTWC熱帯低気圧警報は発表されていない。これにより、90Wを初期渦に固定した個別解析の継続条件を満たさないと判断した。",
+    "過去のGFS・GEFS等が示した7月下旬シナリオは、90Wの消散によって同一初期渦としての連続性を失った。ただし別の低圧部が形成される仮説まで同時に棄却せず、盤面全体の監視へ切り替える。"
+  ],
+  "uncertainties": [
+    "7月下旬に新しい低圧部が形成されるか。",
+    "850hPa渦度と深い対流が持続的に結合する領域が現れるか。",
+    "新しい擾乱表現がGFS単独シナリオからECMWF・CMC・UKMOへ広がるか。",
+    "各アンサンブルで同一初期渦が連続して追跡され始めるか。",
+    "太平洋高気圧とsteering flowが、日本接近経路を形成する配置へ変化するか。"
+  ],
+  "falsifiers": [
+    "新しいInvestがJTWC ABPWへ掲載される。",
+    "西太平洋の新たな擾乱に対してTCFAが発表される。",
+    "複数の全球モデルが同一擾乱を複数ラン連続で解析する。",
+    "実況で閉じた低層循環と深い対流の持続的な結合が確認される。"
+  ],
+  "materials": [
+    {
+      "id": "E-01",
+      "title": "JTWC Significant Tropical Weather Advisory (ABPW)",
+      "type": "official-text-product",
+      "role": "90W消散・監視対象除外と、ほかの疑わしい領域がないことの確認",
+      "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
+      "validTime": "2026-07-18T18:00:00Z–2026-07-19T06:00:00Z",
+      "tags": [
+        "JTWC",
+        "ABPW",
+        "90W",
+        "dissipated",
+        "no-other-suspect-areas"
+      ]
+    },
+    {
+      "id": "E-02",
+      "title": "NWS Guam Tropical Cyclones",
+      "type": "official-status-page",
+      "role": "西太平洋に活動中の熱帯低気圧がないことの補助確認",
+      "sourceUrl": "https://www.weather.gov/gum/cyclones",
+      "validTime": "2026-07-19",
+      "tags": [
+        "NWS-Guam",
+        "active-cyclones",
+        "status"
+      ]
+    },
+    {
+      "id": "E-03",
+      "title": "90W監視時のGEFS進路データ",
+      "type": "ensemble-json",
+      "role": "終了した90W初期渦シナリオを履歴として保存",
+      "data": "../../data.json",
+      "model": "GEFS",
+      "tags": [
+        "90W",
+        "ensemble",
+        "archived-run"
+      ]
+    },
+    {
+      "id": "E-04",
+      "title": "90W進路分岐と後続擾乱の暫定評価",
+      "type": "analysis-session",
+      "role": "監視終了前の仮説と判断過程の参照",
+      "data": "./2026-07-19-90w-branching.json",
+      "tags": [
+        "analysis-history",
+        "branching",
+        "hypothesis-update"
+      ]
+    }
+  ]
+}
