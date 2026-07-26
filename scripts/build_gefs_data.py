@@ -15,6 +15,7 @@ import concurrent.futures
 import json
 import math
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -50,12 +51,165 @@ class TrackPoint:
     mslp_hpa: float
 
 
-def request(url: str, method: str = "GET", retries: int = 3) -> bytes:
+def normalize_storm_id(value: object) -> str:
+    return re.sub(r"[^A-Z0-9]", "", str(value or "").upper())
+
+
+def storm_aliases(config: dict) -> set[str]:
+    info = config.get("stormInfo", {})
+    values = [
+        config.get("storm"),
+        info.get("id"),
+        *info.get("aliases", []),
+        *config.get("seedResolver", {}).get("aliases", []),
+    ]
+    return {normalize_storm_id(value) for value in values if value}
+
+
+def parse_jtwc_abpw_seed(text: str, aliases: Iterable[str]) -> tuple[float, float, str] | None:
+    """Extract an Invest center from JTWC ABPW text.
+
+    The storm suffix is intentionally preserved. This lets a Central Pacific
+    Invest such as 92C remain the same tracked object after it crosses 180E,
+    instead of being silently relabeled as a guessed 92W.
+    """
+    normalized_aliases = {normalize_storm_id(value) for value in aliases}
+    for match in re.finditer(
+        r"\(INVEST\s+([0-9]{2}[A-Z])\).*?"
+        r"(?:PERSISTED|LOCATED)\s+NEAR\s+"
+        r"([0-9]+(?:\.[0-9]+)?)([NS])\s+"
+        r"([0-9]+(?:\.[0-9]+)?)([EW])",
+        text,
+        flags=re.IGNORECASE | re.DOTALL,
+    ):
+        storm_id, lat_raw, lat_hemi, lon_raw, lon_hemi = match.groups()
+        if normalize_storm_id(storm_id) not in normalized_aliases:
+            continue
+        lat = float(lat_raw) * (-1 if lat_hemi.upper() == "S" else 1)
+        lon = float(lon_raw)
+        if lon_hemi.upper() == "W":
+            lon = (360.0 - lon) % 360.0
+        return lat, lon % 360.0, normalize_storm_id(storm_id)
+    return None
+
+
+def previous_forecast_seed(
+    previous: dict,
+    init: datetime,
+    aliases: set[str],
+    max_hours: int,
+) -> tuple[float, float] | None:
+    previous_meta = previous.get("meta", {})
+    previous_aliases = {
+        normalize_storm_id(previous_meta.get("storm")),
+        normalize_storm_id(previous_meta.get("stormInfo", {}).get("id")),
+        *{
+            normalize_storm_id(value)
+            for value in previous_meta.get("stormInfo", {}).get("aliases", [])
+        },
+    }
+    if not aliases.intersection(previous_aliases):
+        return None
+    try:
+        previous_init = datetime.strptime(
+            str(previous_meta["init"]), "%Y%m%d%H"
+        ).replace(tzinfo=timezone.utc)
+    except (KeyError, TypeError, ValueError):
+        return None
+    elapsed = int((init - previous_init).total_seconds() // 3600)
+    if elapsed < 0 or elapsed > max_hours:
+        return None
+    clean_points = []
+    for track in previous.get("tracks", []):
+        if track.get("cluster") == "NOISE":
+            continue
+        point = next(
+            (item for item in track.get("points", []) if int(item.get("fhour", -1)) == elapsed),
+            None,
+        )
+        if point:
+            clean_points.append(point)
+    if not clean_points:
+        return None
+    lat = float(np.median([point["lat"] for point in clean_points]))
+    lon_radians = np.unwrap(np.radians([point["lon"] for point in clean_points]))
+    lon = float(np.degrees(np.median(lon_radians)) % 360.0)
+    return lat, lon
+
+
+def resolve_tracking_seed(config: dict, previous: dict, init: datetime) -> dict:
+    resolved = json.loads(json.dumps(config))
+    resolver = resolved.get("seedResolver", {})
+    fallback = resolved["seed"]
+    resolution = {
+        "lat": float(fallback["lat"]),
+        "lon": float(fallback["lon"]) % 360.0,
+        "source": "tracking_config",
+    }
+    if not resolver.get("enabled", False):
+        resolved["seed"] = {"lat": resolution["lat"], "lon": resolution["lon"]}
+        resolved["_seedResolution"] = resolution
+        return resolved
+
+    aliases = storm_aliases(resolved)
+    official_url = resolver.get("officialUrl")
+    if official_url:
+        try:
+            bulletin = request(str(official_url)).decode("utf-8", errors="replace")
+            official = parse_jtwc_abpw_seed(bulletin, aliases)
+            if official:
+                lat, lon, storm_id = official
+                resolution = {
+                    "lat": lat,
+                    "lon": lon,
+                    "source": "JTWC ABPW",
+                    "sourceStormId": storm_id,
+                    "sourceUrl": official_url,
+                }
+        except RuntimeError as exc:
+            print(f"Official seed lookup unavailable: {exc}", file=sys.stderr)
+
+    if resolution["source"] == "tracking_config":
+        prior = previous_forecast_seed(
+            previous,
+            init,
+            aliases,
+            int(resolver.get("previousForecastFallbackHours", 24)),
+        )
+        if prior:
+            resolution = {
+                "lat": prior[0],
+                "lon": prior[1],
+                "source": "previous GEFS ensemble median",
+            }
+
+    resolved["seed"] = {
+        "lat": round(float(resolution["lat"]), 2),
+        "lon": round(float(resolution["lon"]) % 360.0, 2),
+    }
+    resolved["_seedResolution"] = resolution
+    print(
+        "Tracking seed: "
+        f"{resolved['seed']['lat']:.2f}, {resolved['seed']['lon']:.2f} "
+        f"({resolution['source']})",
+        flush=True,
+    )
+    return resolved
+
+
+def request(
+    url: str,
+    method: str = "GET",
+    retries: int = 5,
+    headers: dict[str, str] | None = None,
+    timeout: int = TIMEOUT,
+) -> bytes:
     last: Exception | None = None
     for attempt in range(retries):
-        req = urllib.request.Request(url, method=method, headers={"User-Agent": USER_AGENT})
+        request_headers = {"User-Agent": USER_AGENT, **(headers or {})}
+        req = urllib.request.Request(url, method=method, headers=request_headers)
         try:
-            with urllib.request.urlopen(req, timeout=TIMEOUT) as response:
+            with urllib.request.urlopen(req, timeout=timeout) as response:
                 return response.read()
         except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
             last = exc
@@ -63,7 +217,7 @@ def request(url: str, method: str = "GET", retries: int = 3) -> bytes:
                 break
             if attempt + 1 < retries:
                 import time
-                time.sleep(2 ** attempt)
+                time.sleep(min(20, 2 ** attempt))
     raise RuntimeError(f"request failed: {url}: {last}")
 
 
@@ -122,6 +276,34 @@ def filter_url(init: datetime, member: str, fhour: int, box: dict[str, float]) -
         "dir": directory,
     }
     return NOMADS_FILTER + "?" + urllib.parse.urlencode(params)
+
+
+def s3_prmsl_blob(init: datetime, member: str, fhour: int) -> bytes:
+    """Fetch PRMSL directly from NOAA S3 using the GRIB index byte offset."""
+    index_url = idx_url(init, member, fhour)
+    index_text = request(index_url).decode("utf-8", errors="replace")
+    lines = index_text.splitlines()
+    for index, line in enumerate(lines):
+        if ":PRMSL:mean sea level:" not in line:
+            continue
+        fields = line.split(":", 2)
+        if len(fields) < 3:
+            break
+        start = int(fields[1])
+        end = None
+        if index + 1 < len(lines):
+            next_fields = lines[index + 1].split(":", 2)
+            if len(next_fields) >= 2:
+                end = int(next_fields[1]) - 1
+        byte_range = f"bytes={start}-{end if end is not None else ''}"
+        data_url = index_url.removesuffix(".idx")
+        blob = request(data_url, headers={"Range": byte_range})
+        if len(blob) < 100:
+            raise RuntimeError(
+                f"Suspiciously small S3 GRIB range for {member} f{fhour:03d}"
+            )
+        return blob
+    raise RuntimeError(f"PRMSL offset missing from {index_url}")
 
 
 def decode_prmsl(blob: bytes) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -183,7 +365,17 @@ def select_minimum(
 
 def download_one(args: tuple[datetime, str, int, dict[str, float]]) -> tuple[str, int, bytes]:
     init, member, fhour, box = args
-    blob = request(filter_url(init, member, fhour, box))
+    if os.environ.get("GEFS_DOWNLOAD_SOURCE", "").lower() == "s3":
+        return member, fhour, s3_prmsl_blob(init, member, fhour)
+    try:
+        blob = request(filter_url(init, member, fhour, box), retries=2, timeout=25)
+    except RuntimeError as nomads_error:
+        print(
+            f"NOMADS fallback to NOAA S3: {member} f{fhour:03d}: {nomads_error}",
+            file=sys.stderr,
+            flush=True,
+        )
+        blob = s3_prmsl_blob(init, member, fhour)
     if len(blob) < 100:
         raise RuntimeError(f"Suspiciously small GRIB response for {member} f{fhour:03d}")
     return member, fhour, blob
@@ -330,6 +522,9 @@ def build_payload(init: datetime, config: dict, tracks: dict[str, list[TrackPoin
         "generatedFrom": "NOAA GEFS PRMSL experimental tracker",
         "stormInfo": config.get("stormInfo", meta.get("stormInfo", {})),
         "trackingSeed": config["seed"],
+        "trackingSeedSource": config.get("_seedResolution", {}).get(
+            "source", "tracking_config"
+        ),
     })
     return {
         "meta": meta,
@@ -374,13 +569,32 @@ def write_atomically(payload: dict, init: datetime) -> None:
 
 
 def self_test() -> None:
+    sample_abpw = """
+    THE AREA OF CONVECTION (INVEST 92C) HAS PERSISTED NEAR
+    12.7N 179.8E, APPROXIMATELY 597 NM NORTHEAST OF MAJURO.
+    """
+    assert parse_jtwc_abpw_seed(sample_abpw, {"92C"}) == (12.7, 179.8, "92C")
+    sample_west = """
+    THE AREA OF CONVECTION (INVEST 92C) HAS PERSISTED NEAR
+    13.0N 179.5W, APPROXIMATELY 600 NM NORTHEAST OF MAJURO.
+    """
+    assert parse_jtwc_abpw_seed(sample_west, {"CP92", "92C"}) == (13.0, 180.5, "92C")
     base = [TrackPoint(h, 8 + h / 24, 160 - h / 80, 1007 - h / 40) for h in FORECAST_HOURS]
     tracks = {}
     for i, member in enumerate(MEMBERS):
         tracks[member] = [TrackPoint(p.fhour, p.lat + (i % 5) * 0.15, p.lon + (i % 3) * 0.1, p.mslp_hpa) for p in base]
     tracks["p30"] = [TrackPoint(p.fhour, p.lat, p.lon if p.fhour < 120 else p.lon + 30, p.mslp_hpa) for p in base]
     previous = {"meta": {}, "disclaimer": {"ja": "test", "en": "test"}}
-    config = {"seed": {"lat": 8, "lon": 160}, "storm": "WP90", "stormInfo": {"id": "90W", "candidateNumber": 11}, "clusterThresholdKm": 650}
+    config = {
+        "seed": {"lat": 12.7, "lon": 179.8},
+        "storm": "CP92",
+        "stormInfo": {
+            "id": "92C",
+            "aliases": ["CP92", "92C"],
+            "candidateNumber": 13,
+        },
+        "clusterThresholdKm": 650,
+    }
     init = datetime(2026, 7, 16, 0, tzinfo=timezone.utc)
     payload = build_payload(init, config, tracks, previous)
     validate(payload, "2026071600")
@@ -405,10 +619,16 @@ def main() -> int:
     )
     init_string = init.strftime("%Y%m%d%H")
     if previous.get("meta", {}).get("init") == init_string and previous.get("summary", {}).get("members") == 31:
-        print(f"data.json already contains complete run {init_string}")
-        return 0
+        previous_id = normalize_storm_id(
+            previous.get("meta", {}).get("stormInfo", {}).get("id")
+        )
+        configured_id = normalize_storm_id(config.get("stormInfo", {}).get("id"))
+        if previous_id == configured_id:
+            print(f"data.json already contains complete run {init_string}")
+            return 0
 
     print(f"Building GEFS analysis for {init_string}")
+    config = resolve_tracking_seed(config, previous, init)
     tracks = build_tracks(init, config)
     payload = build_payload(init, config, tracks, previous)
     validate(payload, init_string)

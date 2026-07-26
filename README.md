@@ -10,11 +10,19 @@ This is an **unofficial, experimental visualization** made for exploring weather
 
 ## 現在の監視状態
 
-- JTWC ABPW: 90Wは消散し監視対象から除外
-- 西太平洋にほかの疑わしい領域なし（NO OTHER SUSPECT AREAS）
-- TCFAなし / JTWC警報なし
-- 90W個別監視を終了し、西太平洋全域の新規Invest監視モードへ移行
+- 対象: Invest 92C（台風13号候補・暫定表記）
+- CPHC/NHCの `CP92` とJTWCの `92C` を同一の循環として追跡
+- 2026年7月26日18Z、JTWC ABPWへ西太平洋の監視対象として移管
+- JTWC評価: 発達可能性 `HIGH`、TCFA発表済み
 - 90W監視時の進路データと解析セッションは履歴として保存
+
+### 海盆をまたぐInvestの扱い
+
+Invest番号の末尾は海盆を表すため、日付変更線を越えても `92C` を
+機械的に `92W` へ置換しません。自動解析はJTWC ABPWから対象IDの最新座標を
+取得し、取得できない場合だけ前回GEFS解析の同一時刻アンサンブル中央値へ
+フォールバックします。これにより、公式機関の移管・改番を表示上の別擾乱と
+誤認しにくくしています。
 
 ## 実装済み機能
 
@@ -36,7 +44,7 @@ This is an **unofficial, experimental visualization** made for exploring weather
 python tools/scripts/build_scenario_site.py tracks.csv \
   --site-dir . \
   --init 2026071518 \
-  --storm WP90 \
+  --storm CP92 \
   --model GEFS
 ```
 

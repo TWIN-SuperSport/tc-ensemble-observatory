@@ -1,7 +1,18 @@
 {
   "schemaVersion": 1,
-  "latest": "./analysis/sessions/2026-07-19-90w-monitoring-ended.json",
+  "latest": "./analysis/sessions/2026-07-27-92c-cross-basin-monitoring.json",
   "sessions": [
+    {
+      "id": "2026-07-27-92c-cross-basin-monitoring",
+      "label": "2026-07-27｜92C越境・個別監視開始",
+      "path": "./analysis/sessions/2026-07-27-92c-cross-basin-monitoring.json",
+      "target": [
+        "92C",
+        "CP92",
+        "台風13号候補"
+      ],
+      "status": "active-monitoring"
+    },
     {
       "id": "2026-07-19-90w-monitoring-ended",
       "label": "2026-07-19｜90W監視終了・新規Invest監視",

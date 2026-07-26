@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "analysisId": "2026-07-27-92c-cross-basin-monitoring",
+  "title": "92C越境・台風13号候補の個別監視開始",
+  "target": [
+    "92C",
+    "CP92",
+    "台風13号候補",
+    "日付変更線越境"
+  ],
+  "generatedAt": "2026-07-27T03:00:00+09:00",
+  "status": "個別監視中",
+  "confidence": {
+    "label": "高",
+    "score": 0.95
+  },
+  "conclusion": [
+    "中部太平洋でCP92 / Invest 92Cとして追跡されていた循環が日付変更線を越え、西太平洋へ移管された。",
+    "JTWC ABPW 261800Zは92Cを12.7N 179.8E、中心気圧約1004hPaと解析し、24時間以内の顕著な熱帯低気圧への発達可能性をHIGHとしている。",
+    "90Wとは別の循環である。観測所の個別監視対象を92Cへ切り替え、海盆接尾辞を機械的にWへ置換せず位置の連続性を保って追跡する。",
+    "台風13号という表記は現時点では候補番号であり、気象庁の正式な台風番号ではない。"
+  ],
+  "reasoning": [
+    "CPHC/NHCは92Cについて、日付変更線を越えて西太平洋へ入るため同機関からのTropical Weather Outlookを終了し、今後はJTWCおよびJMAの情報を参照するよう案内した。",
+    "JTWCは同じ92CをABPWへ移管し、深い対流の集約、低鉛直シア、上層流出、28〜29℃の海面水温を発達に好適な条件として挙げた。",
+    "従来の自動解析設定はWP90 / 90Wと古い固定シードを保持しており、最新GEFSを取得しても92Cではない低圧部へtracker jumpする原因になっていた。",
+    "設定をCP92 / 92Cへ更新し、JTWC ABPWの公式座標を優先、取得不能時は前回GEFSの同一循環へフォールバックする構成へ変更した。"
+  ],
+  "uncertainties": [
+    "JTWC警報開始時の熱帯低気圧番号と、気象庁が台風へ発達した場合に付与する正式番号は未確定。",
+    "GEFSの海面更正気圧最小値トラッカーは、複数の低圧部が近接する場合に中心を飛び移る可能性がある。",
+    "発達強度・転向時刻・日本への接近経路は、決定論モデルとアンサンブルの更新ごとに再評価が必要。"
+  ],
+  "falsifiers": [
+    "深い対流と閉じた低層循環の結合が失われ、JTWCが92Cを監視対象から除外する。",
+    "公式解析で92Cとは別の循環が主役となり、位置・時刻の連続性が成立しなくなる。",
+    "複数全球モデルと各アンサンブルで、同一初期渦の追跡が継続しなくなる。"
+  ],
+  "materials": [
+    {
+      "id": "A-01",
+      "title": "JTWC Significant Tropical Weather Advisory",
+      "type": "text",
+      "role": "92Cの西太平洋移管、位置、環境、HIGH評価、TCFAの確認",
+      "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
+      "validTime": "2026-07-26T18:00:00Z",
+      "tags": [
+        "JTWC",
+        "ABPW",
+        "92C",
+        "TCFA"
+      ]
+    },
+    {
+      "id": "A-02",
+      "title": "Central Pacific Tropical Weather Outlook",
+      "type": "text",
+      "role": "CP92の日付変更線越境と西太平洋への公式移管確認",
+      "sourceUrl": "https://www.nhc.noaa.gov/text/HFOTWOCP.shtml",
+      "validTime": "2026-07-26T17:22:00Z",
+      "tags": [
+        "CPHC",
+        "NHC",
+        "CP92",
+        "basin-crossing"
+      ]
+    }
+  ]
+}

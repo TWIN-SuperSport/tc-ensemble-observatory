@@ -1,13 +1,29 @@
 {
-  "storm": "WP90",
+  "storm": "CP92",
   "stormInfo": {
-    "id": "90W",
+    "id": "92C",
     "status": "invest",
-    "candidateNumber": 12
+    "candidateNumber": 13,
+    "candidateNumberStatus": "provisional",
+    "originBasin": "CPAC",
+    "currentBasin": "WPAC",
+    "aliases": [
+      "CP92",
+      "92C"
+    ],
+    "continuity": "Central Pacific to Western Pacific"
   },
   "seed": {
-    "lat": 4.9,
-    "lon": 152.2
+    "lat": 12.7,
+    "lon": 179.8
+  },
+  "seedResolver": {
+    "enabled": true,
+    "officialUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
+    "aliases": [
+      "92C"
+    ],
+    "previousForecastFallbackHours": 24
   },
   "domain": {
     "leftlon": 105,
