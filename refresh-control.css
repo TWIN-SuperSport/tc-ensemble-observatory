@@ -1,0 +1,66 @@
+header {
+  display: block;
+  padding-top: 8px;
+}
+
+.utilityBar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 7px;
+}
+
+.refreshButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(17, 29, 46, 0.78);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.refreshButton span {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.refreshButton:hover {
+  border-color: var(--accent);
+  color: var(--text);
+  background: #163754;
+}
+
+.refreshButton:active {
+  transform: translateY(1px);
+}
+
+.refreshButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.headerLayout {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: end;
+}
+
+@media (max-width: 800px) {
+  .refreshButton {
+    min-height: 30px;
+  }
+
+  .headerLayout {
+    align-items: start;
+    flex-direction: column;
+  }
+}
