@@ -3,32 +3,41 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>西太平洋台風進路予測観測所</title>
-<link rel="stylesheet" href="styles.css?v=20260719-analysis-room">
+<link rel="stylesheet" href="styles.css?v=20260727-refresh">
+<link rel="stylesheet" href="refresh-control.css?v=20260727">
 <link rel="stylesheet" href="target-layout.css?v=20260716-1748">
 <link rel="stylesheet" href="monitor-status.css?v=20260719-monitoring-ended">
 </head>
 <body>
 <header>
-  <div>
-    <p class="eyebrow">EXPERIMENTAL MODEL PLAYGROUND</p>
-    <h1 id="title">西太平洋台風進路予測観測所</h1>
-    <p class="tagline">アンサンブル予測を「世界線」に分解して観察する実験的解析サイト</p>
-    <p class="taglineEn">An experimental viewer that decomposes ensemble forecasts into plausible scenarios.</p>
-    <p id="subtitle"></p>
-    <p><a class="analysisRoomLink" href="analysis.html">AI解析室を開く →</a></p>
+  <div class="utilityBar">
+    <button id="refreshButton" class="refreshButton" type="button" aria-label="最新データに更新">
+      <span aria-hidden="true">↻</span>
+      更新
+    </button>
   </div>
-  <div class="controls">
-    <label>表示モード / View
-      <select id="view">
-        <option value="clustered">シナリオ別 / Clustered scenarios</option>
-        <option value="raw">全進路 / Raw spaghetti</option>
-        <option value="noise">ノイズ診断 / Noise diagnostics</option>
-      </select>
-    </label>
-    <label>表示する予報時刻 / Forecast hour
-      <input id="hour" type="range" min="0" max="240" step="6" value="240">
-      <span id="hourLabel">+240h</span>
-    </label>
+  <div class="headerLayout">
+    <div>
+      <p class="eyebrow">EXPERIMENTAL MODEL PLAYGROUND</p>
+      <h1 id="title">西太平洋台風進路予測観測所</h1>
+      <p class="tagline">アンサンブル予測を「世界線」に分解して観察する実験的解析サイト</p>
+      <p class="taglineEn">An experimental viewer that decomposes ensemble forecasts into plausible scenarios.</p>
+      <p id="subtitle"></p>
+      <p><a class="analysisRoomLink" href="analysis.html">AI解析室を開く →</a></p>
+    </div>
+    <div class="controls">
+      <label>表示モード / View
+        <select id="view">
+          <option value="clustered">シナリオ別 / Clustered scenarios</option>
+          <option value="raw">全進路 / Raw spaghetti</option>
+          <option value="noise">ノイズ診断 / Noise diagnostics</option>
+        </select>
+      </label>
+      <label>表示する予報時刻 / Forecast hour
+        <input id="hour" type="range" min="0" max="240" step="6" value="240">
+        <span id="hourLabel">+240h</span>
+      </label>
+    </div>
   </div>
 </header>
 <main>
@@ -87,5 +96,6 @@
   <section><h2>What this view does</h2><div class="explain"><div><b>1. Preserve uncertainty</b><span>Tracks are not forced into one artificial average.</span></div><div><b>2. Separate scenarios</b><span>Physically similar paths are grouped and given representative median tracks.</span></div><div><b>3. Quarantine noise</b><span>Likely tracker jumps are displayed separately instead of silently deleted.</span></div></div></section>
 </main>
 <footer>Experimental, unofficial analysis • Not for operational or safety use</footer>
-<script src="app-20260716-1748.js"></script>
+<script src="app-20260716-1748.js?v=20260727-refresh"></script>
+<script src="refresh-control.js?v=20260727"></script>
 </body></html>
