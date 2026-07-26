@@ -49,7 +49,7 @@ jobs:
 
       - name: Build latest complete 31-member GEFS analysis
         env:
-          GEFS_DOWNLOAD_WORKERS: "8"
+          GEFS_DOWNLOAD_WORKERS: "4"
         run: |
           if [ -n "${{ inputs.force_init }}" ]; then
             python scripts/run_gefs_analysis.py --force-init "${{ inputs.force_init }}"
