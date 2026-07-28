@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>西太平洋台風進路予測観測所</title>
-<link rel="stylesheet" href="styles.css?v=20260728-group-filter">
+<link rel="stylesheet" href="styles.css?v=20260729-run-archive">
 <link rel="stylesheet" href="refresh-control.css?v=20260727">
 <link rel="stylesheet" href="target-layout.css?v=20260716-1748">
 <link rel="stylesheet" href="monitor-status.css?v=20260719-monitoring-ended">
@@ -26,6 +26,11 @@
       <p><a class="analysisRoomLink" href="analysis.html">AI解析室を開く →</a></p>
     </div>
     <div class="controls">
+      <label>解析ラン / Archived run
+        <select id="runSelector" aria-label="表示するGEFS解析ラン">
+          <option value="./data.json">最新ランを読み込み中…</option>
+        </select>
+      </label>
       <label>表示モード / View
         <select id="view">
           <option value="clustered">シナリオ別 / Clustered scenarios</option>
@@ -66,7 +71,7 @@
     <p><a class="analysisRoomLink" href="analysis.html">92C越境監視の解析記録を開く →</a></p>
   </section>
   <aside class="archivedRunNotice" aria-label="保存済み解析データについて">
-    進路図はGEFS海面更正気圧の実験的トラッカーです。92Cの公式進路予報ではなく、中心の飛び移りはNoiseとして分離します。
+    解析ラン選択から過去のGEFS世界線を再表示できます。進路図はGEFS海面更正気圧の実験的トラッカーであり、公式進路予報ではありません。
   </aside>
   <section class="layout mapFirst">
     <div class="plotPanel">
@@ -97,6 +102,6 @@
   <section><h2>What this view does</h2><div class="explain"><div><b>1. Preserve uncertainty</b><span>Tracks are not forced into one artificial average.</span></div><div><b>2. Separate scenarios</b><span>Physically similar paths are grouped and given representative median tracks.</span></div><div><b>3. Quarantine noise</b><span>Likely tracker jumps are displayed separately instead of silently deleted.</span></div></div></section>
 </main>
 <footer>Experimental, unofficial analysis • Not for operational or safety use</footer>
-<script src="app.js?v=20260728-group-filter"></script>
+<script src="app.js?v=20260729-run-archive"></script>
 <script src="refresh-control.js?v=20260727"></script>
 </body></html>

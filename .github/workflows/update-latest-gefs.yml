@@ -64,11 +64,15 @@ jobs:
           from pathlib import Path
           data = json.loads(Path('data.json').read_text())
           latest = json.loads(Path('latest_run.json').read_text())
+          history_index = json.loads(Path('history/index.json').read_text())
           assert data['summary']['members'] == 31
           assert len(data['tracks']) == 31
           assert data['meta']['init'] == latest['init']
           assert latest['status'] == 'analysis_complete'
           assert Path('history', latest['init'] + '.json').exists()
+          assert history_index['latest'] == latest['init']
+          assert history_index['runCount'] == len(history_index['runs'])
+          assert any(run['init'] == latest['init'] for run in history_index['runs'])
           print('Validated init', latest['init'])
           PY
 

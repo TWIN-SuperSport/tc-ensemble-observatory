@@ -29,6 +29,7 @@ from typing import Iterable
 
 import numpy as np
 from eccodes import codes_get, codes_get_array, codes_new_from_message, codes_release
+from history_index import write_history_index
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "data.json"
@@ -562,6 +563,7 @@ def write_atomically(payload: dict, init: datetime) -> None:
     HISTORY_DIR.mkdir(exist_ok=True)
     archive = HISTORY_DIR / f"{init.strftime('%Y%m%d%H')}.json"
     archive.write_text(text, encoding="utf-8")
+    write_history_index(HISTORY_DIR)
     with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=ROOT, delete=False) as tmp:
         tmp.write(text)
         temp_path = Path(tmp.name)
