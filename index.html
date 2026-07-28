@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>西太平洋台風進路予測観測所</title>
-<link rel="stylesheet" href="styles.css?v=20260727-refresh">
+<link rel="stylesheet" href="styles.css?v=20260728-group-filter">
 <link rel="stylesheet" href="refresh-control.css?v=20260727">
 <link rel="stylesheet" href="target-layout.css?v=20260716-1748">
 <link rel="stylesheet" href="monitor-status.css?v=20260719-monitoring-ended">
@@ -78,9 +78,10 @@
         </div>
         <div class="mapStatusBlock"><strong>進路シナリオ地図</strong><span id="mapStatus">海岸線を読み込み中…</span></div>
       </div>
+      <div id="activeScenarioFilter" class="activeScenarioFilter" aria-live="polite"></div>
       <svg id="plot" viewBox="0 0 900 560" role="img" aria-label="Western Pacific ensemble tracks over a geographic basemap"></svg>
       <div class="legend" id="legend"></div>
-      <p class="mapHint">線をタップすると、そのメンバーの判定と最新位置を確認できます。</p>
+      <p class="mapHint">Scenario groupをタップすると、そのグループだけに絞れます。線をタップすると、メンバーの判定と最新位置を確認できます。</p>
     </div>
     <aside><h2>Scenario groups</h2><div id="clusters"></div><h2>Selected member</h2><div id="detail" class="detail">地図上の線をタップしてください。</div></aside>
   </section>
@@ -96,6 +97,6 @@
   <section><h2>What this view does</h2><div class="explain"><div><b>1. Preserve uncertainty</b><span>Tracks are not forced into one artificial average.</span></div><div><b>2. Separate scenarios</b><span>Physically similar paths are grouped and given representative median tracks.</span></div><div><b>3. Quarantine noise</b><span>Likely tracker jumps are displayed separately instead of silently deleted.</span></div></div></section>
 </main>
 <footer>Experimental, unofficial analysis • Not for operational or safety use</footer>
-<script src="app-20260716-1748.js?v=20260727-refresh"></script>
+<script src="app.js?v=20260728-group-filter"></script>
 <script src="refresh-control.js?v=20260727"></script>
 </body></html>
