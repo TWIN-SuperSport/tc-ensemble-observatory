@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>西太平洋台風進路予測観測所</title>
-<link rel="stylesheet" href="styles.css?v=20260729-run-archive">
+<link rel="stylesheet" href="styles.css?v=20260730-map-hour-slider">
 <link rel="stylesheet" href="refresh-control.css?v=20260727">
 <link rel="stylesheet" href="target-layout.css?v=20260716-1748">
 <link rel="stylesheet" href="monitor-status.css?v=20260719-monitoring-ended">
@@ -37,10 +37,6 @@
           <option value="raw">全進路 / Raw spaghetti</option>
           <option value="noise">ノイズ診断 / Noise diagnostics</option>
         </select>
-      </label>
-      <label>表示する予報時刻 / Forecast hour
-        <input id="hour" type="range" min="0" max="240" step="6" value="240">
-        <span id="hourLabel">+240h</span>
       </label>
     </div>
   </div>
@@ -85,6 +81,13 @@
       </div>
       <div id="activeScenarioFilter" class="activeScenarioFilter" aria-live="polite"></div>
       <svg id="plot" viewBox="0 0 900 560" role="img" aria-label="Western Pacific ensemble tracks over a geographic basemap"></svg>
+      <label class="forecastTimeControl" for="hour">
+        <span class="forecastTimeHeader">
+          <span>表示する予報時刻 / Forecast hour</span>
+          <output id="hourLabel" for="hour">+240h</output>
+        </span>
+        <input id="hour" type="range" min="0" max="240" step="6" value="240">
+      </label>
       <div class="legend" id="legend"></div>
       <p class="mapHint">Scenario groupをタップすると、そのグループだけに絞れます。線をタップすると、メンバーの判定と最新位置を確認できます。</p>
     </div>
