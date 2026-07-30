@@ -2,7 +2,12 @@ name: Update GEFS analysis
 
 on:
   schedule:
-    - cron: "37 * * * *"
+    # Primary check near the usual +240h publication time for each
+    # 00/06/12/18Z GEFS cycle.
+    - cron: "37 5,11,17,23 * * *"
+    # Low-cost fallback retry 30 minutes later. The pipeline exits without
+    # downloading fields when the completed cycle is already in data.json.
+    - cron: "7 0,6,12,18 * * *"
   workflow_dispatch:
     inputs:
       force_init:
@@ -10,6 +15,8 @@ on:
         required: false
         type: string
   push:
+    branches:
+      - "main"
     paths:
       - "scripts/build_gefs_data.py"
       - "scripts/run_gefs_analysis.py"
