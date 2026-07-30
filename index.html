@@ -4,13 +4,14 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>西太平洋台風進路予測観測所</title>
 <link rel="stylesheet" href="styles.css?v=20260730-map-hour-slider">
-<link rel="stylesheet" href="refresh-control.css?v=20260727">
+<link rel="stylesheet" href="refresh-control.css?v=20260730-last-updated">
 <link rel="stylesheet" href="target-layout.css?v=20260716-1748">
 <link rel="stylesheet" href="monitor-status.css?v=20260719-monitoring-ended">
 </head>
 <body>
 <header>
   <div class="utilityBar">
+    <time id="lastUpdated" class="lastUpdated" aria-live="polite">最終更新: 確認中…</time>
     <button id="refreshButton" class="refreshButton" type="button" aria-label="最新データに更新">
       <span aria-hidden="true">↻</span>
       更新
@@ -105,6 +106,6 @@
   <section><h2>What this view does</h2><div class="explain"><div><b>1. Preserve uncertainty</b><span>Tracks are not forced into one artificial average.</span></div><div><b>2. Separate scenarios</b><span>Physically similar paths are grouped and given representative median tracks.</span></div><div><b>3. Quarantine noise</b><span>Likely tracker jumps are displayed separately instead of silently deleted.</span></div></div></section>
 </main>
 <footer>Experimental, unofficial analysis • Not for operational or safety use</footer>
-<script src="app.js?v=20260729-run-archive"></script>
+<script src="app.js?v=20260730-last-updated"></script>
 <script src="refresh-control.js?v=20260727"></script>
 </body></html>
