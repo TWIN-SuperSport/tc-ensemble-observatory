@@ -5,12 +5,21 @@ header {
 
 .utilityBar {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 7px;
+}
+
+.lastUpdated {
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.35;
 }
 
 .refreshButton {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   gap: 5px;
@@ -55,6 +64,10 @@ header {
 }
 
 @media (max-width: 800px) {
+  .lastUpdated {
+    font-size: 0.68rem;
+  }
+
   .refreshButton {
     min-height: 30px;
   }
