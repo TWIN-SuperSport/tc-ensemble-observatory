@@ -19,6 +19,7 @@ import re
 import shutil
 import sys
 import tempfile
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -67,6 +68,36 @@ def storm_aliases(config: dict) -> set[str]:
     return {normalize_storm_id(value) for value in values if value}
 
 
+def matches_storm_alias(storm_id: str, storm_name: str | None, aliases: set[str]) -> bool:
+    """Return whether a JTWC bulletin identity belongs to this tracked storm."""
+    candidates = {normalize_storm_id(storm_id), normalize_storm_id(storm_name)}
+    return bool(candidates.intersection(aliases))
+
+
+def parse_jtwc_named_seed(text: str, aliases: Iterable[str]) -> tuple[float, float, str] | None:
+    """Extract a named cyclone center from a JTWC warning or ABPW summary."""
+    normalized_aliases = {normalize_storm_id(value) for value in aliases}
+    pattern = re.compile(
+        r"(?:SUPER\s+)?(?:TYPHOON|TROPICAL\s+STORM|TROPICAL\s+DEPRESSION)\s+"
+        r"([0-9]{2}[A-Z])\s+\(([^)]+)\).*?"
+        r"(?:WARNING\s+POSITION:\s*(?:[0-9]{6}Z\s+---\s*)?"
+        r"|WAS\s+LOCATED\s+NEAR\s+)"
+        r"(?:NEAR\s+)?([0-9]+(?:\.[0-9]+)?)([NS])\s+"
+        r"([0-9]+(?:\.[0-9]+)?)([EW])",
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    for match in pattern.finditer(text):
+        storm_id, storm_name, lat_raw, lat_hemi, lon_raw, lon_hemi = match.groups()
+        if not matches_storm_alias(storm_id, storm_name, normalized_aliases):
+            continue
+        lat = float(lat_raw) * (-1 if lat_hemi.upper() == "S" else 1)
+        lon = float(lon_raw)
+        if lon_hemi.upper() == "W":
+            lon = (360.0 - lon) % 360.0
+        return lat, lon % 360.0, normalize_storm_id(storm_id)
+    return None
+
+
 def parse_jtwc_abpw_seed(text: str, aliases: Iterable[str]) -> tuple[float, float, str] | None:
     """Extract an Invest center from JTWC ABPW text.
 
@@ -101,6 +132,11 @@ def previous_forecast_seed(
     max_hours: int,
 ) -> tuple[float, float] | None:
     previous_meta = previous.get("meta", {})
+    # A legacy run that was never identity-verified must not become the seed
+    # for all later runs. That is exactly how an old Invest label can keep a
+    # tracker attached to an unrelated weak low after formal designation.
+    if previous_meta.get("trackingIdentity", {}).get("status") != "verified":
+        return None
     previous_aliases = {
         normalize_storm_id(previous_meta.get("storm")),
         normalize_storm_id(previous_meta.get("stormInfo", {}).get("id")),
@@ -153,17 +189,25 @@ def resolve_tracking_seed(config: dict, previous: dict, init: datetime) -> dict:
         return resolved
 
     aliases = storm_aliases(resolved)
-    official_url = resolver.get("officialUrl")
-    if official_url:
+    for key, source_name, parser in (
+        ("warningUrl", "JTWC warning", parse_jtwc_named_seed),
+        ("officialUrl", "JTWC ABPW", parse_jtwc_named_seed),
+    ):
+        official_url = resolver.get(key)
+        if resolution["source"] != "tracking_config" or not official_url:
+            continue
         try:
             bulletin = request(str(official_url)).decode("utf-8", errors="replace")
-            official = parse_jtwc_abpw_seed(bulletin, aliases)
+            official = parser(bulletin, aliases)
+            # ABPW keeps Invest reports in a different textual form.
+            if not official and key == "officialUrl":
+                official = parse_jtwc_abpw_seed(bulletin, aliases)
             if official:
                 lat, lon, storm_id = official
                 resolution = {
                     "lat": lat,
                     "lon": lon,
-                    "source": "JTWC ABPW",
+                    "source": source_name,
                     "sourceStormId": storm_id,
                     "sourceUrl": official_url,
                 }
@@ -183,6 +227,12 @@ def resolve_tracking_seed(config: dict, previous: dict, init: datetime) -> dict:
                 "lon": prior[1],
                 "source": "previous GEFS ensemble median",
             }
+
+    if resolver.get("requireResolvedSeed", False) and resolution["source"] == "tracking_config":
+        raise RuntimeError(
+            "Tracking seed unresolved: official JTWC identity was unavailable and "
+            "no identity-verified previous GEFS run is eligible for fallback"
+        )
 
     resolved["seed"] = {
         "lat": round(float(resolution["lat"]), 2),
@@ -214,10 +264,9 @@ def request(
                 return response.read()
         except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
             last = exc
-            if isinstance(exc, urllib.error.HTTPError) and exc.code in (400, 403, 404):
+            if isinstance(exc, urllib.error.HTTPError) and exc.code in (400, 404):
                 break
             if attempt + 1 < retries:
-                import time
                 time.sleep(min(20, 2 ** attempt))
     raise RuntimeError(f"request failed: {url}: {last}")
 
@@ -299,9 +348,9 @@ def s3_prmsl_blob(init: datetime, member: str, fhour: int) -> bytes:
         byte_range = f"bytes={start}-{end if end is not None else ''}"
         data_url = index_url.removesuffix(".idx")
         blob = request(data_url, headers={"Range": byte_range})
-        if len(blob) < 100:
+        if not is_grib_message(blob):
             raise RuntimeError(
-                f"Suspiciously small S3 GRIB range for {member} f{fhour:03d}"
+                f"Invalid S3 GRIB range for {member} f{fhour:03d}"
             )
         return blob
     raise RuntimeError(f"PRMSL offset missing from {index_url}")
@@ -324,6 +373,11 @@ def decode_prmsl(blob: bytes) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         return lats, lons, values
     finally:
         codes_release(handle)
+
+
+def is_grib_message(blob: bytes) -> bool:
+    """Reject HTML/error payloads that some upstream endpoints return as HTTP 200."""
+    return len(blob) >= 100 and blob.startswith(b"GRIB") and blob.endswith(b"7777")
 
 
 def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -370,6 +424,8 @@ def download_one(args: tuple[datetime, str, int, dict[str, float]]) -> tuple[str
         return member, fhour, s3_prmsl_blob(init, member, fhour)
     try:
         blob = request(filter_url(init, member, fhour, box), retries=2, timeout=25)
+        if not is_grib_message(blob):
+            raise RuntimeError("NOMADS returned a non-GRIB payload")
     except RuntimeError as nomads_error:
         print(
             f"NOMADS fallback to NOAA S3: {member} f{fhour:03d}: {nomads_error}",
@@ -377,8 +433,8 @@ def download_one(args: tuple[datetime, str, int, dict[str, float]]) -> tuple[str
             flush=True,
         )
         blob = s3_prmsl_blob(init, member, fhour)
-    if len(blob) < 100:
-        raise RuntimeError(f"Suspiciously small GRIB response for {member} f{fhour:03d}")
+    if not is_grib_message(blob):
+        raise RuntimeError(f"Invalid GRIB response for {member} f{fhour:03d}")
     return member, fhour, blob
 
 
@@ -390,7 +446,14 @@ def build_tracks(init: datetime, config: dict) -> dict[str, list[TrackPoint]]:
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
         futures = {executor.submit(download_one, job): job for job in jobs}
         for n, future in enumerate(concurrent.futures.as_completed(futures), 1):
-            member, fhour, blob = future.result()
+            job = futures[future]
+            try:
+                member, fhour, blob = future.result()
+            except Exception as exc:
+                _, member, fhour, _ = job
+                raise RuntimeError(
+                    f"GEFS download failed for {member} f{fhour:03d}: {exc}"
+                ) from exc
             blobs[(member, fhour)] = blob
             if n % 100 == 0 or n == len(jobs):
                 print(f"Downloaded {n}/{len(jobs)} fields")
@@ -428,6 +491,45 @@ def noise_reasons(points: list[TrackPoint]) -> list[str]:
     if any(abs(a.mslp_hpa - b.mslp_hpa) > 25 for a, b in zip(points, points[1:])):
         reasons.append("pressure_discontinuity")
     return reasons
+
+
+def verify_tracking_identity(config: dict, tracks: dict[str, list[TrackPoint]]) -> dict:
+    """Fail closed when the tracked f000 vortex cannot plausibly be the seed.
+
+    A smooth spaghetti plot is not evidence that the right cyclone was
+    tracked.  This guard records the f000 relationship to the independently
+    resolved official position and rejects weak-background-low solutions.
+    """
+    resolution = config.get("_seedResolution", {})
+    source = str(resolution.get("source", "tracking_config"))
+    if source == "tracking_config":
+        raise RuntimeError("Tracking identity rejected: unresolved configured seed")
+    seed = config["seed"]
+    starts = [tracks[member][0] for member in MEMBERS]
+    distances = [haversine_km(float(seed["lat"]), float(seed["lon"]), p.lat, p.lon) for p in starts]
+    pressures = [p.mslp_hpa for p in starts]
+    median_distance = float(np.median(distances))
+    median_pressure = float(np.median(pressures))
+    max_distance = float(config.get("initialIdentityMedianMaxDistanceKm", 750))
+    max_pressure = float(config.get("initialIdentityMedianMslpMaxHpa", 990))
+    identity = {
+        "status": "verified",
+        "source": source,
+        "sourceStormId": resolution.get("sourceStormId"),
+        "seed": {"lat": round(float(seed["lat"]), 2), "lon": round(float(seed["lon"]) % 360.0, 2)},
+        "initialMedianDistanceKm": round(median_distance, 1),
+        "initialMedianMslpHpa": round(median_pressure, 1),
+        "maxMedianDistanceKm": max_distance,
+        "maxMedianMslpHpa": max_pressure,
+    }
+    if median_distance > max_distance or median_pressure > max_pressure:
+        identity["status"] = "rejected"
+        raise RuntimeError(
+            "Tracking identity rejected: "
+            f"f000 median distance={median_distance:.0f}km (limit {max_distance:.0f}), "
+            f"median MSLP={median_pressure:.1f}hPa (limit {max_pressure:.1f})"
+        )
+    return identity
 
 
 def track_distance(a: list[TrackPoint], b: list[TrackPoint]) -> float:
@@ -526,6 +628,7 @@ def build_payload(init: datetime, config: dict, tracks: dict[str, list[TrackPoin
         "trackingSeedSource": config.get("_seedResolution", {}).get(
             "source", "tracking_config"
         ),
+        "trackingIdentity": config.get("_trackingIdentity", {"status": "unverified"}),
     })
     return {
         "meta": meta,
@@ -556,6 +659,7 @@ def validate(payload: dict, expected_init: str) -> None:
     assert {t["member"] for t in payload["tracks"]} == set(MEMBERS)
     assert all(len(t["points"]) == len(FORECAST_HOURS) for t in payload["tracks"])
     assert payload["summary"]["cleanMembers"] + payload["summary"]["noiseMembers"] == 31
+    assert payload["meta"].get("trackingIdentity", {}).get("status") == "verified"
 
 
 def write_atomically(payload: dict, init: datetime) -> None:
@@ -581,7 +685,18 @@ def self_test() -> None:
     13.0N 179.5W, APPROXIMATELY 600 NM NORTHEAST OF MAJURO.
     """
     assert parse_jtwc_abpw_seed(sample_west, {"CP92", "92C"}) == (13.0, 180.5, "92C")
-    base = [TrackPoint(h, 8 + h / 24, 160 - h / 80, 1007 - h / 40) for h in FORECAST_HOURS]
+    sample_warning = """
+    1. TYPHOON 12W (DOLPHIN) WARNING NR 022
+    WARNING POSITION:
+    010600Z --- NEAR 20.8N 157.5E
+    """
+    assert parse_jtwc_named_seed(sample_warning, {"12W", "DOLPHIN"}) == (20.8, 157.5, "12W")
+    sample_named_abpw = """
+    AT 01AUG26 0000Z, TYPHOON 12W (DOLPHIN) WAS LOCATED NEAR
+    20.2N 158.3E, APPROXIMATELY 1718 NM EAST OF KADENA AB.
+    """
+    assert parse_jtwc_named_seed(sample_named_abpw, {"12W", "DOLPHIN"}) == (20.2, 158.3, "12W")
+    base = [TrackPoint(h, 12.5 + h / 24, 179.5 - h / 80, 1007 - h / 40) for h in FORECAST_HOURS]
     tracks = {}
     for i, member in enumerate(MEMBERS):
         tracks[member] = [TrackPoint(p.fhour, p.lat + (i % 5) * 0.15, p.lon + (i % 3) * 0.1, p.mslp_hpa) for p in base]
@@ -596,8 +711,12 @@ def self_test() -> None:
             "candidateNumber": 13,
         },
         "clusterThresholdKm": 650,
+        "initialIdentityMedianMaxDistanceKm": 750,
+        "initialIdentityMedianMslpMaxHpa": 1010,
+        "_seedResolution": {"source": "JTWC warning", "sourceStormId": "12W"},
     }
     init = datetime(2026, 7, 16, 0, tzinfo=timezone.utc)
+    config["_trackingIdentity"] = verify_tracking_identity(config, tracks)
     payload = build_payload(init, config, tracks, previous)
     validate(payload, "2026071600")
     print("Self-test OK")
@@ -632,6 +751,7 @@ def main() -> int:
     print(f"Building GEFS analysis for {init_string}")
     config = resolve_tracking_seed(config, previous, init)
     tracks = build_tracks(init, config)
+    config["_trackingIdentity"] = verify_tracking_identity(config, tracks)
     payload = build_payload(init, config, tracks, previous)
     validate(payload, init_string)
     write_atomically(payload, init)
