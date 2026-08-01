@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="refresh-control.css?v=20260730-last-updated">
 <link rel="stylesheet" href="target-layout.css?v=20260716-1748">
 <link rel="stylesheet" href="monitor-status.css?v=20260719-monitoring-ended">
+<style>.trackingIdentityNotice{margin:0 0 10px;padding:9px 11px;border:1px solid #8f7747;border-radius:9px;background:#2a2419;color:#ffe1a3;font-size:.8rem;line-height:1.5}</style>
 </head>
 <body>
 <header>
@@ -53,19 +54,19 @@
     <div class="monitorStatusHeader">
       <div>
         <p class="eyebrow">ACTIVE MONITORING STATUS</p>
-        <h2 id="monitorStatusTitle">92C 個別監視モード</h2>
+        <h2 id="monitorStatusTitle">台風13号（ドルフィン）個別監視モード</h2>
       </div>
       <span class="monitorStateBadge">監視継続中</span>
     </div>
-    <p class="monitorConclusion">中部太平洋で付番されたInvest 92Cが日付変更線を越え、西太平洋へ移管されました。観測所は92Cを同一の循環として追跡し、台風13号候補（暫定）として監視します。</p>
+    <p class="monitorConclusion">中部太平洋で付番されたInvest 92Cは、日付変更線通過後にJTWC 12W（Dolphin）／台風13号として正式に追跡されています。観測所は旧92Cと12Wを同じ循環として照合します。</p>
     <div class="monitorSignals" aria-label="JTWC発表状況">
-      <span><strong>ABPW</strong> INVEST 92C / HIGH</span>
-      <span><strong>TCFA</strong> WTPN22 PGTW 発表済み</span>
-      <span><strong>JTWC警報</strong> なし</span>
+      <span><strong>ABPW</strong> TYPHOON 12W（DOLPHIN）</span>
+      <span><strong>JMA</strong> 台風13号（ドルフィン）</span>
+      <span><strong>JTWC警報</strong> 発表中</span>
     </div>
-    <p class="monitorMeta">確認基準: JTWC ABPW 261800Z / CPHC TWO 261722Z（2026年7月27日JST確認）</p>
-    <p class="monitorNext">CP92 / 92Cという中部太平洋の識別子を保持したまま、JTWC警報開始・JMAの熱帯低気圧／台風解析・改番後の位置連続性を照合します。「台風13号」は現時点では候補表記であり、正式番号ではありません。</p>
-    <p><a class="analysisRoomLink" href="analysis.html">92C越境監視の解析記録を開く →</a></p>
+    <p class="monitorMeta">追跡基準: 最新のJTWC警報位置を優先し、ABPW要約を照合します。公式発表の更新時刻は各機関の情報で確認してください。</p>
+    <p class="monitorNext">公式位置を取得できないときは、新しいGEFS解析を公開しません。過去のInvest時代ランは履歴として残しますが、追跡ID未検証として明示します。</p>
+    <p><a class="analysisRoomLink" href="analysis.html">12W／92C越境監視の解析記録を開く →</a></p>
   </section>
   <aside class="archivedRunNotice" aria-label="保存済み解析データについて">
     解析ラン選択から過去のGEFS世界線を再表示できます。進路図はGEFS海面更正気圧の実験的トラッカーであり、公式進路予報ではありません。
@@ -80,6 +81,7 @@
         </div>
         <div class="mapStatusBlock"><strong>進路シナリオ地図</strong><span id="mapStatus">海岸線を読み込み中…</span></div>
       </div>
+      <p id="trackingIdentityNotice" class="trackingIdentityNotice" hidden aria-live="polite"></p>
       <div id="activeScenarioFilter" class="activeScenarioFilter" aria-live="polite"></div>
       <svg id="plot" viewBox="0 0 900 560" role="img" aria-label="Western Pacific ensemble tracks over a geographic basemap"></svg>
       <label class="forecastTimeControl" for="hour">
@@ -106,6 +108,6 @@
   <section><h2>What this view does</h2><div class="explain"><div><b>1. Preserve uncertainty</b><span>Tracks are not forced into one artificial average.</span></div><div><b>2. Separate scenarios</b><span>Physically similar paths are grouped and given representative median tracks.</span></div><div><b>3. Quarantine noise</b><span>Likely tracker jumps are displayed separately instead of silently deleted.</span></div></div></section>
 </main>
 <footer>Experimental, unofficial analysis • Not for operational or safety use</footer>
-<script src="app.js?v=20260731-run-selector-state"></script>
+<script src="app.js?v=20260801-identity-guard"></script>
 <script src="refresh-control.js?v=20260727"></script>
 </body></html>
