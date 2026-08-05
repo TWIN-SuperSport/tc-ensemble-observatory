@@ -1,34 +1,29 @@
 {
-  "storm": "WP12",
+  "storm": "WP96",
   "stormInfo": {
-    "id": "12W",
-    "status": "typhoon",
-    "number": 13,
-    "name": "Dolphin",
-    "originBasin": "CPAC",
+    "id": "96W",
+    "status": "invest",
+    "candidateNumber": 15,
+    "name": null,
+    "originBasin": "WPAC",
     "currentBasin": "WPAC",
     "aliases": [
-      "CP92",
-      "92C",
-      "12W",
-      "DOLPHIN"
+      "96W"
     ],
-    "continuity": "Central Pacific to Western Pacific"
+    "continuity": "Western Pacific Invest; JTWC ABPW identity required"
   },
   "seed": {
-    "lat": 20.8,
-    "lon": 157.5
+    "lat": 17.1,
+    "lon": 166.1
   },
   "seedResolver": {
     "enabled": true,
-    "warningUrl": "https://www.metoc.navy.mil/jtwc/products/wp1226web.txt",
+    "warningUrl": null,
     "officialUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
     "aliases": [
-      "92C",
-      "12W",
-      "DOLPHIN"
+      "96W"
     ],
-    "previousForecastFallbackHours": 24,
+    "previousForecastFallbackHours": 12,
     "requireResolvedSeed": true
   },
   "domain": {
@@ -37,9 +32,9 @@
     "toplat": 55,
     "bottomlat": 0
   },
-  "initialSearchRadiusKm": 900,
-  "initialIdentityMedianMaxDistanceKm": 750,
-  "initialIdentityMedianMslpMaxHpa": 990,
+  "initialSearchRadiusKm": 700,
+  "initialIdentityMedianMaxDistanceKm": 600,
+  "initialIdentityMedianMslpMaxHpa": 1008,
   "stepSearchRadiusKm": 750,
   "clusterThresholdKm": 650
 }
