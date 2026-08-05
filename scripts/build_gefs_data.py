@@ -685,6 +685,11 @@ def self_test() -> None:
     13.0N 179.5W, APPROXIMATELY 600 NM NORTHEAST OF MAJURO.
     """
     assert parse_jtwc_abpw_seed(sample_west, {"CP92", "92C"}) == (13.0, 180.5, "92C")
+    sample_96w = """
+    AN AREA OF CONVECTION (INVEST 96W) HAS PERSISTED NEAR 17.1N 166.1E,
+    APPROXIMATELY 134 NM SOUTH-SOUTHWEST OF WAKE ISLAND.
+    """
+    assert parse_jtwc_abpw_seed(sample_96w, {"96W"}) == (17.1, 166.1, "96W")
     sample_warning = """
     1. TYPHOON 12W (DOLPHIN) WARNING NR 022
     WARNING POSITION:
