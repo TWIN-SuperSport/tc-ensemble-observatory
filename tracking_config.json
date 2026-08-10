@@ -26,6 +26,12 @@
     "previousForecastFallbackHours": 12,
     "requireResolvedSeed": true
   },
+  "identityResolver": {
+    "jtwcAbpwUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
+    "jmaTargetUrl": "https://www.jma.go.jp/bosai/typhoon/data/targetTc.json",
+    "promotionMaxDistanceKm": 600,
+    "jmaMatchMaxDistanceKm": 650
+  },
   "domain": {
     "leftlon": 105,
     "rightlon": 220,
