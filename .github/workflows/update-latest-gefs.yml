@@ -76,7 +76,8 @@ jobs:
           assert len(data['tracks']) == 31
           assert data['meta']['init'] == latest['init']
           assert latest['status'] == 'analysis_complete'
-          assert Path('history', latest['init'] + '.json').exists()
+          assert history_index.get('latestPath')
+          assert Path('history', history_index['latestPath']).exists()
           assert history_index['latest'] == latest['init']
           assert history_index['runCount'] == len(history_index['runs'])
           assert any(run['init'] == latest['init'] for run in history_index['runs'])
