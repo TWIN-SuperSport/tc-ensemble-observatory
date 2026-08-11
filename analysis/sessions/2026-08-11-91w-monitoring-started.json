@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "analysisId": "2026-08-11-91w-monitoring-started",
+  "title": "台風15号個別監視終了・Invest 91W監視開始",
+  "target": [
+    "Invest 91W",
+    "台風17号候補",
+    "台風15号（チャンホン）アーカイブ"
+  ],
+  "generatedAt": "2026-08-11T21:58:00+09:00",
+  "status": "91W個別監視開始・15号アーカイブ移行",
+  "confidence": {
+    "label": "高",
+    "score": 0.96
+  },
+  "conclusion": [
+    "台風15号（チャンホン）は茨城県への上陸をもって進路リスクの個別監視対象から外し、GEFS履歴と解析セッションを削除せずアーカイブとして保持する。",
+    "観測所の現行ターゲットをJTWC ABPW掲載のInvest 91Wへ切り替える。91Wは現時点でJTWC Warning未付番、気象庁では24時間以内に台風へ発達すると予想される熱帯低気圧であり、台風17号候補として表示する。",
+    "新しい解析はJTWC ABPWの91W公式位置とGEFS f000の全メンバー中央値を照合できた場合だけ公開し、旧15号の公式IDや中心へ追跡が戻ることを許容しない。"
+  ],
+  "reasoning": [
+    "JTWC ABPW 111230Zは91Wを22.2N・137.3E付近に解析し、24時間以内の顕著な熱帯低気圧への発達可能性をMEDIUMへ引き上げた。",
+    "同ABPWは91Wをモンスーン西風境界上のコンパクトで浅い熱帯性システムとし、低い鉛直シア、赤道向きの良好な流出、29〜30℃の海面水温、36時間以内の閉じた循環形成で全球モデルが一致していると説明する。",
+    "気象庁TC2620は11日18時に21.2N・138.4E、998hPa、最大風速15m/sの熱帯低気圧として解析し、12日18時までに台風へ発達する予報を示す。",
+    "JTWCの91Wと気象庁TC2620は同時刻帯の位置が近く、同一擾乱として位置連続性を検証できる。気象庁が正式番号を付けるまでは17号を候補表記に固定する。"
+  ],
+  "uncertainties": [
+    "浅く細長い初期循環のどこに低層中心が集約されるか。",
+    "JMA予報円が拡大する13〜16日に、東進から北上・北西進へ変わる時刻と位置。",
+    "GEFS f000が91W本体を選び、旧15号や周辺の別低圧部へ中心追跡を飛ばさずに済むか。",
+    "JTWCがTCFAまたはWarningを発表した際に割り当てる番号と名称。"
+  ],
+  "falsifiers": [
+    "JTWC ABPWが91Wを掲載対象から除外する。",
+    "気象庁が24時間以内の台風発達予報を取り下げる。",
+    "GEFS f000中央値がJTWC公式位置または許容気圧範囲から外れ、追跡ID検証に失敗する。",
+    "JTWC Warningまたは気象庁台風番号への昇格時に、91Wとの位置連続性を確認できない。"
+  ],
+  "materials": [
+    {
+      "id": "E-01",
+      "title": "JTWC Significant Tropical Weather Advisory (ABPW)",
+      "type": "official-text-product",
+      "role": "91WのInvest番号、公式位置、環境条件、発達可能性MEDIUMの確認",
+      "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
+      "validTime": "2026-08-11T12:30:00Z–2026-08-12T06:00:00Z",
+      "tags": ["JTWC", "ABPW", "91W", "invest", "official-seed"]
+    },
+    {
+      "id": "E-02",
+      "title": "気象庁 発達する熱帯低気圧 TC2620",
+      "type": "official-forecast-json",
+      "role": "実況位置、998hPa、24時間以内の台風発達予報、5日進路の確認",
+      "sourceUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2620/forecast.json",
+      "validTime": "2026-08-11T09:00:00Z–2026-08-16T06:00:00Z",
+      "tags": ["JMA", "TC2620", "TD", "台風17号候補"]
+    },
+    {
+      "id": "E-03",
+      "title": "台風15号（チャンホン）GEFS解析履歴",
+      "type": "ensemble-json",
+      "role": "対象外化した台風15号の解析結果を削除せず検証履歴として保存",
+      "data": "../../history/index.json",
+      "model": "GEFS",
+      "tags": ["96W", "14W", "Chan-hom", "archived-run"]
+    }
+  ]
+}
