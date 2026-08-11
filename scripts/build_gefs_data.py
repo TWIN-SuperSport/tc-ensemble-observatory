@@ -71,6 +71,21 @@ def storm_aliases(config: dict) -> set[str]:
     return {normalize_storm_id(value) for value in values if value}
 
 
+def same_tracking_target(previous: dict, config: dict) -> bool:
+    """Return whether saved metadata and config refer to the same initial ID."""
+    previous_info = previous.get("meta", {}).get("stormInfo", {})
+    previous_ids = {
+        normalize_storm_id(previous_info.get("id")),
+        *{
+            normalize_storm_id(value)
+            for value in previous_info.get("aliases", [])
+            if value
+        },
+    }
+    previous_ids.discard("")
+    return bool(previous_ids.intersection(storm_aliases(config)))
+
+
 def matches_storm_alias(storm_id: str, storm_name: str | None, aliases: set[str]) -> bool:
     """Return whether a JTWC bulletin identity belongs to this tracked storm."""
     candidates = {normalize_storm_id(storm_id), normalize_storm_id(storm_name)}
@@ -116,8 +131,20 @@ def parse_jtwc_named_systems(text: str) -> list[dict]:
     return systems
 
 
-def parse_jma_forecast_identity(tc_id: str, text: str) -> dict | None:
-    """Extract JMA's own number/name/current centre from a forecast payload."""
+def parse_jma_forecast_identity(
+    tc_id: str,
+    text: str,
+    *,
+    category: str | None = None,
+    candidate_number: int | None = None,
+) -> dict | None:
+    """Extract JMA's number/name/current centre from a forecast payload.
+
+    JMA uses ``typhoonNumber: \"a\"`` while publishing a developing tropical
+    depression.  In that state the configured next-number candidate may be
+    displayed, but it remains explicitly marked as a candidate until JMA
+    assigns a four-digit annual typhoon number.
+    """
     try:
         items = json.loads(text)
     except json.JSONDecodeError:
@@ -126,7 +153,14 @@ def parse_jma_forecast_identity(tc_id: str, text: str) -> dict | None:
         return None
     title = next((item for item in items if item.get("part") == "title"), {})
     number_code = str(title.get("typhoonNumber") or "")
-    if not re.fullmatch(r"\d{4}", number_code):
+    official_number = bool(re.fullmatch(r"\d{4}", number_code))
+    if official_number:
+        number = int(number_code[-2:])
+        status = "typhoon"
+    elif str(category or "").upper() == "TD" and candidate_number:
+        number = int(candidate_number)
+        status = "candidate"
+    else:
         return None
     analysis = next((item for item in items if item.get("advancedHours") == 0), {})
     center = analysis.get("center")
@@ -135,8 +169,11 @@ def parse_jma_forecast_identity(tc_id: str, text: str) -> dict | None:
     name = title.get("name") or {}
     return {
         "tropicalCyclone": tc_id,
-        "number": int(number_code[-2:]),
+        "number": number,
         "numberCode": number_code,
+        "numberOfficial": official_number,
+        "status": status,
+        "category": str(category or ""),
         "nameJa": str(name.get("jp") or ""),
         "nameEn": str(name.get("en") or "").upper(),
         "lat": float(center[0]),
@@ -149,6 +186,8 @@ def parse_jma_forecast_identity(tc_id: str, text: str) -> dict | None:
 def official_identity_aliases(previous: dict, config: dict) -> set[str]:
     """Collect retained identifiers, including serials learned on earlier runs."""
     aliases = storm_aliases(config)
+    if not same_tracking_target(previous, config):
+        return aliases
     prior_info = previous.get("meta", {}).get("stormInfo", {})
     aliases.update(normalize_storm_id(value) for value in prior_info.get("aliases", []) if value)
     prior_identity = previous.get("meta", {}).get("officialIdentity", {})
@@ -211,17 +250,29 @@ def parse_jtwc_abpw_seed(text: str, aliases: Iterable[str]) -> tuple[float, floa
     instead of being silently relabeled as a guessed 92W.
     """
     normalized_aliases = {normalize_storm_id(value) for value in aliases}
-    for match in re.finditer(
-        r"\(INVEST\s+([0-9]{2}[A-Z])\).*?"
-        r"(?:PERSISTED|LOCATED)\s+NEAR\s+"
-        r"([0-9]+(?:\.[0-9]+)?)([NS])\s+"
-        r"([0-9]+(?:\.[0-9]+)?)([EW])",
-        text,
-        flags=re.IGNORECASE | re.DOTALL,
-    ):
-        storm_id, lat_raw, lat_hemi, lon_raw, lon_hemi = match.groups()
+    invest_headers = list(
+        re.finditer(r"\(INVEST\s+([0-9]{2}[A-Z])\)", text, flags=re.IGNORECASE)
+    )
+    for index, header in enumerate(invest_headers):
+        storm_id = header.group(1)
         if normalize_storm_id(storm_id) not in normalized_aliases:
             continue
+        end = invest_headers[index + 1].start() if index + 1 < len(invest_headers) else len(text)
+        block = text[header.end():end]
+        positions = list(
+            re.finditer(
+                r"(?:PERSISTED|LOCATED)\s+NEAR\s+"
+                r"([0-9]+(?:\.[0-9]+)?)([NS])\s+"
+                r"([0-9]+(?:\.[0-9]+)?)([EW])",
+                block,
+                flags=re.IGNORECASE,
+            )
+        )
+        if not positions:
+            continue
+        # ABPW commonly says "PREVIOUSLY LOCATED ... IS NOW LOCATED ...".
+        # The last position in that Invest block is the current centre.
+        lat_raw, lat_hemi, lon_raw, lon_hemi = positions[-1].groups()
         lat = float(lat_raw) * (-1 if lat_hemi.upper() == "S" else 1)
         lon = float(lon_raw)
         if lon_hemi.upper() == "W":
@@ -383,6 +434,8 @@ def resolve_official_identity(config: dict, previous: dict, init: datetime) -> d
                 candidate = parse_jma_forecast_identity(
                     tc_id,
                     request(JMA_FORECAST_URL.format(tc_id=tc_id)).decode("utf-8", errors="replace"),
+                    category=str(item.get("category") or ""),
+                    candidate_number=info.get("candidateNumber"),
                 )
             except RuntimeError:
                 continue
@@ -393,11 +446,14 @@ def resolve_official_identity(config: dict, previous: dict, init: datetime) -> d
             (item for item in jma_candidates if jtwc_name and normalize_name(item["nameEn"]) == jtwc_name),
             None,
         )
-        if not jma and identity.get("jtwc"):
+        reference = identity.get("jtwc")
+        if not reference and (identity.get("invest") or {}).get("status") == "active":
+            reference = identity["invest"]
+        if not jma and reference:
             jma = closest_system(
                 jma_candidates,
-                float(identity["jtwc"]["lat"]),
-                float(identity["jtwc"]["lon"]),
+                float(reference["lat"]),
+                float(reference["lon"]),
                 float(resolver.get("jmaMatchMaxDistanceKm", 650)),
             )
         if jma:
@@ -410,7 +466,11 @@ def resolve_official_identity(config: dict, previous: dict, init: datetime) -> d
     # An upstream timeout must not erase a previously verified serial/name from
     # the public page.  Preserve it explicitly as stale until the source can be
     # checked again; a stale record is safer and more honest than a relabel.
-    prior_identity = previous.get("meta", {}).get("officialIdentity", {})
+    prior_identity = (
+        previous.get("meta", {}).get("officialIdentity", {})
+        if same_tracking_target(previous, config)
+        else {}
+    )
     for source in ("invest", "jtwc", "jma"):
         if not identity.get(source) and prior_identity.get(source):
             identity[source] = dict(prior_identity[source])
@@ -425,7 +485,7 @@ def resolve_official_identity(config: dict, previous: dict, init: datetime) -> d
         info["jtwcNumber"] = identity["jtwc"]["id"]
         info["name"] = identity["jtwc"]["name"]
     if identity.get("jma"):
-        info["status"] = "typhoon"
+        info["status"] = identity["jma"].get("status", "typhoon")
         info["number"] = identity["jma"]["number"]
         info["candidateNumber"] = identity["jma"]["number"]
         info["name"] = identity["jma"]["nameEn"] or info.get("name")
@@ -449,7 +509,7 @@ def refresh_existing_identity(previous: dict, config: dict, init: datetime) -> b
             "stormInfo": storm_info or {},
             "invest": {key: (official.get("invest") or {}).get(key) for key in ("id", "status")},
             "jtwc": {key: (official.get("jtwc") or {}).get(key) for key in ("id", "name")},
-            "jma": {key: (official.get("jma") or {}).get(key) for key in ("tropicalCyclone", "number", "nameJa", "nameEn")},
+            "jma": {key: (official.get("jma") or {}).get(key) for key in ("tropicalCyclone", "number", "numberOfficial", "status", "category", "nameJa", "nameEn")},
         }
     before = json.dumps(signature(meta.get("stormInfo"), meta.get("officialIdentity")), sort_keys=True)
     meta["stormInfo"] = identity["stormInfo"]
@@ -978,12 +1038,36 @@ def validate(payload: dict, expected_init: str) -> None:
     assert "officialIdentity" in payload["meta"]
 
 
+def archive_path_for_payload(payload: dict, init: datetime) -> Path:
+    """Choose an archive path without overwriting another tracked cyclone."""
+    init_key = init.strftime("%Y%m%d%H")
+    base = HISTORY_DIR / f"{init_key}.json"
+    current_id = normalize_storm_id(
+        payload.get("meta", {}).get("stormInfo", {}).get("id")
+        or payload.get("meta", {}).get("storm")
+    )
+    if not base.exists():
+        return base
+    try:
+        saved = json.loads(base.read_text(encoding="utf-8"))
+        saved_id = normalize_storm_id(
+            saved.get("meta", {}).get("stormInfo", {}).get("id")
+            or saved.get("meta", {}).get("storm")
+        )
+    except (OSError, json.JSONDecodeError):
+        saved_id = ""
+    if not saved_id or saved_id == current_id:
+        return base
+    suffix = current_id or "TARGET"
+    return HISTORY_DIR / f"{init_key}-{suffix}.json"
+
+
 def write_atomically(payload: dict, init: datetime) -> None:
     text = json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "\n"
     HISTORY_DIR.mkdir(exist_ok=True)
-    archive = HISTORY_DIR / f"{init.strftime('%Y%m%d%H')}.json"
+    archive = archive_path_for_payload(payload, init)
     archive.write_text(text, encoding="utf-8")
-    write_history_index(HISTORY_DIR)
+    write_history_index(HISTORY_DIR, latest_path=archive.name)
     with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=ROOT, delete=False) as tmp:
         tmp.write(text)
         temp_path = Path(tmp.name)
@@ -1006,6 +1090,11 @@ def self_test() -> None:
     APPROXIMATELY 134 NM SOUTH-SOUTHWEST OF WAKE ISLAND.
     """
     assert parse_jtwc_abpw_seed(sample_96w, {"96W"}) == (17.1, 166.1, "96W")
+    sample_relocated = """
+    THE AREA OF CONVECTION (INVEST 91W) PREVIOUSLY LOCATED NEAR
+    22.0N 136.0E IS NOW LOCATED NEAR 22.2N 137.3E.
+    """
+    assert parse_jtwc_abpw_seed(sample_relocated, {"91W"}) == (22.2, 137.3, "91W")
     sample_warning = """
     1. TYPHOON 12W (DOLPHIN) WARNING NR 022
     WARNING POSITION:
@@ -1027,10 +1116,31 @@ def self_test() -> None:
     }, {"part": {"jp": "実況"}, "advancedHours": 0, "center": [34.1, 149.3]}])
     assert parse_jma_forecast_identity("TC2617", sample_jma) == {
         "tropicalCyclone": "TC2617", "number": 15, "numberCode": "2615",
+        "numberOfficial": True, "status": "typhoon", "category": "",
         "nameJa": "チャンホン", "nameEn": "CHAN-HOM", "lat": 34.1, "lon": 149.3,
         "issue": "2026-08-10T12:45:00+09:00",
         "sourceUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2617/forecast.json",
     }
+    sample_developing = json.dumps([{
+        "part": "title",
+        "issue": {"JST": "2026-08-11T19:30:00+09:00"},
+        "typhoonNumber": "a",
+    }, {"part": {"jp": "実況"}, "advancedHours": 0, "center": [21.2, 138.4]}])
+    assert parse_jma_forecast_identity(
+        "TC2620", sample_developing, category="TD", candidate_number=17
+    ) == {
+        "tropicalCyclone": "TC2620", "number": 17, "numberCode": "a",
+        "numberOfficial": False, "status": "candidate", "category": "TD",
+        "nameJa": "", "nameEn": "", "lat": 21.2, "lon": 138.4,
+        "issue": "2026-08-11T19:30:00+09:00",
+        "sourceUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2620/forecast.json",
+    }
+    old_target = {
+        "meta": {"storm": "WP96", "stormInfo": {"id": "96W", "aliases": ["14W"]}}
+    }
+    new_target_config = {"storm": "WP91", "stormInfo": {"id": "91W", "aliases": ["91W"]}}
+    assert not same_tracking_target(old_target, new_target_config)
+    assert official_identity_aliases(old_target, new_target_config) == {"WP91", "91W"}
     base = [TrackPoint(h, 12.5 + h / 24, 179.5 - h / 80, 1007 - h / 40) for h in FORECAST_HOURS]
     tracks = {}
     for i, member in enumerate(MEMBERS):

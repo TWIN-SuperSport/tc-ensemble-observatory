@@ -1,7 +1,18 @@
 {
   "schemaVersion": 1,
-  "latest": "./analysis/sessions/2026-08-05-96w-monitoring-started.json",
+  "latest": "./analysis/sessions/2026-08-11-91w-monitoring-started.json",
   "sessions": [
+    {
+      "id": "2026-08-11-91w-monitoring-started",
+      "label": "2026-08-11｜15号監視終了・91W監視開始",
+      "path": "./analysis/sessions/2026-08-11-91w-monitoring-started.json",
+      "target": [
+        "91W",
+        "台風17号候補",
+        "台風15号アーカイブ"
+      ],
+      "status": "active-monitoring"
+    },
     {
       "id": "2026-08-05-96w-monitoring-started",
       "label": "2026-08-05｜13号個別監視終了・96W監視開始",

@@ -1,27 +1,27 @@
 {
-  "storm": "WP96",
+  "storm": "WP91",
   "stormInfo": {
-    "id": "96W",
-    "status": "invest",
-    "candidateNumber": 15,
+    "id": "91W",
+    "status": "candidate",
+    "candidateNumber": 17,
     "name": null,
     "originBasin": "WPAC",
     "currentBasin": "WPAC",
     "aliases": [
-      "96W"
+      "91W"
     ],
-    "continuity": "Western Pacific Invest; JTWC ABPW identity required"
+    "continuity": "Western Pacific Invest 91W; JTWC ABPW identity required"
   },
   "seed": {
-    "lat": 17.1,
-    "lon": 166.1
+    "lat": 22.2,
+    "lon": 137.3
   },
   "seedResolver": {
     "enabled": true,
     "warningUrl": null,
     "officialUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
     "aliases": [
-      "96W"
+      "91W"
     ],
     "previousForecastFallbackHours": 12,
     "requireResolvedSeed": true
