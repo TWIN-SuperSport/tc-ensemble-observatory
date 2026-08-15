@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "state": "standby",
+  "titleJa": "現在監視対象なし",
+  "titleEn": "No active monitoring target",
+  "badgeJa": "待機中",
+  "conclusionJa": "台風15号・16号・17号の個別監視は終了しました。現在の監視対象はありません。次のJTWC Investまたは気象庁の対象発表を待機しています。",
+  "signals": [
+    "個別監視: 解除",
+    "過去データ: 保存済み",
+    "次回条件: JTWC Invest／気象庁対象"
+  ],
+  "checkedAt": "2026-08-15T09:16:52+09:00",
+  "metaJa": "解除日時: 2026年8月15日 09:16 JST • 過去のGEFSラン・履歴・解析セッションは保存済み",
+  "nextJa": "新しいJTWC Invest、気象庁の監視対象、または複数モデルで継続的に表現される熱帯擾乱を確認した時点で、個別監視を再開します。",
+  "sessionPath": "analysis/sessions/2026-08-15-monitoring-standby.json",
+  "sources": [
+    {
+      "label": "JTWC ABPW",
+      "url": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
+      "validTime": "2026-08-14T18:00:00Z/2026-08-15T06:00:00Z",
+      "note": "16WのFinal Warning、他の熱帯低気圧なし、他の疑わしい領域なし"
+    }
+  ]
+}

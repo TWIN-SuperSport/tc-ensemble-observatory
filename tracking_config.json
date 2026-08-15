@@ -1,4 +1,7 @@
 {
+  "monitoringState": "standby",
+  "monitoringEnabled": false,
+  "standbyReason": "2026-08-15: 台風15号・16号・17号の個別監視を終了し、次の公式対象を待機",
   "storm": "WP91",
   "stormInfo": {
     "id": "91W",

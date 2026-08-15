@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="styles.css?v=20260730-map-hour-slider">
 <link rel="stylesheet" href="refresh-control.css?v=20260730-last-updated">
 <link rel="stylesheet" href="target-layout.css?v=20260716-1748">
-<link rel="stylesheet" href="monitor-status.css?v=20260811-target-switch">
+<link rel="stylesheet" href="monitor-status.css?v=20260815-standby">
 <style>.trackingIdentityNotice{margin:0 0 10px;padding:9px 11px;border:1px solid #8f7747;border-radius:9px;background:#2a2419;color:#ffe1a3;font-size:.8rem;line-height:1.5}</style>
 </head>
 <body>
@@ -53,7 +53,7 @@
   <section class="monitorStatus" aria-labelledby="monitorStatusTitle">
     <div class="monitorStatusHeader">
       <div>
-        <p class="eyebrow">ACTIVE MONITORING STATUS</p>
+        <p class="eyebrow">MONITORING STATUS</p>
         <h2 id="monitorStatusTitle">公式IDを照合中…</h2>
       </div>
       <span id="monitorStateBadge" class="monitorStateBadge">確認中</span>
@@ -63,7 +63,7 @@
     <div id="monitorSignals" class="monitorSignals" aria-label="ID照合状況"></div>
     <p id="monitorMeta" class="monitorMeta"></p>
     <p id="monitorNext" class="monitorNext"></p>
-    <p><a class="analysisRoomLink" href="analysis.html">監視対象の切替記録を開く →</a></p>
+    <p><a class="analysisRoomLink" href="analysis.html" data-monitor-session-link>監視対象の切替記録を開く →</a></p>
   </section>
   <aside class="archivedRunNotice" aria-label="保存済み解析データについて">
     解析ラン選択から過去のGEFS世界線を再表示できます。進路図はGEFS海面更正気圧の実験的トラッカーであり、公式進路予報ではありません。
@@ -105,6 +105,6 @@
   <section><h2>What this view does</h2><div class="explain"><div><b>1. Preserve uncertainty</b><span>Tracks are not forced into one artificial average.</span></div><div><b>2. Separate scenarios</b><span>Physically similar paths are grouped and given representative median tracks.</span></div><div><b>3. Quarantine noise</b><span>Likely tracker jumps are displayed separately instead of silently deleted.</span></div></div></section>
 </main>
 <footer>Experimental, unofficial analysis • Not for operational or safety use</footer>
-<script src="app.js?v=20260811-candidate-identity"></script>
+<script src="app.js?v=20260815-standby"></script>
 <script src="refresh-control.js?v=20260727"></script>
 </body></html>

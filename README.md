@@ -10,11 +10,15 @@ This is an **unofficial, experimental visualization** made for exploring weather
 
 ## 現在の監視状態
 
-- 対象: Invest `96W`（台風15号候補）
-- JTWC ABPWに掲載された `96W` の公式座標を固定seedとして個別追跡
-- 96Wは広い循環で複数の低層中心候補を含むため、公式IDとの照合を必須化
-- 公式位置を解決できない場合は、新しいGEFS解析を公開しない
-- 台風13号（ドルフィン）・90W監視時の進路データと解析セッションは履歴として保存
+- 個別監視: **待機中（現在の監視対象なし）**
+- 台風15号・16号・17号の個別監視を終了
+- 次のJTWC Invest、気象庁の監視対象、または複数モデルで継続する熱帯擾乱を待機
+- 過去のGEFSラン、`history/`、解析セッションは削除せず保存
+- 表示中の最新GEFSランは保存済みアーカイブとして再表示可能
+
+待機状態の正本は `monitor_status.json` です。サイト本体はこの状態をトップへ表示し、
+過去データの表示機能は停止しません。JTWCのABPW確認記録は同JSONと
+`analysis/sessions/2026-08-15-monitoring-standby.json` に保存しています。
 
 ### 海盆をまたぐInvestの扱い
 

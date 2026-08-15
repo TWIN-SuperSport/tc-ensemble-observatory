@@ -33,7 +33,28 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check-monitoring-state:
+    runs-on: ubuntu-latest
+    outputs:
+      active: ${{ steps.state.outputs.active }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Read monitoring state
+        id: state
+        shell: bash
+        run: |
+          state="$(python -c 'import json; print(json.load(open("monitor_status.json", encoding="utf-8")).get("state", "active"))')"
+          if [ "$state" = "standby" ]; then
+            echo "active=false" >> "$GITHUB_OUTPUT"
+            echo "Monitoring is in standby; skipping GEFS acquisition."
+          else
+            echo "active=true" >> "$GITHUB_OUTPUT"
+            echo "Monitoring is active; continuing with GEFS acquisition."
+          fi
   update:
+    needs: check-monitoring-state
+    if: needs.check-monitoring-state.outputs.active == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 55
     steps:

@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "analysisId": "2026-08-15-monitoring-standby",
+  "title": "台風15号・16号・17号の個別監視終了・待機モード移行",
+  "target": ["台風15号", "台風16号", "台風17号", "西太平洋全域"],
+  "generatedAt": "2026-08-15T09:16:52+09:00",
+  "status": "個別監視終了・待機中",
+  "confidence": {"label": "高", "score": 0.96},
+  "conclusion": [
+    "台風15号・16号・17号の個別監視を終了し、観測所を次の公式監視対象が現れるまでの待機モードへ切り替える。",
+    "サイト自体は停止せず、トップに現在監視対象がないことを表示しながら、過去のGEFSラン、history、既存解析セッションを保存済みアーカイブとして閲覧可能にする。",
+    "次のJTWC Invest、気象庁の監視対象、または複数全球モデルで同一擾乱の継続表現が確認された時点で、個別監視を再開する。"
+  ],
+  "reasoning": [
+    "現運用上の対象である台風15号・16号・17号が個別監視の継続条件を満たさなくなったため、旧対象の進路を現在の予報として扱わない状態へ切り替えた。",
+    "JTWC ABPW 141800Z–150600Zは16WのFinal Warning、他の熱帯低気圧なし、他の疑わしい領域なしと記載している。",
+    "過去データを削除せず、監視終了を新しい解析セッションとして追加することで、判断時点と過去の世界線を追跡可能にした。"
+  ],
+  "uncertainties": [
+    "次にJTWC Investまたは気象庁の監視対象となる擾乱がいつ形成されるか。",
+    "新規擾乱が公式ID付与前から複数モデルで継続的に表現されるか。",
+    "待機中に保存済みランを現行予報と誤認しないよう、表示上のアーカイブ境界を維持できるか。"
+  ],
+  "falsifiers": [
+    "新しいJTWC Investまたは気象庁の監視対象が公式に掲載される。",
+    "複数全球モデルが同一の新規擾乱を複数ラン連続で追跡する。",
+    "閉じた低層循環と深い対流が持続し、個別監視の再開条件を満たす。"
+  ],
+  "materials": [
+    {
+      "id": "E-01",
+      "title": "JTWC Significant Tropical Weather Advisory (ABPW)",
+      "type": "official-text-product",
+      "role": "16WのFinal Warning、他の熱帯低気圧なし、他の疑わしい領域なしを確認",
+      "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
+      "validTime": "2026-08-14T18:00:00Z–2026-08-15T06:00:00Z",
+      "tags": ["JTWC", "ABPW", "16W", "final-warning", "no-other-suspect-areas"]
+    },
+    {
+      "id": "E-02",
+      "title": "既存のGEFS・解析セッション履歴",
+      "type": "archive-index",
+      "role": "台風15号・16号・17号の過去解析を削除せず保存",
+      "data": "../../history/index.json",
+      "tags": ["archive", "history", "analysis-session"]
+    }
+  ]
+}
