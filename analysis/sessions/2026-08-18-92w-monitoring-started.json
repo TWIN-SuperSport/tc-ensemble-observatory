@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "analysisId": "2026-08-18-92w-monitoring-started",
+  "title": "Invest 92W監視再開・旧対象アーカイブ保持",
+  "target": ["Invest 92W", "台風15号・16号・17号アーカイブ"],
+  "generatedAt": "2026-08-18T11:02:28+09:00",
+  "status": "92W個別監視中",
+  "confidence": {"label": "高", "score": 0.91},
+  "conclusion": [
+    "台風15号・16号・17号の過去解析を削除せずアーカイブとして保持し、観測所の現役監視対象をJTWC Invest 92Wへ切り替える。",
+    "92Wは正式なJTWC Warning番号、気象庁台風番号、名称が未付与のInvestとして表示し、昇格時は各公式ソースのIDを別々に照合する。",
+    "初回公開ランは、2026年8月18日00Zがf240まで完成していないため、完成確認済みの2026年8月17日18Z GEFS 31メンバーランを候補に選定し、次回自動更新で92W公式位置から生成する。"
+  ],
+  "reasoning": [
+    "JTWC ABPW 180100Z–180600Zは92Wを7.9N・155.2E付近へ更新し、20〜25ktの風、29〜30℃の海面水温、15kt以下の鉛直シア、良好な極向き流出を記載して発達可能性をMEDIUMへ引き上げた。",
+    "ABPWは92Wについて、24〜48時間以内に北北西進しながら着実に強化する全球モデルの一致を記載している。",
+    "2026年8月18日00ZのGEFS完成判定は未成立だったため、次に利用可能な2026年8月17日18Zを初回ラン候補に選び、次回自動更新で00Z以降へ追従できる状態へ戻す。",
+    "この作業ブランチでは外部GEFS取得を完了できなかったため、既存の91W解析データを上書きせず、公開用の92W初回データ生成をGitHub Actionsへ委譲する。",
+    "旧91W・台風17号の保存済みランとは異なるInvest IDであり、同一初期時刻に別対象が存在する場合は履歴アーカイブ名へ対象IDを付加して上書きを防ぐ。"
+  ],
+  "uncertainties": [
+    "92Wの広い・伸長した低層循環がどの位置へ集約するか。",
+    "24〜48時間後の発達が続くか、上層場やモンスーン循環との相互作用で進路・強度がどう変わるか。",
+    "2026年8月18日00Z以降のGEFSで、同一92Wの中心連続性と日本接近シナリオが維持されるか。",
+    "JTWC Warningまたは気象庁台風番号へ昇格する時期と、昇格後の公式名称。"
+  ],
+  "falsifiers": [
+    "JTWC ABPWから92Wが消失し、公式位置の連続性を再確認できない。",
+    "GEFS f000の31メンバー中央値がJTWC公式位置・気圧条件から外れ、追跡ID検証に失敗する。",
+    "複数ランで92Wの低層循環が維持されず、別の低圧部へのtracker jumpが発生する。",
+    "JTWC Warningまたは気象庁台風番号への昇格時に、92Wとの位置連続性を確認できない。"
+  ],
+  "materials": [
+    {
+      "id": "E-01",
+      "title": "JTWC Significant Tropical Weather Advisory (ABPW)",
+      "type": "official-text-product",
+      "role": "92Wの公式位置、環境、発達可能性MEDIUM、北北西進・強化見通しの確認",
+      "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
+      "validTime": "2026-08-18T01:00:00Z–2026-08-18T06:00:00Z",
+      "tags": ["JTWC", "ABPW", "92W", "invest", "official-seed"]
+    },
+    {
+      "id": "E-02",
+      "title": "92W初回GEFS解析",
+      "type": "ensemble-json",
+      "role": "初回候補GEFS 31メンバーランの追跡ID、メンバー数、シナリオ分布を次回更新で生成・確認",
+      "data": "../../history/index.json",
+      "model": "GEFS",
+      "tags": ["92W", "GEFS", "initial-run", "31-members"]
+    },
+    {
+      "id": "E-03",
+      "title": "監視解除セッション",
+      "type": "analysis-session",
+      "role": "旧15号・16号・17号の監視終了判断と、92Wへの現役対象切替の境界を保持",
+      "data": "2026-08-15-monitoring-standby.json",
+      "tags": ["archive-boundary", "standby", "previous-targets"]
+    }
+  ]
+}

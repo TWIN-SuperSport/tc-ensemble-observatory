@@ -10,15 +10,15 @@ This is an **unofficial, experimental visualization** made for exploring weather
 
 ## 現在の監視状態
 
-- 個別監視: **待機中（現在の監視対象なし）**
+- 個別監視: **監視中（Invest 92W）**
 - 台風15号・16号・17号の個別監視を終了
-- 次のJTWC Invest、気象庁の監視対象、または複数モデルで継続する熱帯擾乱を待機
+- JTWC Invest 92Wを現役対象として、発達・中心連続性・公式ID昇格を追跡
 - 過去のGEFSラン、`history/`、解析セッションは削除せず保存
-- 表示中の最新GEFSランは保存済みアーカイブとして再表示可能
+- 92Wの初回GEFSラン生成後、過去対象の解析とともに履歴プルダウンから再表示可能
 
-待機状態の正本は `monitor_status.json` です。サイト本体はこの状態をトップへ表示し、
-過去データの表示機能は停止しません。JTWCのABPW確認記録は同JSONと
-`analysis/sessions/2026-08-15-monitoring-standby.json` に保存しています。
+現行監視状態の正本は `monitor_status.json` です。サイト本体はこの状態をトップへ表示し、
+過去データの表示機能も維持します。92WのJTWC ABPW確認記録と監視再開判断は同JSONと
+`analysis/sessions/2026-08-18-92w-monitoring-started.json` に保存しています。
 
 ### 海盆をまたぐInvestの扱い
 

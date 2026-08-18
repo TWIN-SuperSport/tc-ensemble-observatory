@@ -1,7 +1,14 @@
 {
   "schemaVersion": 1,
-  "latest": "./analysis/sessions/2026-08-15-monitoring-standby.json",
+  "latest": "./analysis/sessions/2026-08-18-92w-monitoring-started.json",
   "sessions": [
+    {
+      "id": "2026-08-18-92w-monitoring-started",
+      "label": "2026-08-18｜Invest 92W監視再開",
+      "path": "./analysis/sessions/2026-08-18-92w-monitoring-started.json",
+      "target": ["92W", "旧対象アーカイブ"],
+      "status": "active-monitoring"
+    },
     {
       "id": "2026-08-15-monitoring-standby",
       "label": "2026-08-15｜台風15号・16号・17号の個別監視終了・待機",
