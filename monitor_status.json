@@ -1,25 +1,25 @@
 {
   "schemaVersion": 1,
-  "state": "standby",
-  "titleJa": "現在監視対象なし",
-  "titleEn": "No active monitoring target",
-  "badgeJa": "待機中",
-  "conclusionJa": "台風15号・16号・17号の個別監視は終了しました。現在の監視対象はありません。次のJTWC Investまたは気象庁の対象発表を待機しています。",
+  "state": "active",
+  "titleJa": "Invest 92W",
+  "titleEn": "Invest 92W",
+  "badgeJa": "監視中",
+  "conclusionJa": "台風15号・16号・17号のアーカイブ保持を継続し、新しい現役監視対象としてJTWC Invest 92Wを登録しました。正式なJTWC Warning番号・気象庁台風番号・名称はまだ付与されていません。",
   "signals": [
-    "個別監視: 解除",
-    "過去データ: 保存済み",
-    "次回条件: JTWC Invest／気象庁対象"
+    "個別監視: 再開",
+    "対象: Invest 92W",
+    "GEFS: 初回解析を次回更新で生成"
   ],
-  "checkedAt": "2026-08-15T09:16:52+09:00",
-  "metaJa": "解除日時: 2026年8月15日 09:16 JST • 過去のGEFSラン・履歴・解析セッションは保存済み",
-  "nextJa": "新しいJTWC Invest、気象庁の監視対象、または複数モデルで継続的に表現される熱帯擾乱を確認した時点で、個別監視を再開します。",
-  "sessionPath": "analysis/sessions/2026-08-15-monitoring-standby.json",
+  "checkedAt": "2026-08-18T11:02:28+09:00",
+  "metaJa": "監視再開日時: 2026年8月18日 11:02 JST • 旧対象のGEFSラン・履歴・解析セッションは保存済み • 初回GEFS解析は次回更新で生成",
+  "nextJa": "JTWC ABPW・JTWC Warning・気象庁台風情報を別々に照合し、92Wの発達・昇格・中心連続性を更新します。",
+  "sessionPath": "analysis/sessions/2026-08-18-92w-monitoring-started.json",
   "sources": [
     {
       "label": "JTWC ABPW",
       "url": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
-      "validTime": "2026-08-14T18:00:00Z/2026-08-15T06:00:00Z",
-      "note": "16WのFinal Warning、他の熱帯低気圧なし、他の疑わしい領域なし"
+      "validTime": "2026-08-18T01:00:00Z/2026-08-18T06:00:00Z",
+      "note": "Invest 92Wを7.9N・155.2E付近へ更新し、発達可能性をMEDIUMへ引き上げ"
     }
   ]
 }
