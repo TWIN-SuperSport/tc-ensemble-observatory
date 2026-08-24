@@ -1,7 +1,14 @@
 {
   "schemaVersion": 1,
-  "latest": "./analysis/sessions/2026-08-18-92w-monitoring-started.json",
+  "latest": "./analysis/sessions/2026-08-25-atsani-monitoring-started.json",
   "sessions": [
+    {
+      "id": "2026-08-25-atsani-monitoring-started",
+      "label": "2026-08-25｜18号監視終了・21号アッサニー監視開始",
+      "path": "./analysis/sessions/2026-08-25-atsani-monitoring-started.json",
+      "target": ["台風21号アッサニー", "19W", "97W", "台風18号ソウデル・アーカイブ"],
+      "status": "active-monitoring"
+    },
     {
       "id": "2026-08-18-92w-monitoring-started",
       "label": "2026-08-18｜Invest 92W監視再開",

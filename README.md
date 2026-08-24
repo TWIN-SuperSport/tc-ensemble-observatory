@@ -10,15 +10,15 @@ This is an **unofficial, experimental visualization** made for exploring weather
 
 ## 現在の監視状態
 
-- 個別監視: **監視中（Invest 92W）**
-- 台風15号・16号・17号の個別監視を終了
-- JTWC Invest 92Wを現役対象として、発達・中心連続性・公式ID昇格を追跡
+- 個別監視: **監視中（台風21号アッサニー / JTWC 19W）**
+- 台風18号ソウデル（JTWC 17W / 旧Invest 92W）の個別監視を終了
+- 旧Invest 97Wから昇格したJTWC 19W・気象庁台風21号アッサニーを現役対象として追跡
 - 過去のGEFSラン、`history/`、解析セッションは削除せず保存
-- 92Wの初回GEFSラン生成後、過去対象の解析とともに履歴プルダウンから再表示可能
+- アッサニーの初回GEFSラン生成後、過去対象の解析とともに履歴プルダウンから再表示可能
 
 現行監視状態の正本は `monitor_status.json` です。サイト本体はこの状態をトップへ表示し、
-過去データの表示機能も維持します。92WのJTWC ABPW確認記録と監視再開判断は同JSONと
-`analysis/sessions/2026-08-18-92w-monitoring-started.json` に保存しています。
+過去データの表示機能も維持します。ソウデルの監視解除とアッサニーへの切替判断は同JSONと
+`analysis/sessions/2026-08-25-atsani-monitoring-started.json` に保存しています。
 
 ### 海盆をまたぐInvestの扱い
 

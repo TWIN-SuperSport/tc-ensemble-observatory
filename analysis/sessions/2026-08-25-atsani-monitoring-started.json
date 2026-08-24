@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "analysisId": "2026-08-25-atsani-monitoring-started",
+  "title": "台風18号ソウデル監視終了・台風21号アッサニー監視開始",
+  "target": ["台風21号アッサニー", "JTWC 19W", "旧Invest 97W", "台風18号ソウデル・アーカイブ"],
+  "generatedAt": "2026-08-25T08:48:14+09:00",
+  "status": "台風21号アッサニー個別監視中",
+  "confidence": {"label": "高", "score": 0.95},
+  "conclusion": [
+    "台風18号ソウデルは本州への直接影響がほぼないと判断し、個別監視対象から解除する。92Wから17W、台風18号ソウデルへ至った系統と過去解析は削除せず保存する。",
+    "新しい現役監視対象として、旧Invest 97WからJTWC 19Wへ昇格し、気象庁が台風21号アッサニーとした同一システムを登録する。",
+    "次のGEFS更新はJTWC 19Wの公式位置を初期seedとして使い、旧ソウデルの進路データを上書きせず、新対象として中心連続性を検証してから公開する。"
+  ],
+  "reasoning": [
+    "TWINは台風18号ソウデルについて、本州への直接影響がほぼないことが確定したとして個別監視解除を決定した。",
+    "気象庁は2026年8月24日09時JSTにフィリピンの東の熱帯低気圧を台風21号へ昇格し、アジア名をアッサニーとした。",
+    "JTWC系統では同じシステムを19W ATSANIとして追跡しており、昇格前のInvest 97Wを別名として保持することでtracker jumpを防ぐ。",
+    "監視対象の切替は影響の大きさを断定するものではなく、今後の進路・中心連続性・強度変化を個別に追跡する対象の変更である。"
+  ],
+  "uncertainties": [
+    "アッサニーが短時間で弱化した場合も、低層循環の中心連続性をどこまで維持できるか。",
+    "ソウデルとの相互作用や周辺の高度場が、アッサニーの進路と寿命へどの程度影響するか。",
+    "新対象で最初に完成するGEFS 31メンバーランが、JTWC 19Wの公式位置・気圧条件を満たして追跡ID検証を通過するか。"
+  ],
+  "falsifiers": [
+    "JTWC Warningから19Wが消失し、公式位置の連続性を確認できない。",
+    "GEFS f000の31メンバー中央値がJTWC公式位置・気圧条件から外れ、追跡ID検証に失敗する。",
+    "19W ATSANIと気象庁台風21号アッサニーの位置・名称の対応が公式情報で一致しない。",
+    "別の低圧部へのtracker jumpが検出され、97W・19W・台風21号の同一性を維持できない。"
+  ],
+  "materials": [
+    {
+      "id": "E-01",
+      "title": "気象庁 台風21号情報",
+      "type": "official-json-product",
+      "role": "台風番号、アジア名、公式位置の確認",
+      "sourceUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2624/forecast.json",
+      "validTime": "2026-08-24T21:00:00Z/2026-08-24T22:30:00Z",
+      "tags": ["JMA", "台風21号", "アッサニー", "official-identity"]
+    },
+    {
+      "id": "E-02",
+      "title": "JTWC 19W ATSANI Warning",
+      "type": "official-text-product",
+      "role": "JTWC Warning番号、名称、公式seedの確認",
+      "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/wp1926web.txt",
+      "validTime": "2026-08-24T18:00:00Z/2026-08-24T21:00:00Z",
+      "tags": ["JTWC", "19W", "ATSANI", "97W", "official-seed"]
+    },
+    {
+      "id": "E-03",
+      "title": "旧92W監視開始セッション",
+      "type": "analysis-session",
+      "role": "92Wから17W・台風18号ソウデルへ至った旧対象の履歴境界を保持",
+      "data": "2026-08-18-92w-monitoring-started.json",
+      "tags": ["archive-boundary", "92W", "17W", "SAUDEL", "台風18号"]
+    }
+  ]
+}
