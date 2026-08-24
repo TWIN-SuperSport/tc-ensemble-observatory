@@ -1,29 +1,37 @@
 {
   "monitoringState": "active",
   "monitoringEnabled": true,
-  "activationReason": "2026-08-18: JTWC Invest 92Wを新しい個別監視対象へ昇格",
-  "storm": "WP92",
+  "activationReason": "2026-08-25: 台風18号ソウデルの個別監視を終了し、台風21号アッサニーを新しい個別監視対象へ昇格",
+  "storm": "WP19",
   "stormInfo": {
-    "id": "92W",
-    "status": "invest",
-    "name": null,
+    "id": "97W",
+    "status": "typhoon",
+    "name": "ATSANI",
+    "nameJa": "アッサニー",
+    "number": 21,
+    "candidateNumber": 21,
+    "jtwcNumber": "19W",
     "originBasin": "WPAC",
     "currentBasin": "WPAC",
     "aliases": [
-      "92W"
+      "97W",
+      "19W",
+      "ATSANI"
     ],
-    "continuity": "Western Pacific Invest 92W; retain the Invest ID through any JTWC warning promotion"
+    "continuity": "Western Pacific Invest 97W promoted to JTWC 19W / JMA Typhoon 21 Atsani; retain all identities"
   },
   "seed": {
-    "lat": 7.9,
-    "lon": 155.2
+    "lat": 17.6,
+    "lon": 137.7
   },
   "seedResolver": {
     "enabled": true,
-    "warningUrl": null,
+    "warningUrl": "https://www.metoc.navy.mil/jtwc/products/wp1926web.txt",
     "officialUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
     "aliases": [
-      "92W"
+      "97W",
+      "19W",
+      "ATSANI"
     ],
     "previousForecastFallbackHours": 12,
     "requireResolvedSeed": true
