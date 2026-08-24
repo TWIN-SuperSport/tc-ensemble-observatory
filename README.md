@@ -14,7 +14,7 @@ This is an **unofficial, experimental visualization** made for exploring weather
 - 台風18号ソウデル（JTWC 17W / 旧Invest 92W）の個別監視を終了
 - 旧Invest 97Wから昇格したJTWC 19W・気象庁台風21号アッサニーを現役対象として追跡
 - 過去のGEFSラン、`history/`、解析セッションは削除せず保存
-- アッサニーの初回GEFSラン生成後、過去対象の解析とともに履歴プルダウンから再表示可能
+- アッサニーの2026年8月24日18Z初回候補は追跡ID検証に失敗したため非公開。次の検証済みランができるまで旧対象の保存済み地図を保持
 
 現行監視状態の正本は `monitor_status.json` です。サイト本体はこの状態をトップへ表示し、
 過去データの表示機能も維持します。ソウデルの監視解除とアッサニーへの切替判断は同JSONと
