@@ -18,14 +18,14 @@
     {
       "label": "JTWC 19W Warning",
       "url": "https://www.metoc.navy.mil/jtwc/products/wp1926web.txt",
-      "validTime": "2026-08-24T21:10:00Z",
-      "note": "JTWC系統ではAtsaniを19Wとして追跡"
+      "validTime": "2026-08-24T18:00:00Z/2026-08-24T21:00:00Z",
+      "note": "JTWC Warning 010はAtsaniを19Wとして18.3N・138.3Eで追跡"
     },
     {
       "label": "気象庁 台風21号情報",
-      "url": "https://www.jma.go.jp/bosai/typhoon/data/TC2621/forecast.json",
-      "validTime": "2026-08-24T00:00:00Z",
-      "note": "気象庁はフィリピンの東の熱帯低気圧を台風21号アッサニーへ昇格"
+      "url": "https://www.jma.go.jp/bosai/typhoon/data/TC2624/forecast.json",
+      "validTime": "2026-08-24T21:00:00Z/2026-08-24T22:30:00Z",
+      "note": "気象庁は内部ID TC2624を台風21号アッサニーとして18.4N・138.1Eで解析"
     }
   ]
 }
