@@ -34,8 +34,8 @@
       "title": "気象庁 台風21号情報",
       "type": "official-json-product",
       "role": "台風番号、アジア名、公式位置の確認",
-      "sourceUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2621/forecast.json",
-      "validTime": "2026-08-24T00:00:00Z",
+      "sourceUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2624/forecast.json",
+      "validTime": "2026-08-24T21:00:00Z/2026-08-24T22:30:00Z",
       "tags": ["JMA", "台風21号", "アッサニー", "official-identity"]
     },
     {
@@ -44,7 +44,7 @@
       "type": "official-text-product",
       "role": "JTWC Warning番号、名称、公式seedの確認",
       "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/wp1926web.txt",
-      "validTime": "2026-08-24T21:10:00Z",
+      "validTime": "2026-08-24T18:00:00Z/2026-08-24T21:00:00Z",
       "tags": ["JTWC", "19W", "ATSANI", "97W", "official-seed"]
     },
     {
