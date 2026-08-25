@@ -1,7 +1,14 @@
 {
   "schemaVersion": 1,
-  "latest": "./analysis/sessions/2026-08-25-atsani-monitoring-started.json",
+  "latest": "./analysis/sessions/2026-08-25-atsani-monitoring-ended.json",
   "sessions": [
+    {
+      "id": "2026-08-25-atsani-monitoring-ended",
+      "label": "2026-08-25｜21号アッサニー降格・現在監視対象なし／新規Invest監視",
+      "path": "./analysis/sessions/2026-08-25-atsani-monitoring-ended.json",
+      "target": ["台風21号アッサニー", "19W", "97W", "熱帯低気圧", "新規Invest"],
+      "status": "monitoring-standby"
+    },
     {
       "id": "2026-08-25-atsani-monitoring-started",
       "label": "2026-08-25｜18号監視終了・21号アッサニー監視開始",

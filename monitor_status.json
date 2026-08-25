@@ -1,36 +1,32 @@
 {
   "schemaVersion": 1,
-  "state": "active",
-  "targetAliases": [
-    "97W",
-    "19W",
-    "ATSANI"
-  ],
-  "titleJa": "台風21号 アッサニー",
-  "titleEn": "Typhoon 21 Atsani",
-  "badgeJa": "監視中",
-  "conclusionJa": "台風18号ソウデルは本州への直接影響がほぼないと判断して個別監視を終了し、過去解析を保持したまま、台風21号アッサニーを新しい現役監視対象へ切り替えました。",
+  "state": "standby",
+  "titleJa": "現在監視対象なし",
+  "titleEn": "No active monitoring target",
+  "badgeJa": "待機中",
+  "conclusionJa": "気象庁は2026年8月25日10時15分、台風21号アッサニーをフィリピンの東で熱帯低気圧へ降格しました。アッサニーを現役の台風監視対象から解除し、過去解析を保持したまま、新規Invest監視モードへ戻します。",
   "signals": [
-    "旧対象: 台風18号ソウデル（17W / 92W系統）の個別監視を終了",
-    "現役対象: 台風21号アッサニー（19W / 97W系統）",
-    "GEFS 18Z: 公式位置から688km離れた渦を検出し、追跡ID Guardが公開を拒否"
+    "現役台風監視: 解除（台風21号アッサニー / 19W / 97W）",
+    "現状: 熱帯低気圧（中心気圧1000 hPa）／active monitoring外",
+    "過去解析: 保存済み（アッサニー／ソウデル）",
+    "次回条件: 再発達兆候を確認した場合のみ候補へ戻す"
   ],
-  "checkedAt": "2026-08-25T08:48:14+09:00",
-  "metaJa": "監視対象切替: 2026年8月25日 08:48 JST • 台風18号のGEFSラン・履歴・解析セッションは保存 • 97W→19W→台風21号の同一性を保持",
-  "nextJa": "旧ソウデルの保存済み地図を保持したまま、次のGEFSランで19Wの中心連続性を再検証します。600kmの同一性上限は緩和しません。",
-  "sessionPath": "analysis/sessions/2026-08-25-atsani-monitoring-started.json",
+  "checkedAt": "2026-08-25T10:15:00+09:00",
+  "metaJa": "解除日時: 2026年8月25日 10:15 JST • 気象庁TC2624は熱帯低気圧 • アッサニー／ソウデルのGEFSラン・履歴・解析セッションは保存",
+  "nextJa": "現在は新規Invest監視モードです。アッサニーを含む残存熱帯低気圧は、再発達兆候が確認されるまで候補・active monitoringへ戻しません。",
+  "sessionPath": "analysis/sessions/2026-08-25-atsani-monitoring-ended.json",
   "sources": [
     {
-      "label": "JTWC 19W Warning",
-      "url": "https://www.metoc.navy.mil/jtwc/products/wp1926web.txt",
-      "validTime": "2026-08-24T18:00:00Z/2026-08-24T21:00:00Z",
-      "note": "JTWC Warning 010はAtsaniを19Wとして18.3N・138.3Eで追跡"
+      "label": "気象庁 台風対象一覧",
+      "url": "https://www.jma.go.jp/bosai/typhoon/data/targetTc.json",
+      "validTime": "2026-08-25T10:15:00+09:00",
+      "note": "TC2624・台風第21号・category TD・issue 2026-08-25T10:15:00+09:00を確認。取得JSONには中心気圧フィールドがなく、1000 hPaはTWIN承認済み方針の値として記録。"
     },
     {
       "label": "気象庁 台風21号情報",
       "url": "https://www.jma.go.jp/bosai/typhoon/data/TC2624/forecast.json",
-      "validTime": "2026-08-24T21:00:00Z/2026-08-24T22:30:00Z",
-      "note": "気象庁は内部ID TC2624を台風21号アッサニーとして18.4N・138.1Eで解析"
+      "validTime": "2026-08-25T09:00:00+09:00/2026-08-25T10:15:00+09:00",
+      "note": "TC2624の台風21号アッサニー情報を再取得。降格分類は対象一覧で確認し、当JSONには中心気圧フィールドなし。"
     }
   ]
 }
