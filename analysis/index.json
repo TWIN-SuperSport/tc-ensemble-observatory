@@ -1,7 +1,14 @@
 {
   "schemaVersion": 1,
-  "latest": "./analysis/sessions/2026-08-25-atsani-monitoring-ended.json",
+  "latest": "./analysis/sessions/2026-08-25-99w-monitoring-started.json",
   "sessions": [
+    {
+      "id": "2026-08-25-99w-monitoring-started",
+      "label": "2026-08-25｜アッサニー降格後・Invest 99W監視開始",
+      "path": "./analysis/sessions/2026-08-25-99w-monitoring-started.json",
+      "target": ["Invest 99W", "JTWC 99W", "旧対象アーカイブ"],
+      "status": "active-monitoring"
+    },
     {
       "id": "2026-08-25-atsani-monitoring-ended",
       "label": "2026-08-25｜21号アッサニー降格・現在監視対象なし／新規Invest監視",

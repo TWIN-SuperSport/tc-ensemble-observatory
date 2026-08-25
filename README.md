@@ -10,15 +10,15 @@ This is an **unofficial, experimental visualization** made for exploring weather
 
 ## 現在の監視状態
 
-- 個別監視: **待機中（現在の監視対象なし／新規Invest監視モード）**
-- 気象庁の2026年8月25日10:15 JST発表で、台風21号アッサニー（19W / 97W系統）が熱帯低気圧へ降格したため現役監視を解除
-- アッサニーを含む残存熱帯低気圧は、再発達兆候が確認された場合だけ候補へ戻し、現時点ではactive monitoringに残さない
+- 個別監視: **監視中（JTWC Invest 99W）**
+- JTWCの2026年8月25日13Z発表で、ウェーク島南西のInvest 99Wを発達可能性MEDIUMとして掲載
+- 99Wは警報番号未付与のInvestとして、公式位置・中心連続性・GEFS進路シナリオを個別追跡
 - 過去のアッサニー／ソウデルのGEFSラン、`history/`、解析セッションは削除・上書きせず保存
-- アッサニーの中心気圧1000 hPaはTWIN承認済み方針の値として記録。取得した気象庁JSONには中心気圧フィールドがないため、同JSONからの独立確認値とは区別する
+- JTWC ABPWの推定値は18–23 kt、約1007 hPa。モデル出力や将来の強度を公式観測値として扱わない
 
 現行監視状態の正本は `monitor_status.json` です。サイト本体はこの状態をトップへ表示し、
-過去データの表示機能も維持します。アッサニーの監視解除と新規Invest待機への移行判断は同JSONと
-`analysis/sessions/2026-08-25-atsani-monitoring-ended.json` に保存しています。
+過去データの表示機能も維持します。アッサニー降格後の99W監視再開判断は同JSONと
+`analysis/sessions/2026-08-25-99w-monitoring-started.json` に保存しています。
 
 ### 海盆をまたぐInvestの扱い
 

@@ -1,38 +1,33 @@
 {
-  "monitoringState": "standby",
-  "monitoringEnabled": false,
-  "standbyReason": "2026-08-25: 気象庁10:15 JST発表で台風21号アッサニーが熱帯低気圧へ降格したため現役監視を解除し、新規Invest監視モードへ移行",
-  "candidateReturnCondition": "アッサニーを含む残存熱帯低気圧は、再発達兆候が確認された場合だけ候補へ戻す",
-  "storm": "WP19",
+  "monitoringState": "active",
+  "monitoringEnabled": true,
+  "activationReason": "2026-08-25: JTWCがInvest 99WをMEDIUM発達可能性で掲載したため、アッサニー降格後の新しい個別監視対象へ昇格",
+  "storm": "WP99",
   "stormInfo": {
-    "id": "97W",
-    "status": "tropical_depression",
-    "name": "ATSANI",
-    "nameJa": "アッサニー",
-    "number": 21,
-    "candidateNumber": 21,
-    "jtwcNumber": "19W",
+    "id": "99W",
+    "status": "invest",
+    "name": null,
+    "nameJa": null,
+    "number": null,
+    "candidateNumber": null,
+    "jtwcNumber": null,
     "originBasin": "WPAC",
     "currentBasin": "WPAC",
     "aliases": [
-      "97W",
-      "19W",
-      "ATSANI"
+      "99W"
     ],
-    "continuity": "Western Pacific Invest 97W / JTWC 19W / JMA Typhoon 21 Atsani; downgraded to a tropical depression, retain all identities without active monitoring"
+    "continuity": "Western Pacific Invest 99W; retain the Invest ID until JTWC assigns a warning number or official promotion"
   },
   "seed": {
-    "lat": 17.6,
-    "lon": 137.7
+    "lat": 15.3,
+    "lon": 162.3
   },
   "seedResolver": {
     "enabled": true,
-    "warningUrl": "https://www.metoc.navy.mil/jtwc/products/wp1926web.txt",
+    "warningUrl": null,
     "officialUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
     "aliases": [
-      "97W",
-      "19W",
-      "ATSANI"
+      "99W"
     ],
     "previousForecastFallbackHours": 12,
     "requireResolvedSeed": true

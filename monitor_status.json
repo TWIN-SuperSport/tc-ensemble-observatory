@@ -1,32 +1,29 @@
 {
   "schemaVersion": 1,
-  "state": "standby",
-  "titleJa": "現在監視対象なし",
-  "titleEn": "No active monitoring target",
-  "badgeJa": "待機中",
-  "conclusionJa": "気象庁は2026年8月25日10時15分、台風21号アッサニーをフィリピンの東で熱帯低気圧へ降格しました。アッサニーを現役の台風監視対象から解除し、過去解析を保持したまま、新規Invest監視モードへ戻します。",
-  "signals": [
-    "現役台風監視: 解除（台風21号アッサニー / 19W / 97W）",
-    "現状: 熱帯低気圧（中心気圧1000 hPa）／active monitoring外",
-    "過去解析: 保存済み（アッサニー／ソウデル）",
-    "次回条件: 再発達兆候を確認した場合のみ候補へ戻す"
+  "state": "active",
+  "targetAliases": [
+    "99W"
   ],
-  "checkedAt": "2026-08-25T10:15:00+09:00",
-  "metaJa": "解除日時: 2026年8月25日 10:15 JST • 気象庁TC2624は熱帯低気圧 • アッサニー／ソウデルのGEFSラン・履歴・解析セッションは保存",
-  "nextJa": "現在は新規Invest監視モードです。アッサニーを含む残存熱帯低気圧は、再発達兆候が確認されるまで候補・active monitoringへ戻しません。",
-  "sessionPath": "analysis/sessions/2026-08-25-atsani-monitoring-ended.json",
+  "titleJa": "Invest 99W",
+  "titleEn": "Invest 99W",
+  "badgeJa": "監視中",
+  "conclusionJa": "JTWCは2026年8月25日13時00分UTCの熱帯気象情報で、ウェーク島南西のInvest 99Wを発達可能性MEDIUMとして掲載しました。アッサニー降格後の新しい現役監視対象として99Wを登録し、過去解析を保持したまま個別監視を再開します。",
+  "signals": [
+    "旧対象: 台風21号アッサニー（19W / 97W）の解析をアーカイブ保持",
+    "現役対象: JTWC Invest 99W（警報番号未付与）",
+    "公式解析: 15.3N・162.3E付近／推定18–23 kt／約1007 hPa",
+    "発達可能性: 24時間以内 MEDIUM（JTWC ABPW）"
+  ],
+  "checkedAt": "2026-08-25T23:17:41+09:00",
+  "metaJa": "監視対象切替: 2026年8月25日23:17 JST • JTWC ABPW 25日13Z（26日06Zまで有効） • 99Wの公式座標・発達可能性を確認",
+  "nextJa": "次のGEFS完全ランでJTWC公式位置を初期seedとして中心連続性を検証します。99Wが警報番号へ昇格しても、過去のInvest IDを別名として保持します。",
+  "sessionPath": "analysis/sessions/2026-08-25-99w-monitoring-started.json",
   "sources": [
     {
-      "label": "気象庁 台風対象一覧",
-      "url": "https://www.jma.go.jp/bosai/typhoon/data/targetTc.json",
-      "validTime": "2026-08-25T10:15:00+09:00",
-      "note": "TC2624・台風第21号・category TD・issue 2026-08-25T10:15:00+09:00を確認。取得JSONには中心気圧フィールドがなく、1000 hPaはTWIN承認済み方針の値として記録。"
-    },
-    {
-      "label": "気象庁 台風21号情報",
-      "url": "https://www.jma.go.jp/bosai/typhoon/data/TC2624/forecast.json",
-      "validTime": "2026-08-25T09:00:00+09:00/2026-08-25T10:15:00+09:00",
-      "note": "TC2624の台風21号アッサニー情報を再取得。降格分類は対象一覧で確認し、当JSONには中心気圧フィールドなし。"
+      "label": "JTWC Significant Tropical Weather Advisory",
+      "url": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
+      "validTime": "2026-08-25T13:00:00Z/2026-08-26T06:00:00Z",
+      "note": "ABPW10 PGTW 251300。Invest 99Wを15.3N・162.3E付近、推定18–23 kt・約1007 hPa、24時間発達可能性MEDIUMとして掲載。"
     }
   ]
 }
