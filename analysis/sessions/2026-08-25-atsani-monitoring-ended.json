@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "analysisId": "2026-08-25-atsani-monitoring-ended",
+  "title": "台風21号アッサニー降格・現在監視対象なし／新規Invest監視モード移行",
+  "target": ["台風21号アッサニー", "JTWC 19W", "旧Invest 97W", "熱帯低気圧", "新規Invest"],
+  "generatedAt": "2026-08-25T10:15:00+09:00",
+  "status": "個別監視終了・新規Invest監視モード",
+  "confidence": {"label": "高", "score": 0.99},
+  "conclusion": [
+    "気象庁の公式対象一覧で、TC2624・台風第21号・アッサニーが2026年8月25日10時15分JSTにcategory TD（熱帯低気圧）へ更新されたことを確認し、現役の台風監視対象から解除する。",
+    "中心気圧1000 hPaはTWIN承認済み方針の値として状態へ記録する。今回取得した気象庁のtargetTc.jsonとforecast.jsonには中心気圧フィールドがないため、この値を当該JSONから独立に検証したとは扱わない。",
+    "アッサニー／ソウデルの過去GEFSラン、history、解析セッションは削除・上書きせず保持し、現在表示を既存の待機表示と新規Invest監視モードへ戻す。"
+  ],
+  "reasoning": [
+    "Decision Owner TWINが、アッサニーの台風監視解除、残存熱帯低気圧のactive monitoring除外、再発達兆候が確認された場合だけ候補へ戻す方針を承認した。",
+    "気象庁公式targetTc.jsonはTC2624を台風番号2621、category TD、issue 2026-08-25T10:15:00+09:00として掲載している。",
+    "既存コードにはstandby表示とmonitor_status.jsonによるGEFS更新スキップがあるため、表示・運用状態のJSONと解析記録だけを更新し、UIや解析ロジックは変更しない。",
+    "監視終了を新しいセッションとして追加し、直前のアッサニー監視開始セッションとソウデル履歴をそのまま参照可能にする。"
+  ],
+  "uncertainties": [
+    "取得した気象庁公式JSONに中心気圧フィールドがなく、1000 hPaの独立取得経路は今回確認できていない。",
+    "アッサニーを含む残存熱帯低気圧が再発達兆候を示す時期と、候補へ戻す具体的な判定閾値は未定義である。",
+    "新規Investがいつ公式に付番されるかは未確定であり、次の監視対象の選定は今回の作業範囲外である。"
+  ],
+  "falsifiers": [
+    "気象庁またはJTWCがアッサニーを再び台風・Investとして公式に掲載し、再発達の兆候が確認される。",
+    "公式ソースの分類・発表時刻が今回のTC2624/category TD/10:15 JST記録と異なることが判明する。",
+    "過去のアッサニーまたはソウデルの解析JSON、history、セッションが欠落・上書きされていることが検証で判明する。"
+  ],
+  "materials": [
+    {
+      "id": "E-01",
+      "title": "気象庁 台風対象一覧",
+      "type": "official-json-product",
+      "role": "TC2624のcategory TDと2026-08-25 10:15 JSTの発表時刻を確認",
+      "sourceUrl": "https://www.jma.go.jp/bosai/typhoon/data/targetTc.json",
+      "validTime": "2026-08-25T10:15:00+09:00",
+      "observation": {"tropicalCyclone": "TC2624", "typhoonNumber": "2621", "category": "TD", "issue": "2026-08-25T10:15:00+09:00"},
+      "tags": ["JMA", "TC2624", "台風21号", "アッサニー", "tropical-depression"]
+    },
+    {
+      "id": "E-02",
+      "title": "気象庁 台風21号情報",
+      "type": "official-json-product",
+      "role": "TC2624・アッサニーの同一情報と現況座標を再取得。中心気圧フィールドの不在も確認",
+      "sourceUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2624/forecast.json",
+      "validTime": "2026-08-25T09:00:00+09:00/2026-08-25T10:15:00+09:00",
+      "tags": ["JMA", "TC2624", "Atsani", "pressure-field-absent"]
+    },
+    {
+      "id": "D-01",
+      "title": "TWIN承認済み監視対象解除方針",
+      "type": "decision-owner-instruction",
+      "role": "台風監視解除、再発達時のみ候補復帰、履歴保持、新規Invest監視モードへの復帰",
+      "tags": ["TWIN", "decision-owner", "standby", "archive-preservation"]
+    },
+    {
+      "id": "A-01",
+      "title": "アッサニー監視開始セッション",
+      "type": "analysis-session",
+      "role": "監視開始時点の判断とGEFS追跡ID検証失敗を保存した履歴",
+      "data": "2026-08-25-atsani-monitoring-started.json",
+      "tags": ["archive", "ATSANI", "19W", "97W"]
+    },
+    {
+      "id": "A-02",
+      "title": "ソウデル監視・GEFS履歴",
+      "type": "archive-index",
+      "role": "ソウデルと旧監視対象の過去解析を削除せず保持",
+      "data": "../../history/index.json",
+      "tags": ["archive", "SAUDEL", "92W", "17W"]
+    }
+  ]
+}
