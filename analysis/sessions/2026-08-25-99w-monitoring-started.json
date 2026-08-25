@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "analysisId": "2026-08-25-99w-monitoring-started",
+  "title": "台風21号アッサニー降格後・Invest 99W監視開始",
+  "target": ["Invest 99W", "JTWC 99W", "旧対象アッサニー／ソウデル・アーカイブ"],
+  "generatedAt": "2026-08-25T23:17:41+09:00",
+  "status": "Invest 99W個別監視中",
+  "confidence": {"label": "高", "score": 0.95},
+  "conclusion": [
+    "台風21号アッサニー（19W / 97W）の降格後も、同系統のGEFSラン・履歴・解析セッションは削除せず保存する。",
+    "JTWCは2026年8月25日13ZのABPWで、ウェーク島南西のInvest 99Wを新しい現役監視対象として掲載した。",
+    "99Wは15.3N・162.3E付近、推定18–23ノット・最低海面気圧約1007 hPaで、24時間以内の発達可能性はMEDIUM。",
+    "警報番号や正式名称はまだ付与されていないため、99W単独のInvest IDを保持し、次のGEFS完全ランで公式seedから追跡IDを検証する。"
+  ],
+  "reasoning": [
+    "JTWC ABPW10 PGTW 251300は、99Wについて弱いバンディングを伴う持続的対流と、緩やかに定義された低層循環を記載している。",
+    "同 bulletin は低い鉛直シアー（10–15 kt）、暖かい海面水温（29–30℃）、豊富な深層水蒸気、上層の強い放射状流出を発達に有利な環境としている。",
+    "JTWCは全球決定論・アンサンブルモデルが今後24–36時間の緩やかな発達から定常的な発達を示すとしているが、これは公式監視情報であり、将来のモデル解析結果とは分離して保持する。",
+    "現在の公式座標はJTWC ABPWから取得し、未付与の警報番号や気象庁台風番号を推測せず、Invest 99Wのまま監視を開始する。"
+  ],
+  "uncertainties": [
+    "低層循環中心はまだ緩く定義されており、次回 bulletin で中心位置が変化する可能性がある。",
+    "99Wには現時点でJTWC Warning番号・正式名称・気象庁台風番号が付与されていない。",
+    "次のGEFS 31メンバー完全ランが、JTWC公式位置から600km以内かつ許容気圧条件を満たすかは未検証。",
+    "JTWCが示す24時間MEDIUMは発達可能性の評価であり、個別地点への影響や将来進路を意味しない。"
+  ],
+  "falsifiers": [
+    "JTWC ABPWから99Wが消失し、後続 bulletin で対象の継続性を確認できない。",
+    "GEFS f000の31メンバー中央値がJTWC公式位置・気圧条件から外れ、追跡ID検証に失敗する。",
+    "別の低圧部へのtracker jumpが検出され、99Wの中心連続性を維持できない。",
+    "JTWCが99Wを別の公式IDへ昇格・変更した際に、位置連続性を確認できない。"
+  ],
+  "materials": [
+    {
+      "id": "E-01",
+      "title": "JTWC Significant Tropical Weather Advisory 25 Aug 2026 13Z",
+      "type": "official-text-product",
+      "role": "Invest 99Wの公式ID、位置、発達可能性、環境条件の確認",
+      "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
+      "validTime": "2026-08-25T13:00:00Z/2026-08-26T06:00:00Z",
+      "tags": ["JTWC", "ABPW", "99W", "official-seed", "MEDIUM"]
+    },
+    {
+      "id": "E-02",
+      "title": "旧アッサニー監視終了セッション",
+      "type": "analysis-session",
+      "role": "旧現役対象の履歴境界を保持し、99Wの解析と混同しない",
+      "data": "2026-08-25-atsani-monitoring-ended.json",
+      "tags": ["archive-boundary", "19W", "97W", "ATSANI", "アッサニー"]
+    }
+  ]
+}
