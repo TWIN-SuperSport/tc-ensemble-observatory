@@ -1,6 +1,11 @@
 {
   "schemaVersion": 1,
   "state": "active",
+  "targetAliases": [
+    "97W",
+    "19W",
+    "ATSANI"
+  ],
   "titleJa": "台風21号 アッサニー",
   "titleEn": "Typhoon 21 Atsani",
   "badgeJa": "監視中",
