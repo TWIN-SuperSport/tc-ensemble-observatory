@@ -17,58 +17,35 @@
       "id": "2026-08-25-99w-monitoring-started",
       "label": "2026-08-25｜アッサニー降格後・Invest 99W監視開始",
       "path": "./analysis/sessions/2026-08-25-99w-monitoring-started.json",
-      "target": [
-        "Invest 99W",
-        "JTWC 99W",
-        "旧対象アーカイブ"
-      ],
+      "target": ["Invest 99W", "JTWC 99W", "旧対象アーカイブ"],
       "status": "active-monitoring"
     },
     {
       "id": "2026-08-25-atsani-monitoring-ended",
       "label": "2026-08-25｜21号アッサニー降格・現在監視対象なし／新規Invest監視",
       "path": "./analysis/sessions/2026-08-25-atsani-monitoring-ended.json",
-      "target": [
-        "台風21号アッサニー",
-        "19W",
-        "97W",
-        "熱帯低気圧",
-        "新規Invest"
-      ],
+      "target": ["台風21号アッサニー", "19W", "97W", "熱帯低気圧", "新規Invest"],
       "status": "monitoring-standby"
     },
     {
       "id": "2026-08-25-atsani-monitoring-started",
       "label": "2026-08-25｜18号監視終了・21号アッサニー監視開始",
       "path": "./analysis/sessions/2026-08-25-atsani-monitoring-started.json",
-      "target": [
-        "台風21号アッサニー",
-        "19W",
-        "97W",
-        "台風18号ソウデル・アーカイブ"
-      ],
+      "target": ["台風21号アッサニー", "19W", "97W", "台風18号ソウデル・アーカイブ"],
       "status": "active-monitoring"
     },
     {
       "id": "2026-08-18-92w-monitoring-started",
       "label": "2026-08-18｜Invest 92W監視再開",
       "path": "./analysis/sessions/2026-08-18-92w-monitoring-started.json",
-      "target": [
-        "92W",
-        "旧対象アーカイブ"
-      ],
+      "target": ["92W", "旧対象アーカイブ"],
       "status": "active-monitoring"
     },
     {
       "id": "2026-08-15-monitoring-standby",
       "label": "2026-08-15｜台風15号・16号・17号の個別監視終了・待機",
       "path": "./analysis/sessions/2026-08-15-monitoring-standby.json",
-      "target": [
-        "台風15号",
-        "台風16号",
-        "台風17号",
-        "西太平洋全域"
-      ],
+      "target": ["台風15号", "台風16号", "台風17号", "西太平洋全域"],
       "status": "monitoring-standby"
     },
     {
