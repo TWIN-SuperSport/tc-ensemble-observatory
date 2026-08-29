@@ -1,7 +1,18 @@
 {
   "schemaVersion": 1,
-  "latest": "./analysis/sessions/2026-08-25-99w-monitoring-started.json",
+  "latest": "./analysis/sessions/2026-08-29-94w-monitoring-started.json",
   "sessions": [
+    {
+      "id": "2026-08-29-94w-monitoring-started",
+      "label": "2026-08-29｜Invest 94W監視開始",
+      "path": "./analysis/sessions/2026-08-29-94w-monitoring-started.json",
+      "target": [
+        "Invest 94W",
+        "JTWC 94W",
+        "旧対象99W・アーカイブ"
+      ],
+      "status": "active-monitoring"
+    },
     {
       "id": "2026-08-25-99w-monitoring-started",
       "label": "2026-08-25｜アッサニー降格後・Invest 99W監視開始",

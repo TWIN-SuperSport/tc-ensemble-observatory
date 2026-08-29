@@ -2,28 +2,28 @@
   "schemaVersion": 1,
   "state": "active",
   "targetAliases": [
-    "99W"
+    "94W"
   ],
-  "titleJa": "Invest 99W",
-  "titleEn": "Invest 99W",
+  "titleJa": "Invest 94W",
+  "titleEn": "Invest 94W",
   "badgeJa": "監視中",
-  "conclusionJa": "JTWCは2026年8月25日13時00分UTCの熱帯気象情報で、ウェーク島南西のInvest 99Wを発達可能性MEDIUMとして掲載しました。アッサニー降格後の新しい現役監視対象として99Wを登録し、過去解析を保持したまま個別監視を再開します。",
+  "conclusionJa": "JTWCは2026年8月29日13時00分UTCの熱帯気象情報で、グアム北西のInvest 94Wを発達可能性MEDIUMとして掲載しました。旧対象99Wの解析を保持したまま、94Wを新しい現役監視対象へ切り替えます。",
   "signals": [
-    "旧対象: 台風21号アッサニー（19W / 97W）の解析をアーカイブ保持",
-    "現役対象: JTWC Invest 99W（警報番号未付与）",
-    "公式解析: 15.3N・162.3E付近／推定18–23 kt／約1007 hPa",
+    "旧対象: Invest 99WのGEFSラン・履歴・解析セッションをアーカイブ保持",
+    "現役対象: JTWC Invest 94W（警報番号未付与）",
+    "公式解析: 20.2N・134.7E付近／推定13–18 kt／約1004 hPa",
     "発達可能性: 24時間以内 MEDIUM（JTWC ABPW）"
   ],
-  "checkedAt": "2026-08-25T23:17:41+09:00",
-  "metaJa": "監視対象切替: 2026年8月25日23:17 JST • JTWC ABPW 25日13Z（26日06Zまで有効） • 99Wの公式座標・発達可能性を確認",
-  "nextJa": "次のGEFS完全ランでJTWC公式位置を初期seedとして中心連続性を検証します。99Wが警報番号へ昇格しても、過去のInvest IDを別名として保持します。",
-  "sessionPath": "analysis/sessions/2026-08-25-99w-monitoring-started.json",
+  "checkedAt": "2026-08-29T22:00:00+09:00",
+  "metaJa": "監視対象切替: 2026年8月29日22:00 JST • JTWC ABPW 29日13Z（30日06Zまで有効） • 94Wの公式座標・発達可能性を確認",
+  "nextJa": "次のGEFS完全ランでJTWC公式位置を初期seedとして中心連続性を検証します。94Wが警報番号へ昇格しても、過去のInvest IDと旧99W解析を別名・履歴として保持します。",
+  "sessionPath": "analysis/sessions/2026-08-29-94w-monitoring-started.json",
   "sources": [
     {
       "label": "JTWC Significant Tropical Weather Advisory",
       "url": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
-      "validTime": "2026-08-25T13:00:00Z/2026-08-26T06:00:00Z",
-      "note": "ABPW10 PGTW 251300。Invest 99Wを15.3N・162.3E付近、推定18–23 kt・約1007 hPa、24時間発達可能性MEDIUMとして掲載。"
+      "validTime": "2026-08-29T13:00:00Z/2026-08-30T06:00:00Z",
+      "note": "ABPW10 PGTW 291300。Invest 94Wを20.2N・134.7E付近、推定13–18 kt・約1004 hPa、24時間発達可能性MEDIUMとして掲載。"
     }
   ]
 }
