@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "analysisId": "2026-08-29-94w-monitoring-started",
+  "title": "Invest 94W監視開始",
+  "target": [
+    "Invest 94W",
+    "JTWC 94W",
+    "旧対象99W・アーカイブ"
+  ],
+  "generatedAt": "2026-08-29T22:00:00+09:00",
+  "status": "Invest 94W個別監視中",
+  "confidence": {
+    "label": "公式掲載確認",
+    "score": 0.95
+  },
+  "conclusion": [
+    "JTWCは2026年8月29日13ZのABPWで、グアム北西のInvest 94Wを新しい現役監視対象として掲載した。",
+    "94Wは20.2N・134.7E付近、推定13–18ノット・最低海面気圧約1004 hPaで、24時間以内の発達可能性はMEDIUM。",
+    "警報番号や正式名称はまだ付与されていないため、94W単独のInvest IDを保持し、次のGEFS完全ランで公式seedから追跡IDを検証する。",
+    "旧99WのGEFSラン、履歴、解析セッションは削除・上書きせず保存し、94Wの新しい完全解析に成功するまでdata.json/latest_run.jsonを旧解析のまま保持する。"
+  ],
+  "reasoning": [
+    "JTWC ABPW10 PGTW 291300は、94Wについて持続的な対流に隠れた不明瞭な低層循環と、下層の細長い循環を記載している。",
+    "同 bulletin は低い鉛直シアー（10–15 kt）、暖かい海面水温（29–30℃）、豊富な水蒸気、上層の強い赤道向き流出を発達に有利な環境としている。",
+    "JTWCは全球決定論・アンサンブルモデルが94Wの西北西進に伴う緩やかな発達で一致しているとしているが、これは公式監視情報であり、将来のGEFS解析結果とは分離して保持する。",
+    "現在の公式座標はJTWC ABPWから取得し、未付与の警報番号や気象庁台風番号を推測せず、Invest 94Wのまま監視を開始する。"
+  ],
+  "uncertainties": [
+    "低層循環中心は持続的な対流に隠れて不明瞭で、次回 bulletin で中心位置が変化する可能性がある。",
+    "94Wには現時点でJTWC Warning番号・正式名称・気象庁台風番号が付与されていない。",
+    "次のGEFS 31メンバー完全ランが、JTWC公式位置から600km以内かつ許容気圧条件を満たすかは未検証。",
+    "JTWCが示す24時間MEDIUMは発達可能性の評価であり、個別地点への影響や将来進路を意味しない。"
+  ],
+  "falsifiers": [
+    "JTWC ABPWから94Wが消失し、後続 bulletin で対象の継続性を確認できない。",
+    "GEFS f000の31メンバー中央値がJTWC公式位置・気圧条件から外れ、追跡ID検証に失敗する。",
+    "別の低圧部へのtracker jumpが検出され、94Wの中心連続性を維持できない。",
+    "JTWCが94Wを別の公式IDへ昇格・変更した際に、位置連続性を確認できない。"
+  ],
+  "materials": [
+    {
+      "id": "E-01",
+      "title": "JTWC Significant Tropical Weather Advisory 29 Aug 2026 13Z",
+      "type": "official-text-product",
+      "role": "Invest 94Wの公式ID、位置、発達可能性、環境条件の確認",
+      "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
+      "validTime": "2026-08-29T13:00:00Z/2026-08-30T06:00:00Z",
+      "tags": [
+        "JTWC",
+        "ABPW",
+        "94W",
+        "official-seed",
+        "MEDIUM"
+      ]
+    },
+    {
+      "id": "E-02",
+      "title": "旧Invest 99W監視セッション",
+      "type": "analysis-session",
+      "role": "旧現役対象のGEFSラン・履歴・解析を保存し、94Wの新解析と混同しない",
+      "data": "2026-08-25-99w-monitoring-started.json",
+      "tags": [
+        "archive-boundary",
+        "99W",
+        "Invest 94W"
+      ]
+    }
+  ]
+}

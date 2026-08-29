@@ -1,10 +1,10 @@
 {
   "monitoringState": "active",
   "monitoringEnabled": true,
-  "activationReason": "2026-08-25: JTWCがInvest 99WをMEDIUM発達可能性で掲載したため、アッサニー降格後の新しい個別監視対象へ昇格",
-  "storm": "WP99",
+  "activationReason": "2026-08-29: JTWCがInvest 94WをMEDIUM発達可能性で掲載したため、旧99W解析を保持したまま新しい個別監視対象へ切替",
+  "storm": "WP94",
   "stormInfo": {
-    "id": "99W",
+    "id": "94W",
     "status": "invest",
     "name": null,
     "nameJa": null,
@@ -14,20 +14,20 @@
     "originBasin": "WPAC",
     "currentBasin": "WPAC",
     "aliases": [
-      "99W"
+      "94W"
     ],
-    "continuity": "Western Pacific Invest 99W; retain the Invest ID until JTWC assigns a warning number or official promotion"
+    "continuity": "Western Pacific Invest 94W; retain the Invest ID until JTWC assigns a warning number or official promotion"
   },
   "seed": {
-    "lat": 15.3,
-    "lon": 162.3
+    "lat": 20.2,
+    "lon": 134.7
   },
   "seedResolver": {
     "enabled": true,
     "warningUrl": null,
     "officialUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
     "aliases": [
-      "99W"
+      "94W"
     ],
     "previousForecastFallbackHours": 12,
     "requireResolvedSeed": true
