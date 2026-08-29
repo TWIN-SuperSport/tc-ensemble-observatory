@@ -257,7 +257,20 @@ def parse_jtwc_abpw_seed(text: str, aliases: Iterable[str]) -> tuple[float, floa
         storm_id = header.group(1)
         if normalize_storm_id(storm_id) not in normalized_aliases:
             continue
-        end = invest_headers[index + 1].start() if index + 1 < len(invest_headers) else len(text)
+        end_candidates = []
+        if index + 1 < len(invest_headers):
+            end_candidates.append(invest_headers[index + 1].start())
+        # An ABPW bulletin may contain only one Invest, followed by an
+        # unrelated subtropical or other-area paragraph.  Stop at the next
+        # section/item boundary so its LOCATED NEAR position is not mistaken
+        # for the Invest's current centre.
+        boundary = re.search(
+            r"(?m)^\s*(?:[A-Z]\.\s+|\d+\.\s+|\(\d+\)\s+)",
+            text[header.end():],
+        )
+        if boundary:
+            end_candidates.append(header.end() + boundary.start())
+        end = min(end_candidates, default=len(text))
         block = text[header.end():end]
         positions = list(
             re.finditer(
@@ -1090,6 +1103,21 @@ def self_test() -> None:
     APPROXIMATELY 134 NM SOUTH-SOUTHWEST OF WAKE ISLAND.
     """
     assert parse_jtwc_abpw_seed(sample_96w, {"96W"}) == (17.1, 166.1, "96W")
+    sample_94w_with_other_system = """
+    B. TROPICAL DISTURBANCE SUMMARY:
+       (1) AN AREA OF CONVECTION (INVEST 94W) HAS PERSISTED NEAR 20.2N
+       134.7E, APPROXIMATELY 706 NM NORTHWEST OF GUAM. THE POTENTIAL FOR
+       DEVELOPMENT WITHIN THE NEXT 24 HOURS IS MEDIUM.
+    C. SUBTROPICAL SYSTEM SUMMARY:
+       (1) THE AREA OF CONVECTION (SD 01C) PREVIOUSLY LOCATED NEAR 38.5N
+       178.8E IS NOW LOCATED NEAR 38.4N 176.4E.
+    """
+    assert parse_jtwc_abpw_seed(sample_94w_with_other_system, {"94W"}) == (
+        20.2,
+        134.7,
+        "94W",
+    )
+    assert parse_jtwc_abpw_seed(sample_94w_with_other_system, {"01C"}) is None
     sample_relocated = """
     THE AREA OF CONVECTION (INVEST 91W) PREVIOUSLY LOCATED NEAR
     22.0N 136.0E IS NOW LOCATED NEAR 22.2N 137.3E.
