@@ -1,7 +1,6 @@
 {
-  "monitoringState": "active",
-  "monitoringEnabled": true,
-  "activationReason": "2026-08-29: JTWCがInvest 94WをMEDIUM発達可能性で掲載したため、旧99W解析を保持したまま新しい個別監視対象へ切替",
+  "monitoringState": "standby",
+  "monitoringEnabled": false,
   "storm": "WP94",
   "stormInfo": {
     "id": "94W",
@@ -48,5 +47,6 @@
   "initialIdentityMedianMaxDistanceKm": 600,
   "initialIdentityMedianMslpMaxHpa": 1008,
   "stepSearchRadiusKm": 750,
-  "clusterThresholdKm": 650
+  "clusterThresholdKm": 650,
+  "standbyReason": "2026-09-12: TWINの全監視対象解除指示に基づき待機へ移行。storm・stormInfo・seedは停止中の最終設定として保持し、現役監視対象を意味しない。"
 }

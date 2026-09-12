@@ -10,15 +10,16 @@ This is an **unofficial, experimental visualization** made for exploring weather
 
 ## 現在の監視状態
 
-- 個別監視: **監視中（JTWC Invest 94W）**
-- JTWCの2026年8月29日13Z発表で、グアム北西のInvest 94Wを発達可能性MEDIUMとして掲載
-- 94Wは警報番号未付与のInvestとして、公式位置・中心連続性・GEFS進路シナリオを個別追跡
-- 過去の99W／アッサニー／ソウデルのGEFSラン、`history/`、解析セッションは削除・上書きせず保存
-- JTWC ABPWの推定値は13–18 kt、約1004 hPa。モデル出力や将来の強度を公式観測値として扱わない
+- 個別監視: **現在監視対象なし／待機中**
+- 2026年9月12日JST、TWINの指示に基づき全監視対象を解除
+- 待機中のGEFS自動取得は、既存ワークフローの監視状態判定でスキップ
+- 過去のGEFSラン、`history/`、解析セッションは削除・上書きせず保存
+- 表示中の進路図は保存済み解析として閲覧可能
 
-現行監視状態の正本は `monitor_status.json` です。サイト本体はこの状態をトップへ表示し、
-過去データの表示機能も維持します。99Wから94Wへの監視対象切替判断は同JSONと
-`analysis/sessions/2026-08-29-94w-monitoring-started.json` に保存しています。
+現行監視状態の正本は `monitor_status.json` です。全対象解除の判断は同JSONと
+`analysis/sessions/2026-09-12-monitoring-standby.json` に保存しています。
+`tracking_config.json` のID・seedは停止中の最終設定であり、現役監視対象ではありません。
+次の対象が指定された際に、最新の公式情報で設定を更新して監視を再開します。
 
 ### 海盆をまたぐInvestの扱い
 
