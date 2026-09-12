@@ -1,29 +1,19 @@
 {
   "schemaVersion": 1,
-  "state": "active",
-  "targetAliases": [
-    "94W"
-  ],
-  "titleJa": "Invest 94W",
-  "titleEn": "Invest 94W",
-  "badgeJa": "監視中",
-  "conclusionJa": "JTWCは2026年8月29日13時00分UTCの熱帯気象情報で、グアム北西のInvest 94Wを発達可能性MEDIUMとして掲載しました。旧対象99Wの解析を保持したまま、94Wを新しい現役監視対象へ切り替えます。",
+  "state": "standby",
+  "targetAliases": [],
+  "titleJa": "現在監視対象なし",
+  "titleEn": "No active monitoring target",
+  "badgeJa": "待機中",
+  "conclusionJa": "すべての個別監視対象を解除し、待機中です。過去の進路図と解析記録は保存済みデータとして閲覧できます。",
   "signals": [
-    "旧対象: Invest 99WのGEFSラン・履歴・解析セッションをアーカイブ保持",
-    "現役対象: JTWC Invest 94W（警報番号未付与）",
-    "公式解析: 20.2N・134.7E付近／推定13–18 kt／約1004 hPa",
-    "発達可能性: 24時間以内 MEDIUM（JTWC ABPW）"
+    "個別監視対象: 0件（すべて解除）",
+    "GEFS自動取得: 待機中はスキップ",
+    "過去のGEFSラン・解析セッション: 保存済み"
   ],
-  "checkedAt": "2026-08-29T22:00:00+09:00",
-  "metaJa": "監視対象切替: 2026年8月29日22:00 JST • JTWC ABPW 29日13Z（30日06Zまで有効） • 94Wの公式座標・発達可能性を確認",
-  "nextJa": "次のGEFS完全ランでJTWC公式位置を初期seedとして中心連続性を検証します。94Wが警報番号へ昇格しても、過去のInvest IDと旧99W解析を別名・履歴として保持します。",
-  "sessionPath": "analysis/sessions/2026-08-29-94w-monitoring-started.json",
-  "sources": [
-    {
-      "label": "JTWC Significant Tropical Weather Advisory",
-      "url": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
-      "validTime": "2026-08-29T13:00:00Z/2026-08-30T06:00:00Z",
-      "note": "ABPW10 PGTW 291300。Invest 94Wを20.2N・134.7E付近、推定13–18 kt・約1004 hPa、24時間発達可能性MEDIUMとして掲載。"
-    }
-  ]
+  "checkedAt": "2026-09-12T15:02:24+09:00",
+  "metaJa": "監視解除: 2026年09月12日 15:02 JST • 全対象解除の指示を反映",
+  "nextJa": "次の監視対象が指定されるまで待機します。表示中の進路図は保存済み解析です。",
+  "sessionPath": "analysis/sessions/2026-09-12-monitoring-standby.json",
+  "sources": []
 }

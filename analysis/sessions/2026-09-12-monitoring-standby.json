@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "analysisId": "2026-09-12-monitoring-standby",
+  "title": "全監視対象解除・現在監視対象なし／待機中",
+  "target": [],
+  "generatedAt": "2026-09-12T15:02:24+09:00",
+  "status": "個別監視終了・待機中",
+  "confidence": "監視運用の決定記録",
+  "conclusion": [
+    "TWINの指示に基づき、すべての個別監視対象を解除し、監視対象0件の待機状態へ移行する。",
+    "既存の待機表示を使い、GEFSの自動取得は既存ワークフローの監視状態判定でスキップする。",
+    "過去のGEFSラン、history、解析セッションは削除・上書きせず、保存済み解析として閲覧可能にする。"
+  ],
+  "reasoning": [
+    "Decision Owner TWINが、マークすべき擾乱がなくなったとして、監視サイトの全対象解除を指示した。",
+    "monitor_status.jsonのstateをstandby、targetAliasesを空配列にし、tracking_config.jsonのmonitoringEnabledをfalseにする。",
+    "tracking_config.json内のID・seedは停止中の最終設定として保持する。再開時は指定された対象の公式情報で設定を更新する。",
+    "旧セッションは当時の判断記録としてそのまま保存し、この待機移行セッションを最新として追加する。"
+  ],
+  "uncertainties": [
+    "このセッションは監視対象選定の運用記録であり、個々の擾乱の消滅時刻や海域全体の気象状態を独立に検証した解析ではない。",
+    "次の監視対象と監視再開時期は未指定である。"
+  ],
+  "falsifiers": [
+    "新しい監視対象がTWINから指定された場合、最新の公式情報を照合して対象と運用状態を更新する。"
+  ],
+  "materials": [
+    {
+      "id": "D-01",
+      "title": "全監視対象解除の指示",
+      "type": "decision-owner-instruction",
+      "role": "TWINによる全対象解除・監視サイト更新の指示",
+      "tags": [
+        "TWIN",
+        "decision-owner",
+        "standby"
+      ]
+    },
+    {
+      "id": "A-01",
+      "title": "直前のInvest 94W監視開始記録",
+      "type": "analysis-session",
+      "role": "監視開始時点の判断を当時の記録として保持",
+      "data": "2026-08-29-94w-monitoring-started.json",
+      "tags": [
+        "archive",
+        "94W"
+      ]
+    },
+    {
+      "id": "A-02",
+      "title": "保存済みGEFSラン一覧",
+      "type": "archive-index",
+      "role": "過去ランと解析履歴を保持",
+      "data": "../../history/index.json",
+      "tags": [
+        "archive",
+        "GEFS"
+      ]
+    }
+  ]
+}

@@ -1,7 +1,14 @@
 {
   "schemaVersion": 1,
-  "latest": "./analysis/sessions/2026-08-29-94w-monitoring-started.json",
+  "latest": "./analysis/sessions/2026-09-12-monitoring-standby.json",
   "sessions": [
+    {
+      "id": "2026-09-12-monitoring-standby",
+      "label": "2026-09-12｜全監視対象解除・現在監視対象なし／待機中",
+      "path": "./analysis/sessions/2026-09-12-monitoring-standby.json",
+      "target": [],
+      "status": "monitoring-standby"
+    },
     {
       "id": "2026-08-29-94w-monitoring-started",
       "label": "2026-08-29｜Invest 94W監視開始",
