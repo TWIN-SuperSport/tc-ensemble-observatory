@@ -1,19 +1,26 @@
 {
   "schemaVersion": 1,
-  "state": "standby",
-  "targetAliases": [],
-  "titleJa": "現在監視対象なし",
-  "titleEn": "No active monitoring target",
-  "badgeJa": "待機中",
-  "conclusionJa": "すべての個別監視対象を解除し、待機中です。過去の進路図と解析記録は保存済みデータとして閲覧できます。",
+  "state": "active",
+  "targetAliases": ["90W", "WP90"],
+  "titleJa": "Invest 90W 個別監視中",
+  "titleEn": "Monitoring Invest 90W",
+  "badgeJa": "監視中 / LOW",
+  "conclusionJa": "TWINの指定に基づき90Wの個別監視を開始。JTWCの9月13日15時JSTの情報では12.2N・156.1E付近、24時間以内の発達評価はLOW。90WのGEFS完全解析が完成するまでは、地図に旧対象の保存済み解析を表示します。",
   "signals": [
-    "個別監視対象: 0件（すべて解除）",
-    "GEFS自動取得: 待機中はスキップ",
-    "過去のGEFSラン・解析セッション: 保存済み"
+    "現役対象: Invest 90W（2026年9月）",
+    "JTWC: 推定13–18 kt / 約1007 hPa / 24時間LOW",
+    "北北西進しながら36〜48時間かけて次第に組織化する見立て",
+    "GEFS自動取得を再開・90Wの31メンバー完全解析待ち"
   ],
-  "checkedAt": "2026-09-12T15:02:24+09:00",
-  "metaJa": "監視解除: 2026年09月12日 15:02 JST • 全対象解除の指示を反映",
-  "nextJa": "次の監視対象が指定されるまで待機します。表示中の進路図は保存済み解析です。",
-  "sessionPath": "analysis/sessions/2026-09-12-monitoring-standby.json",
-  "sources": []
+  "checkedAt": "2026-09-13T21:20:08+09:00",
+  "metaJa": "確認: 2026年09月13日 21:20 JST • JTWC ABPW 13日15:00 JST発表",
+  "nextJa": "最新の公式位置を照合し、90WのGEFS追跡結果を検証します。LOWは24時間以内の発達評価であり、日本への接近確率ではありません。",
+  "sessionPath": "analysis.html",
+  "sources": [
+    {
+      "label": "Invest 90W / LOW",
+      "note": "JTWC ABPW 2026-09-13 15:00 JST",
+      "url": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt"
+    }
+  ]
 }
