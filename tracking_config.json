@@ -1,9 +1,9 @@
 {
-  "monitoringState": "standby",
-  "monitoringEnabled": false,
-  "storm": "WP94",
+  "monitoringState": "active",
+  "monitoringEnabled": true,
+  "storm": "WP90",
   "stormInfo": {
-    "id": "94W",
+    "id": "90W",
     "status": "invest",
     "name": null,
     "nameJa": null,
@@ -13,20 +13,20 @@
     "originBasin": "WPAC",
     "currentBasin": "WPAC",
     "aliases": [
-      "94W"
+      "90W"
     ],
-    "continuity": "Western Pacific Invest 94W; retain the Invest ID until JTWC assigns a warning number or official promotion"
+    "continuity": "Western Pacific Invest 90W identified in JTWC ABPW 130600Z September 2026; distinct from the archived July 2026 Invest 90W. Retain this Invest ID until official promotion and verify position continuity."
   },
   "seed": {
-    "lat": 20.2,
-    "lon": 134.7
+    "lat": 12.2,
+    "lon": 156.1
   },
   "seedResolver": {
     "enabled": true,
     "warningUrl": null,
     "officialUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
     "aliases": [
-      "94W"
+      "90W"
     ],
     "previousForecastFallbackHours": 12,
     "requireResolvedSeed": true
@@ -47,6 +47,5 @@
   "initialIdentityMedianMaxDistanceKm": 600,
   "initialIdentityMedianMslpMaxHpa": 1008,
   "stepSearchRadiusKm": 750,
-  "clusterThresholdKm": 650,
-  "standbyReason": "2026-09-12: TWINの全監視対象解除指示に基づき待機へ移行。storm・stormInfo・seedは停止中の最終設定として保持し、現役監視対象を意味しない。"
+  "clusterThresholdKm": 650
 }

@@ -10,16 +10,17 @@ This is an **unofficial, experimental visualization** made for exploring weather
 
 ## 現在の監視状態
 
-- 個別監視: **現在監視対象なし／待機中**
-- 2026年9月12日JST、TWINの指示に基づき全監視対象を解除
-- 待機中のGEFS自動取得は、既存ワークフローの監視状態判定でスキップ
+- 個別監視: **Invest 90W（2026年9月）**
+- 2026年9月13日JST、TWINの指定に基づき待機状態から監視を再開
+- JTWC ABPW 13日15:00 JST: 12.2N・156.1E、推定13–18 kt、約1007 hPa、24時間以内の発達評価LOW
+- GEFS自動取得を再開し、最新のJTWC公式位置から90Wを追跡・検証
 - 過去のGEFSラン、`history/`、解析セッションは削除・上書きせず保存
-- 表示中の進路図は保存済み解析として閲覧可能
+- 90Wの31メンバー完全解析が完成するまでは、旧対象の進路図を保存済み解析として表示
 
-現行監視状態の正本は `monitor_status.json` です。全対象解除の判断は同JSONと
-`analysis/sessions/2026-09-12-monitoring-standby.json` に保存しています。
-`tracking_config.json` のID・seedは停止中の最終設定であり、現役監視対象ではありません。
-次の対象が指定された際に、最新の公式情報で設定を更新して監視を再開します。
+現行監視状態の正本は `monitor_status.json`、追跡設定は `tracking_config.json` です。
+今回の開始記録は `analysis/sessions/2026-09-13-90w-monitoring-started.json` に保存しています。
+9月12日の全対象解除記録と、7月の同番号90Wの過去セッションは保存します。
+今回の90Wは7月の90Wとは別の擾乱であり、過去の同番号の進路を流用しません。
 
 ### 海盆をまたぐInvestの扱い
 
