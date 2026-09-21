@@ -1,9 +1,9 @@
 {
   "monitoringState": "active",
   "monitoringEnabled": true,
-  "storm": "WP90",
+  "storm": "WP91",
   "stormInfo": {
-    "id": "90W",
+    "id": "91W",
     "status": "invest",
     "name": null,
     "nameJa": null,
@@ -13,20 +13,20 @@
     "originBasin": "WPAC",
     "currentBasin": "WPAC",
     "aliases": [
-      "90W"
+      "91W"
     ],
-    "continuity": "Western Pacific Invest 90W identified in JTWC ABPW 130600Z September 2026; distinct from the archived July 2026 Invest 90W. Retain this Invest ID until official promotion and verify position continuity."
+    "continuity": "Western Pacific Invest 91W identified in JTWC ABPW 210000Z September 2026; distinct from August 2026 Invest 91W and former target 90W / 24W / DUJUAN (JMA Typhoon 25). Retain this Invest ID until official promotion and verify position continuity."
   },
   "seed": {
-    "lat": 12.2,
-    "lon": 156.1
+    "lat": 11.3,
+    "lon": 144.3
   },
   "seedResolver": {
     "enabled": true,
     "warningUrl": null,
     "officialUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
     "aliases": [
-      "90W"
+      "91W"
     ],
     "previousForecastFallbackHours": 12,
     "requireResolvedSeed": true
