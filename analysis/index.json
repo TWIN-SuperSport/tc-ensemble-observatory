@@ -1,7 +1,17 @@
 {
   "schemaVersion": 1,
-  "latest": "./analysis/sessions/2026-09-21-91w-monitoring-started.json",
+  "latest": "./analysis/sessions/2026-09-29-93w-monitoring-started.json",
   "sessions": [
+    {
+      "id": "2026-09-29-93w-monitoring-started",
+      "label": "2026-09-29｜台風26号追跡終了・Invest 93W監視開始",
+      "path": "./analysis/sessions/2026-09-29-93w-monitoring-started.json",
+      "target": [
+        "Invest 93W（2026年9月）",
+        "台風26号スリゲ・アーカイブ"
+      ],
+      "status": "active-monitoring"
+    },
     {
       "id": "2026-09-21-91w-monitoring-started",
       "label": "2026-09-21｜台風25号追跡終了・Invest 91W監視開始",
