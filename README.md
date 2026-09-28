@@ -10,17 +10,18 @@ This is an **unofficial, experimental visualization** made for exploring weather
 
 ## 現在の監視状態
 
-- 個別監視: **Invest 91W（2026年9月）**
-- 2026年9月21日JST、TWINの指定に基づき台風25号（90W / 24W / DUJUAN）の追跡を終了し91Wへ切替
-- JTWC ABPW 21日09:00 JST: 11.3N・144.3E、推定13–18 kt、約1008 hPa、24時間以内の発達評価LOW
-- GEFS自動取得対象を91Wへ変更し、最新のJTWC公式位置から追跡・検証
+- 個別監視: **Invest 93W（2026年9月）**
+- 2026年9月29日JST、TWINの指定に基づき台風26号スリゲの個別監視を終了し93Wへ切替
+- JTWC ABPW 28日23:00 JST: 15.2N・156.1E、推定15–20 kt、約1008 hPa、24時間以内の発達評価LOW
+- JTWCのモデル要約: 西北西へ進みながら徐々に発達する見通し
+- GEFS自動取得対象を93Wへ変更し、最新のJTWC公式位置から追跡・検証
 - 過去のGEFSラン、`history/`、解析セッションは保存
-- 91Wの31メンバー完全解析が完成するまでは、25号の進路図を保存済み解析として表示
+- 93Wの31メンバー完全解析が完成するまでは、旧対象の進路図を保存済み解析として表示
 
 現行監視状態の正本は `monitor_status.json`、追跡設定は `tracking_config.json` です。
-今回の切替記録は `analysis/sessions/2026-09-21-91w-monitoring-started.json` に保存しています。
-今回の91Wは2026年8月の91Wとは別の擾乱であり、過去の同番号の進路を流用しません。
-25号の追跡終了は、台風の消滅や影響終了を意味しません。
+今回の切替記録は `analysis/sessions/2026-09-29-93w-monitoring-started.json` に保存しています。
+切替直前の対象は91W / JTWC 25W / SURIGAE（気象庁台風26号）。気象庁台風25号（90W / JTWC 24W / DUJUAN）は9月21日に監視解除済みです。
+過去の対象IDや予測中心を93Wへ流用しません。監視解除は、台風の消滅や影響終了を意味しません。
 
 ### 海盆をまたぐInvestの扱い
 
