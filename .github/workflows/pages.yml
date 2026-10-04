@@ -32,3 +32,7 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Verify public Pages payload
+        timeout-minutes: 6
+        run: python3 scripts/verify_published_site.py "${{ steps.deployment.outputs.page_url }}"

@@ -34,6 +34,7 @@ jobs:
           python -m unittest discover -s scripts -p 'test_*.py'
           node --check app.js
           node scripts/test_renderer.mjs
+          python scripts/verify_published_site.py --self-test
       - name: Validate complete current ensemble without publishing
         env:
           GEFS_DOWNLOAD_WORKERS: '3'
