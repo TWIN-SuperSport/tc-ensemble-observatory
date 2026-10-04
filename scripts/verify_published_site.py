@@ -19,6 +19,7 @@ HOURS = list(range(0, 241, 12))
 
 def validate_payload(data, latest, monitor, history, expected_target, minimum_init):
     meta, summary, tracks = data["meta"], data["summary"], data["tracks"]
+    assert all(isinstance(data["disclaimer"][key], str) and data["disclaimer"][key] for key in ("ja", "en"))
     assert meta.get("trackingTargetId") == expected_target, "Published target episode differs"
     assert monitor.get("trackingTargetId") == expected_target, "Published monitoring episode differs"
     assert meta.get("trackingAlgorithm") == "normalized-domain-closed-minimum-v2"
@@ -31,7 +32,26 @@ def validate_payload(data, latest, monitor, history, expected_target, minimum_in
     assert len(clean) == summary["cleanMembers"] >= 20
     assert summary["noiseMembers"] == 31 - len(clean)
     assert meta["trackingIdentity"]["status"] == "verified"
+    clusters = data["clusters"]
+    assert isinstance(clusters, list) and len(clusters) == summary["clusterCount"] > 0
+    cluster_ids = [cluster["id"] for cluster in clusters]
+    assert len(cluster_ids) == len(set(cluster_ids)) and "NOISE" not in cluster_ids
+    assigned = {}
+    for cluster in clusters:
+        assert isinstance(cluster["label"], str) and cluster["label"]
+        members = cluster["members"]
+        assert members and len(members) == len(set(members)) == cluster["count"]
+        assert abs(float(cluster["share"]) - round(len(members) / 31 * 100, 1)) < 1e-9
+        for member in members:
+            assert member in MEMBERS and member not in assigned
+            assigned[member] = cluster["id"]
+        median = cluster["medianTrack"]
+        assert [point["fhour"] for point in median] == HOURS
+        assert all(math.isfinite(float(point[key])) for point in median for key in ("lat", "lon"))
+    assert set(assigned) == {track["member"] for track in clean}
+    assert all(assigned[track["member"]] == track["cluster"] for track in clean)
     for track in tracks:
+        assert isinstance(track["noiseReasons"], list) and all(isinstance(reason, str) for reason in track["noiseReasons"])
         points = track["points"]
         assert points and [p["fhour"] for p in points] == HOURS[:len(points)]
         assert all(math.isfinite(float(p[key])) for p in points for key in ("lat", "lon", "mslp_hpa"))
@@ -39,6 +59,12 @@ def validate_payload(data, latest, monitor, history, expected_target, minimum_in
             assert len(points) == 21 and not track["noiseReasons"]
         if len(points) != 21:
             assert track["cluster"] == "NOISE" and track.get("termination")
+            termination = track["termination"]
+            assert termination["reason"] in track["noiseReasons"]
+            assert termination["lastValidForecastHour"] == points[-1]["fhour"]
+            assert termination["atForecastHour"] == HOURS[len(points)]
+        else:
+            assert not track.get("termination")
     assert history["latest"] == init and history["runCount"] == len(history["runs"])
     assert any(run["path"] == history["latestPath"] and run["init"] == init for run in history["runs"])
     return {"init": init, "trackingTargetId": expected_target, "summary": summary, "historyRunCount": history["runCount"]}
@@ -48,23 +74,27 @@ def self_test():
     import copy
     target = "test-episode"
     tracks = [{"member": m, "cluster": "C1", "noiseReasons": [], "points": [{"fhour": h, "lat": 10, "lon": 160, "mslp_hpa": 1000} for h in HOURS]} for m in sorted(MEMBERS)]
-    data = {"meta": {"init": "2026100318", "trackingTargetId": target, "trackingAlgorithm": "normalized-domain-closed-minimum-v2", "trackingIdentity": {"status": "verified"}}, "summary": {"members": 31, "cleanMembers": 31, "noiseMembers": 0}, "tracks": tracks}
+    data = {"meta": {"init": "2026100318", "trackingTargetId": target, "trackingAlgorithm": "normalized-domain-closed-minimum-v2", "trackingIdentity": {"status": "verified"}}, "summary": {"members": 31, "cleanMembers": 31, "noiseMembers": 0, "clusterCount": 1}, "tracks": tracks, "disclaimer": {"ja": "test", "en": "test"}, "clusters": [{"id": "C1", "label": "test", "members": sorted(MEMBERS), "count": 31, "share": 100.0, "medianTrack": [{"fhour": h, "lat": 10, "lon": 160} for h in HOURS]}]}
     latest = {"init": "2026100318", "status": "analysis_complete", "members": 31}
     monitor = {"trackingTargetId": target}
     history = {"latest": "2026100318", "latestPath": "2026100318.json", "runCount": 1, "runs": [{"path": "2026100318.json", "init": "2026100318"}]}
     validate_payload(data, latest, monitor, history, target, "2026100312")
-    for mutation in ("target", "old", "count", "nan"):
+    for mutation in ("target", "old", "count", "nan", "clusters", "median", "termination", "disclaimer"):
         broken = copy.deepcopy(data)
         if mutation == "target": broken["meta"]["trackingTargetId"] = "old-episode"
         if mutation == "old": broken["meta"]["init"] = "2026100300"
         if mutation == "count": broken["summary"]["cleanMembers"] = 30
         if mutation == "nan": broken["tracks"][0]["points"][0]["lat"] = float("nan")
+        if mutation == "clusters": broken["clusters"] = []
+        if mutation == "median": broken["clusters"][0]["medianTrack"][0]["lat"] = float("nan")
+        if mutation == "termination": broken["tracks"][0]["termination"] = {"reason": "center_lost"}
+        if mutation == "disclaimer": broken["disclaimer"] = {}
         try:
             validate_payload(broken, latest, monitor, history, target, "2026100312")
-        except AssertionError:
+        except (AssertionError, KeyError):
             continue
         raise AssertionError(f"Failed to reject {mutation}")
-    print("Published-payload self-test passed (valid/newer and four rejection cases)")
+    print("Published-payload self-test passed (valid/newer and eight rejection cases)")
 
 
 def main(base):
@@ -75,11 +105,15 @@ def main(base):
     expected_paths = {run["path"] for run in expected_history["runs"]}
     target = config["trackingTargetId"]
     stamp = os.environ.get("GITHUB_SHA", "verification")
+    deadline = time.monotonic() + 300
     def get(path, attempt):
         url = urllib.parse.urljoin(base.rstrip("/") + "/", path)
         url += "?verification=" + urllib.parse.quote(stamp + "-" + str(attempt))
         request = urllib.request.Request(url, headers={"User-Agent": "tc-ensemble-observatory-public-verification/1.0", "Cache-Control": "no-cache"})
-        with urllib.request.urlopen(request, timeout=20) as response:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError("Public verification deadline exceeded")
+        with urllib.request.urlopen(request, timeout=min(20, remaining)) as response:
             assert response.status == 200
             return response.read()
     last_error = None
@@ -101,11 +135,13 @@ def main(base):
                 with open(summary, "a") as handle:
                     handle.write("\nPublic Pages payload verified: " + json.dumps(report, ensure_ascii=False) + "\n")
             return
-        except (AssertionError, KeyError, ValueError, OSError) as exc:
+        except (AssertionError, KeyError, TypeError, ValueError, OSError) as exc:
             last_error = exc
             print(f"Public verification attempt {attempt}/30: {type(exc).__name__}: {exc}", flush=True)
-            if attempt < 30:
-                time.sleep(10)
+            remaining = deadline - time.monotonic()
+            if attempt >= 30 or remaining <= 0:
+                break
+            time.sleep(min(10, remaining))
     raise RuntimeError(f"Public Pages verification did not converge: {last_error}")
 
 
