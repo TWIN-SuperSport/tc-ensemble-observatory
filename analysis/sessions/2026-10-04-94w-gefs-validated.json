@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "analysisId": "2026-10-04-94w-gefs-validated",
+  "trackingTargetId": "2026-10-invest-94w",
+  "title": "Invest 94W（2026年10月）GEFS実解析検証完了",
+  "target": [
+    "Invest 94W（2026年10月）"
+  ],
+  "generatedAt": "2026-10-04T03:30:16.852385Z",
+  "initialTime": "2026-10-03T18:00:00Z",
+  "status": "GEFS実解析検証済み（検証時点の工程記録）",
+  "confidence": "公式位置の同一性検証合格／進路・発達はモデルの仮説",
+  "validationRunUrl": "https://github.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/37174197376",
+  "conclusion": [
+    "GEFS 2026年10月3日18Z（4日03時JST）初期値の31メンバーを取得し、10月4日03:30Z（12:30 JST）に94Wの解析候補が検証に合格した。本記録は候補の検証結果であり、GitHub Pages本番への反映確認とは区別する。",
+    "全メンバーの初期中心はJTWC公式位置8.3N・167.4Eから約35〜315km。中央値123km、中央気圧1007.3hPaで、既存の600km・1008hPaの同一性検証条件を満たした。",
+    "27本を+240hまで追跡し4つのシナリオ群へ分類。残る4本は中心喪失として打ち切り、確認できた区間だけをNOISE枠へ保存した。31本すべてを10日先まで追跡できたという意味ではない。",
+    "対象世代2026-10-invest-94wを確認。August 94Wおよび旧93W / JTWC 26W / CHOI-WANの名称・予測中心を流用せず、過去の解析・切替時点の検証待ち記録を保存する。"
+  ],
+  "reasoning": [
+    "修正後の取得・追跡処理を実際の31メンバーで実行し、初期中心・気圧・メンバー構成・予報時間と打切り理由を検証した。距離・気圧閾値は緩めていない。",
+    "公式情報は実行時の10月4日03:29:16Zに再取得。ABPWの発表は10月3日13Z、有効期限は4日06Zで、検証時点では記載の有効期間内だった。切替時の03:07Z取得原文と取得記録は上書きしていない。",
+    "p12は+192hで中心を見失い+180hまで、p14・p17・p27は+240hで中心を見失い+228hまで保存。別の低圧部へ無理につなげず、4本を物理的な進路群の集計から除外した。",
+    "シナリオ群の比率は、このモデルランの追跡できたメンバーに対する条件付き分布。上陸・接近の校正済み確率ではない。"
+  ],
+  "uncertainties": [
+    "この検証工程ではGitHub Pages本番への反映確認を含まない。この時点の記録から、その後の本番反映状況を判定しない。",
+    "中心喪失は追跡アルゴリズムの判定であり、実際の擾乱消滅の証明ではない。4本の打切り後の進路は未評価。",
+    "JTWCのMEDIUMは10月3日13Z発表時点から24時間以内の発達評価。10月4日06Z以降の実況には新しい公式情報が必要。",
+    "長期進路・発達の成否、日本への影響は未確定。"
+  ],
+  "falsifiers": [
+    "次回の公式位置・番号変更と、同じ対象世代の位置連続性が整合しなくなった場合は、再検証する。",
+    "初期同一性検証が不合格のランを新しい成功解析として公開しない。",
+    "後続ランで中心喪失・別低気圧への飛び・領域外が判明した区間を、継続する94Wの進路として扱わない。"
+  ],
+  "materials": [
+    {
+      "id": "V-01",
+      "title": "GitHub Actions 31メンバー実データ検証",
+      "type": "workflow-run",
+      "role": "修正コード9770c62での取得・追跡・検証の実行記録。公開完了の証拠とは区別",
+      "sourceUrl": "https://github.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/37174197376",
+      "validTime": "2026-10-04T03:30:16Z",
+      "tags": [
+        "GEFS",
+        "31-members",
+        "validation",
+        "release-pending"
+      ]
+    },
+    {
+      "id": "V-02",
+      "title": "GEFS修正の機械可読検証記録",
+      "type": "validation-summary",
+      "role": "候補SHA-256・初期同一性・31メンバー集計・打切り区間の記録",
+      "data": "../materials/2026-10-04-gefs-repair-validation.json",
+      "tags": [
+        "94W",
+        "October 2026",
+        "center_lost",
+        "provenance"
+      ]
+    },
+    {
+      "id": "V-03",
+      "title": "GEFS 2026年10月3日18Z 保存解析",
+      "type": "gefs-archive",
+      "role": "初期値と対象世代を固定した検証済み解析の保存先",
+      "data": "../../history/2026100318.json",
+      "model": "GEFS",
+      "validTime": "2026-10-03T18:00:00Z",
+      "tags": [
+        "94W",
+        "archive",
+        "31-members",
+        "27-full-tracks"
+      ]
+    },
+    {
+      "id": "V-04",
+      "title": "サイト最新解析",
+      "type": "latest-analysis",
+      "role": "data.jsonの現在値。初期時刻と対象世代を確認してから参照し、未反映の旧解析と混同しない",
+      "data": "../../data.json",
+      "model": "GEFS",
+      "tags": [
+        "latest",
+        "check-init",
+        "check-generation"
+      ]
+    },
+    {
+      "id": "V-05",
+      "title": "最新解析の状態メタデータ",
+      "type": "latest-run-metadata",
+      "role": "最新初期値・成功状態・確認時刻をdata.jsonと照合",
+      "data": "../../latest_run.json",
+      "tags": [
+        "latest-run",
+        "publication-check"
+      ]
+    },
+    {
+      "id": "V-06",
+      "title": "94W切替時の記録（解析検証前）",
+      "type": "analysis-session",
+      "role": "12:07 JST時点の解析待ち状態と公式原文の取得記録を保持",
+      "data": "2026-10-04-94w-monitoring-started.json",
+      "tags": [
+        "target-switch",
+        "pending-phase",
+        "history"
+      ]
+    }
+  ],
+  "validationStage": {
+    "recordedAt": "2026-10-04T03:30:16.852385Z",
+    "productionVerifiedAtThisStage": false,
+    "note": "この検証工程で公開反映を確認したという意味ではない。その後の本番状態はこの時点の記録から判定しない。"
+  }
+}

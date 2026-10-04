@@ -1,7 +1,17 @@
 {
   "schemaVersion": 1,
-  "latest": "./analysis/sessions/2026-10-04-94w-monitoring-started.json",
+  "latest": "./analysis/sessions/2026-10-04-94w-gefs-validated.json",
   "sessions": [
+    {
+      "id": "2026-10-04-94w-gefs-validated",
+      "label": "2026-10-04｜94W GEFS実解析検証完了",
+      "path": "./analysis/sessions/2026-10-04-94w-gefs-validated.json",
+      "trackingTargetId": "2026-10-invest-94w",
+      "target": [
+        "Invest 94W（2026年10月）"
+      ],
+      "status": "analysis-validated"
+    },
     {
       "id": "2026-10-04-94w-monitoring-started",
       "label": "2026-10-04｜台風27号追跡終了・Invest 94W（10月）監視開始",

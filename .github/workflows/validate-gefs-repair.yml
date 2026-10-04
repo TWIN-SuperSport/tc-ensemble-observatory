@@ -33,6 +33,7 @@ jobs:
           python scripts/run_gefs_analysis.py --self-test
           python -m unittest discover -s scripts -p 'test_*.py'
           node --check app.js
+          node scripts/test_renderer.mjs
       - name: Validate complete current ensemble without publishing
         env:
           GEFS_DOWNLOAD_WORKERS: '3'
@@ -54,6 +55,8 @@ jobs:
           assert latest['status'] == 'analysis_complete'
           print(json.dumps({'init': latest['init'], 'target': data['meta']['trackingTargetId'], 'summary': data['summary'], 'identity': data['meta']['trackingIdentity']}, ensure_ascii=False))
           PY
+      - name: Compare real NOMADS and S3 fields
+        run: python scripts/check_gefs_source_parity.py
       - name: Preserve candidate and diagnostic evidence
         if: always()
         uses: actions/upload-artifact@v4

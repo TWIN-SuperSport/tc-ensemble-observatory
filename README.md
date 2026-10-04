@@ -16,12 +16,17 @@ This is an **unofficial, experimental visualization** made for exploring weather
 - 公式原文は10月4日12:07 JST取得。有効期間は10月3日22:00〜4日15:00 JST。発表時点の評価と現在の実況を区別
 - JTWCのモデル要約: 今後24時間はほぼ停滞しつつまとまる見通し（独自のGEFS解析結果ではない）
 - GEFS自動取得対象を94Wへ変更し、解析実行時に最新のJTWC公式位置から追跡・検証
-- 切替時点では94Wの31メンバー完全解析は未検証。新対象の検証合格までは旧対象の進路図を保存済み解析として表示
+- 10月4日12:30 JST、GEFS 10月3日18Zの31メンバー取得・初期同一性検証に合格。27本を+240hまで追跡し、4本は中心喪失時点で打切り・別枠保存
+- 初期中心は公式位置から約35〜315km、中央値123km、中央気圧1007.3hPa。閾値は緩めず、4シナリオ群を抽出
+- [実データ検証run](https://github.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/37174197376)は10月4日12:30 JSTに合格（初期値: 10月3日18Z）
 - 過去のGEFSラン、`history/`、解析セッションは保存
 
 現行監視状態の正本は `monitor_status.json`、追跡設定は `tracking_config.json` です。
-今回の切替記録は `analysis/sessions/2026-10-04-94w-monitoring-started.json`、
+検証結果は `analysis/sessions/2026-10-04-94w-gefs-validated.json`、
+解析待ちだった切替時点の記録は `analysis/sessions/2026-10-04-94w-monitoring-started.json`、
 公式原文と取得記録は `analysis/materials/2026-10-03-1300z-jtwc-abpw*` に保存しています。
+検証実行時の公式再取得は10月4日12:29 JST。元の発表・初回取得記録は保持しています。
+検証候補の公開先は `data.json`、`latest_run.json`、`history/2026100318.json` です。
 
 **10月の94Wは8月の94Wとは別の擾乱です。** Invest番号は再利用されるため、
 `trackingTargetId: 2026-10-invest-94w` で対象の世代を区別し、正式な昇格後も同じ世代IDを保ちます。
