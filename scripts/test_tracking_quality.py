@@ -406,6 +406,12 @@ class TrackConstructionTests(unittest.TestCase):
 
 
 class BulletinValidityTests(unittest.TestCase):
+    def test_missing_or_malformed_validity_is_rejected(self):
+        now = datetime(2026, 10, 4, 3, tzinfo=timezone.utc)
+        for text in ("", "upstream returned an HTML error", "031300Z-041300ZXXX2026", "039960Z-041300ZOCT2026"):
+            with self.subTest(text=text), self.assertRaises((RuntimeError, ValueError)):
+                pipeline.jtwc_bulletin_validity(text, now)
+
     def test_issue_expiry_and_retrieval_are_separate(self):
         now = datetime(2026, 10, 4, 3, tzinfo=timezone.utc)
         result = pipeline.jtwc_bulletin_validity("031300Z-041300ZOCT2026", now)
@@ -455,7 +461,7 @@ class DiagnosticEvidenceTests(unittest.TestCase):
 
 
 class ExistingCycleTests(unittest.TestCase):
-    def run_existing_cycle(self, mutation=None):
+    def run_existing_cycle(self, mutation=None, force=False, diagnostic_error=None, build_error=None):
         cfg = config()
         member_tracks = tracks()
         previous = pipeline.build_payload(INIT, cfg, member_tracks, {})
@@ -468,18 +474,29 @@ class ExistingCycleTests(unittest.TestCase):
             config_path, data_path = root / "config.json", root / "data.json"
             config_path.write_text(json.dumps(cfg))
             data_path.write_text(json.dumps(previous))
+            saved_bytes = data_path.read_bytes()
+            argv = ["build_gefs_data.py"] + (["--force-init", INIT_KEY] if force else [])
             with patch.object(pipeline, "CONFIG_PATH", config_path), \
                     patch.object(pipeline, "DATA_PATH", data_path), \
                     patch.object(pipeline, "LATEST_PATH", root / "latest.json"), \
-                    patch.object(pipeline.sys, "argv", ["build_gefs_data.py"]), \
+                    patch.object(pipeline.sys, "argv", argv), \
                     patch.object(pipeline, "latest_complete_cycle", return_value=INIT), \
                     patch.object(pipeline, "refresh_existing_identity", return_value=False), \
                     patch.object(pipeline, "resolve_tracking_seed", return_value=cfg), \
-                    patch.object(pipeline, "build_tracks", return_value=member_tracks) as build, \
+                    patch.object(pipeline, "build_tracks", return_value=member_tracks, side_effect=build_error) as build, \
                     patch.object(pipeline, "verify_tracking_identity", return_value={"status": "verified"}), \
-                    patch.object(pipeline, "write_atomically"), \
-                    patch.object(pipeline, "write_run_diagnostics"):
-                self.assertEqual(pipeline.main(), 0)
+                    patch.object(pipeline, "write_atomically") as publish, \
+                    patch.object(pipeline, "write_run_diagnostics", side_effect=diagnostic_error):
+                expected_error = build_error or diagnostic_error
+                if expected_error is not None:
+                    with self.assertRaises(type(expected_error)) as caught:
+                        pipeline.main()
+                    self.assertIs(caught.exception, expected_error)
+                    publish.assert_not_called()
+                    self.assertFalse((root / "latest.json").exists())
+                    self.assertEqual(data_path.read_bytes(), saved_bytes)
+                else:
+                    self.assertEqual(pipeline.main(), 0)
                 return build.call_count
 
     def test_valid_current_algorithm_cycle_avoids_redownload(self):
@@ -490,6 +507,17 @@ class ExistingCycleTests(unittest.TestCase):
 
     def test_same_cycle_unverified_payload_must_be_rebuilt(self):
         self.assertEqual(self.run_existing_cycle("unverified_identity"), 1)
+
+    def test_explicit_force_init_rebuilds_current_valid_cycle(self):
+        self.assertEqual(self.run_existing_cycle(force=True), 1)
+
+    def test_diagnostic_failure_cannot_overwrite_published_payload(self):
+        self.assertEqual(self.run_existing_cycle(force=True, diagnostic_error=OSError("fixture evidence disk full")), 1)
+
+    def test_secondary_diagnostic_failure_cannot_mask_original_error(self):
+        self.assertEqual(self.run_existing_cycle(force=True,
+            diagnostic_error=OSError("fixture evidence disk full"),
+            build_error=RuntimeError("fixture scientific rejection")), 1)
 
 
 if __name__ == "__main__":

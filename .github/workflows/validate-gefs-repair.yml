@@ -1,0 +1,68 @@
+name: Validate GEFS repair
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - 'tracking_config.json'
+      - 'requirements.txt'
+      - '.github/workflows/validate-gefs-repair.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-gefs-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install analysis dependencies
+        run: pip install -r requirements.txt
+      - name: Run offline regressions
+        run: |
+          python scripts/run_gefs_analysis.py --self-test
+          python -m unittest discover -s scripts -p 'test_*.py'
+          node --check app.js
+      - name: Validate complete current ensemble without publishing
+        env:
+          GEFS_DOWNLOAD_WORKERS: '3'
+        run: python -u scripts/run_gefs_analysis.py
+      - name: Check candidate identity and integrity
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import sys
+          sys.path.insert(0, 'scripts')
+          import build_gefs_data as pipeline
+          data = json.loads(Path('data.json').read_text())
+          config = json.loads(Path('tracking_config.json').read_text())
+          latest = json.loads(Path('latest_run.json').read_text())
+          pipeline.validate(data, latest['init'])
+          assert data['meta']['trackingTargetId'] == config['trackingTargetId']
+          assert data['meta']['stormInfo']['id'] == config['stormInfo']['id']
+          assert latest['status'] == 'analysis_complete'
+          print(json.dumps({'init': latest['init'], 'target': data['meta']['trackingTargetId'], 'summary': data['summary'], 'identity': data['meta']['trackingIdentity']}, ensure_ascii=False))
+          PY
+      - name: Preserve candidate and diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gefs-validation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            .diagnostics/
+            data.json
+            latest_run.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14

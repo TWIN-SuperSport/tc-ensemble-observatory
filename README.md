@@ -121,3 +121,14 @@ python -m http.server 8000
 ---
 
 GitHub Pages deployment re-triggered after Pages was enabled.
+
+## 追跡品質と再現検証（2026-10-04）
+
+- NOMADS切出しとNOAA S3全球場は、復号後に同一領域・同一格子順へ正規化します
+- 領域端、中心喪失、開いた気圧の谷では追跡を打ち切り、有効な前半だけをNOISEとして保存します。打切りは台風の消滅を意味しません
+- シナリオ集計には+240hまで揃う正常メンバーだけを使います。正常20本以上、12時間25hPa、85km/hの品質条件は緩和していません
+- 海面気圧の局所極小は閉じた循環や熱帯低気圧の証明ではありません。気圧急変は保守的な品質フラグであり、物理的急変と誤追跡を診断素材で区別します
+- PR検証はread-only権限で実際の最新GEFSを解析し、公開・commit・Pages dispatchは行いません。既存の定時更新間隔は変更しません
+- Actions artifactsに追跡点、符号付き気圧差、終了理由、取得元とSHA256を14日保存します。失敗runも旧公開データを置き換えず証拠を残します
+- ローカル検証: `python scripts/run_gefs_analysis.py --self-test` と `python -m unittest discover -s scripts -p 'test_*.py'`
+- 任意の再現用rawキャッシュは `GEFS_CACHE_DIR`、診断出力先は `GEFS_DIAGNOSTICS_PATH` で指定できます。`--force-init YYYYMMDDHH` は既存同一ランでも再解析します
