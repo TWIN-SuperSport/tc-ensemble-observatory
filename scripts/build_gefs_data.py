@@ -11,6 +11,7 @@ minimum from a configured seed, not an operational tropical-cyclone tracker.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import concurrent.futures
 import json
 import math
@@ -73,7 +74,12 @@ def storm_aliases(config: dict) -> set[str]:
 
 def same_tracking_target(previous: dict, config: dict) -> bool:
     """Return whether saved metadata and config refer to the same initial ID."""
-    previous_info = previous.get("meta", {}).get("stormInfo", {})
+    previous_meta = previous.get("meta", {})
+    configured_target = config.get("trackingTargetId") or config.get("stormInfo", {}).get("trackingTargetId")
+    if configured_target:
+        previous_target = previous_meta.get("trackingTargetId") or previous_meta.get("stormInfo", {}).get("trackingTargetId")
+        return previous_target == configured_target
+    previous_info = previous_meta.get("stormInfo", {})
     previous_ids = {
         normalize_storm_id(previous_info.get("id")),
         *{
@@ -299,8 +305,11 @@ def previous_forecast_seed(
     init: datetime,
     aliases: set[str],
     max_hours: int,
+    tracking_target_id: str | None = None,
 ) -> tuple[float, float] | None:
     previous_meta = previous.get("meta", {})
+    if tracking_target_id and tracking_target_id != (previous_meta.get("trackingTargetId") or previous_meta.get("stormInfo", {}).get("trackingTargetId")):
+        return None
     # A legacy run that was never identity-verified must not become the seed
     # for all later runs. That is exactly how an old Invest label can keep a
     # tracker attached to an unrelated weak low after formal designation.
@@ -343,6 +352,23 @@ def previous_forecast_seed(
     return lat, lon
 
 
+def jtwc_bulletin_validity(text: str, now=None) -> dict:
+    """Retain issue/expiry separately from retrieval time; reject expired ABPW."""
+    match = re.search(r"([0-9]{2})([0-9]{4})Z-([0-9]{2})([0-9]{4})Z([A-Z]{3})([0-9]{4})", text.upper())
+    if not match:
+        raise RuntimeError("JTWC ABPW validity window could not be parsed")
+    start_day, start_hm, end_day, end_hm, month, year = match.groups()
+    end = datetime.strptime(f"{year}{month}{end_day}{end_hm}", "%Y%b%d%H%M").replace(tzinfo=timezone.utc)
+    start_month = end
+    if int(start_day) > int(end_day):
+        start_month = end.replace(day=1) - timedelta(days=1)
+    start = start_month.replace(day=int(start_day), hour=int(start_hm[:2]), minute=int(start_hm[2:]))
+    now = now or datetime.now(timezone.utc)
+    if now > end or start > now + timedelta(hours=1):
+        raise RuntimeError(f"JTWC bulletin outside validity: {start.isoformat()} to {end.isoformat()}")
+    return {"issuedAt": start.isoformat().replace("+00:00", "Z"), "validUntil": end.isoformat().replace("+00:00", "Z"), "retrievedAt": now.isoformat().replace("+00:00", "Z"), "status": "within-stated-validity"}
+
+
 def resolve_official_identity(config: dict, previous: dict, init: datetime) -> dict:
     """Resolve Invest, JTWC, and JMA identities from their original feeds.
 
@@ -367,6 +393,8 @@ def resolve_official_identity(config: dict, previous: dict, init: datetime) -> d
     named_system: dict | None = None
     try:
         abpw_text = request(abpw_url).decode("utf-8", errors="replace")
+        bulletin_validity = jtwc_bulletin_validity(abpw_text)
+        identity["bulletinValidity"] = bulletin_validity
         invest = parse_jtwc_abpw_seed(abpw_text, {invest_id} if invest_id else set())
         if invest:
             lat, lon, current_invest_id = invest
@@ -376,6 +404,7 @@ def resolve_official_identity(config: dict, previous: dict, init: datetime) -> d
                 "lon": lon,
                 "sourceUrl": abpw_url,
                 "status": "active",
+                "bulletinValidity": bulletin_validity,
             }
             identity["linkage"] = {"method": "JTWC ABPW Invest", "confidence": "official"}
 
@@ -393,6 +422,7 @@ def resolve_official_identity(config: dict, previous: dict, init: datetime) -> d
                 init,
                 storm_aliases(config),
                 int(config.get("seedResolver", {}).get("previousForecastFallbackHours", 24)),
+                config.get("trackingTargetId"),
             )
             if prior:
                 promoted = closest_system(
@@ -558,7 +588,7 @@ def resolve_tracking_seed(config: dict, previous: dict, init: datetime) -> dict:
     resolved["stormInfo"] = official_identity["stormInfo"]
     resolved["_officialIdentity"] = official_identity
     aliases = official_identity_aliases(previous, resolved)
-    if official_identity.get("jtwc"):
+    if official_identity.get("jtwc") and official_identity["jtwc"].get("status") != "stale":
         jtwc = official_identity["jtwc"]
         resolution = {
             "lat": jtwc["lat"],
@@ -585,6 +615,8 @@ def resolve_tracking_seed(config: dict, previous: dict, init: datetime) -> dict:
             continue
         try:
             bulletin = request(str(official_url)).decode("utf-8", errors="replace")
+            if key == "officialUrl":
+                jtwc_bulletin_validity(bulletin)
             official = parser(bulletin, aliases)
             # ABPW keeps Invest reports in a different textual form.
             if not official and key == "officialUrl":
@@ -607,6 +639,7 @@ def resolve_tracking_seed(config: dict, previous: dict, init: datetime) -> dict:
             init,
             aliases,
             int(resolver.get("previousForecastFallbackHours", 24)),
+            resolved.get("trackingTargetId"),
         )
         if prior:
             resolution = {
@@ -775,94 +808,194 @@ def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     return 6371.0 * 2 * math.atan2(math.sqrt(a), math.sqrt(max(0.0, 1 - a)))
 
 
-def select_minimum(
-    lats: np.ndarray,
-    lons: np.ndarray,
-    values: np.ndarray,
-    previous: tuple[float, float],
-    radius_km: float,
-) -> tuple[float, float, float]:
-    lat0, lon0 = previous
-    # Fast equirectangular prefilter followed by exact distance for candidates.
-    dx = (((lons - lon0 + 180) % 360) - 180) * np.cos(np.radians((lats + lat0) / 2)) * 111.32
-    dy = (lats - lat0) * 110.57
-    mask = (dx * dx + dy * dy) <= radius_km * radius_km
+class TrackingTerminated(RuntimeError):
+    """A center cannot safely be continued; retain the verified prefix only."""
+    def __init__(self, reason: str, detail: str):
+        self.reason = reason
+        super().__init__(detail)
+
+
+def normalize_domain(lats, lons, values, box):
+    """Make NOMADS subsets and global S3 fields identical tracking inputs."""
+    lats, lons, values = (np.asarray(a, dtype=float).ravel() for a in (lats, lons, values))
+    lons = np.mod(lons, 360.0)
+    if not (len(lats) == len(lons) == len(values)):
+        raise RuntimeError("GRIB coordinate/value length mismatch")
+    left, right = float(box["leftlon"]) % 360, float(box["rightlon"]) % 360
+    longitude_mask = ((lons >= left) & (lons <= right)) if left <= right else ((lons >= left) | (lons <= right))
+    mask = longitude_mask & (lats >= float(box["bottomlat"])) & (lats <= float(box["toplat"]))
     if not np.any(mask):
-        raise RuntimeError(f"No grid points within tracking radius near {lat0:.1f},{lon0:.1f}")
-    candidate_indices = np.flatnonzero(mask)
-    local = values[candidate_indices]
-    order = np.argsort(local)
-    # Prefer the deepest minimum, with a weak continuity penalty to avoid jumps.
-    best_score = float("inf")
-    best_idx = None
-    for rel in order[: min(30, len(order))]:
-        idx = int(candidate_indices[int(rel)])
-        distance = haversine_km(lat0, lon0, float(lats[idx]), float(lons[idx]))
-        score = float(values[idx]) + 0.0015 * distance
-        if score < best_score:
-            best_score, best_idx = score, idx
-    assert best_idx is not None
-    return float(lats[best_idx]), float(lons[best_idx]), float(values[best_idx])
+        raise RuntimeError("GRIB field has no points in configured domain")
+    lats, lons, values = lats[mask], lons[mask], values[mask]
+    if not all(np.all(np.isfinite(a)) for a in (lats, lons, values)):
+        raise RuntimeError("Non-finite GRIB values in tracking domain")
+    order = np.lexsort(((lons - left) % 360, lats))
+    lats, lons, values = lats[order], lons[order], values[order]
+    lat_axis = np.unique(lats)
+    lon_axis = np.sort(np.unique((lons - left) % 360))
+    ny, nx = len(lat_axis), len(lon_axis)
+    if any(len(axis) > 2 and not np.allclose(np.diff(axis), np.diff(axis)[0], atol=1e-7, rtol=0) for axis in (lat_axis, lon_axis)):
+        raise RuntimeError("Irregular grid spacing in tracking domain")
+    if nx < 3 or ny < 3 or nx * ny != len(values) or len(np.unique(np.column_stack((lats, lons)), axis=0)) != len(values):
+        raise RuntimeError("Tracking domain is not a complete unique rectangular grid")
+    return lats, lons, values
 
 
-def download_one(args: tuple[datetime, str, int, dict[str, float]]) -> tuple[str, int, bytes]:
+def select_minimum(lats, lons, values, previous, radius_km):
+    """Select an interior local minimum, never a cutout/search-boundary point.
+
+    An enclosed grid-scale pressure minimum is necessary, not proof of a tropical vortex.
+    Pressure tendency remains a separate conservative quality screen.
+    """
+    lat0, lon0 = previous
+    phi, phi0 = np.radians(lats), math.radians(lat0)
+    delta_lon = np.radians(((lons - lon0 + 180) % 360) - 180)
+    a = np.sin((phi - phi0) / 2) ** 2 + np.cos(phi) * math.cos(phi0) * np.sin(delta_lon / 2) ** 2
+    distance = 6371 * 2 * np.arctan2(np.sqrt(a), np.sqrt(np.maximum(0, 1-a)))
+    mask = distance <= radius_km
+    if not np.any(mask):
+        raise TrackingTerminated("domain_exit", f"No grid points within tracking radius near {lat0:.1f},{lon0:.1f}")
+    ny, nx = len(np.unique(lats)), len(np.unique(lons))
+    if nx * ny != len(values):
+        raise RuntimeError("select_minimum requires a normalized rectangular grid")
+    field = values.reshape(ny, nx)
+    minima = np.zeros(field.shape, dtype=bool)
+    center = field[1:-1, 1:-1]
+    neighbors = [field[1+dy:ny-1+dy, 1+dx:nx-1+dx] for dy in (-1, 0, 1) for dx in (-1, 0, 1) if dx or dy]
+    minima[1:-1, 1:-1] = np.logical_and.reduce([center <= n for n in neighbors]) & np.logical_or.reduce([center < n for n in neighbors])
+    # If the strongest nearby low is on the cutout boundary, do not switch to
+    # an unrelated interior minimum merely to manufacture a complete track.
+    nearby = np.flatnonzero(mask)
+    strongest = int(nearby[np.argmin(values[nearby] + 0.0015 * distance[nearby])])
+    row, col = divmod(strongest, nx)
+    if row in (0, ny - 1) or col in (0, nx - 1):
+        raise TrackingTerminated("domain_exit", f"Pressure minimum reaches domain edge near {lats[strongest]:.1f},{lons[strongest]:.1f}")
+    # Quantized broad minima must be enclosed as an entire plateau. A flat
+    # trough connected to a lower cell or cutout edge is not a tracked center.
+    processed = set()
+    plateau_representatives = []
+    for candidate in np.flatnonzero(mask & minima.ravel()):
+        candidate = int(candidate)
+        if candidate in processed:
+            continue
+        pressure = float(values[candidate])
+        component, pending = set(), [candidate]
+        enclosed = True
+        while pending:
+            idx = pending.pop()
+            if idx in component:
+                continue
+            component.add(idx)
+            row, col = divmod(idx, nx)
+            if row in (0, ny-1) or col in (0, nx-1):
+                enclosed = False
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    if not (dy or dx) or not (0 <= row+dy < ny and 0 <= col+dx < nx):
+                        continue
+                    neighbor = (row+dy)*nx+col+dx
+                    if values[neighbor] < pressure:
+                        enclosed = False
+                    elif values[neighbor] == pressure and neighbor not in component:
+                        pending.append(neighbor)
+        processed.update(component)
+        if enclosed:
+            eligible = [idx for idx in component if mask[idx]]
+            center_lat = float(np.mean(lats[list(component)]))
+            center_lon = float(np.mean(lons[list(component)]))
+            # Stable representative independent of source byte/grid ordering.
+            plateau_representatives.append(min(eligible, key=lambda idx: (haversine_km(center_lat, center_lon, float(lats[idx]), float(lons[idx])), idx)))
+    candidates = np.array(plateau_representatives, dtype=int)
+    if not len(candidates):
+        raise TrackingTerminated("center_lost", f"No enclosed local pressure minimum within {radius_km:.0f} km near {lat0:.1f},{lon0:.1f}")
+    scores = values[candidates] + 0.0015 * distance[candidates]
+    idx = int(candidates[np.argmin(scores)])
+    return float(lats[idx]), float(lons[idx]), float(values[idx])
+
+
+def download_one(args):
     init, member, fhour, box = args
+    cache_root = os.environ.get("GEFS_CACHE_DIR")
+    cache = Path(cache_root) / init.strftime("%Y%m%d%H") / f"{member}-f{fhour:03d}.grib2" if cache_root else None
+    if cache and cache.exists() and cache.with_suffix(".json").exists():
+        blob = cache.read_bytes()
+        source = json.loads(cache.with_suffix(".json").read_text())
+        if is_grib_message(blob) and hashlib.sha256(blob).hexdigest() == source.get("sha256"):
+            return member, fhour, blob, source
     if os.environ.get("GEFS_DOWNLOAD_SOURCE", "").lower() == "s3":
-        return member, fhour, s3_prmsl_blob(init, member, fhour)
-    try:
-        blob = request(filter_url(init, member, fhour, box), retries=2, timeout=25)
-        if not is_grib_message(blob):
-            raise RuntimeError("NOMADS returned a non-GRIB payload")
-    except RuntimeError as nomads_error:
-        print(
-            f"NOMADS fallback to NOAA S3: {member} f{fhour:03d}: {nomads_error}",
-            file=sys.stderr,
-            flush=True,
-        )
         blob = s3_prmsl_blob(init, member, fhour)
+        origin = "NOAA S3"
+    else:
+        try:
+            blob = request(filter_url(init, member, fhour, box), retries=2, timeout=25)
+            if not is_grib_message(blob):
+                raise RuntimeError("NOMADS returned a non-GRIB payload")
+            origin = "NOMADS"
+        except RuntimeError as nomads_error:
+            print(f"NOMADS fallback to NOAA S3: {member} f{fhour:03d}: {nomads_error}", file=sys.stderr, flush=True)
+            blob = s3_prmsl_blob(init, member, fhour)
+            origin = "NOAA S3"
     if not is_grib_message(blob):
         raise RuntimeError(f"Invalid GRIB response for {member} f{fhour:03d}")
-    return member, fhour, blob
+    source = {"source": origin, "sha256": hashlib.sha256(blob).hexdigest(), "bytes": len(blob)}
+    if cache:
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        cache.write_bytes(blob)
+        cache.with_suffix(".json").write_text(json.dumps(source))
+    return member, fhour, blob, source
 
 
 def build_tracks(init: datetime, config: dict) -> dict[str, list[TrackPoint]]:
     box = config["domain"]
     jobs = [(init, m, h, box) for m in MEMBERS for h in FORECAST_HOURS]
-    blobs: dict[tuple[str, int], bytes] = {}
+    blobs = {}
+    provenance = config["_fieldProvenance"] = {}
     workers = int(os.environ.get("GEFS_DOWNLOAD_WORKERS", "8"))
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
         futures = {executor.submit(download_one, job): job for job in jobs}
         for n, future in enumerate(concurrent.futures.as_completed(futures), 1):
             job = futures[future]
             try:
-                member, fhour, blob = future.result()
+                member, fhour, blob, source = future.result()
             except Exception as exc:
                 _, member, fhour, _ = job
-                raise RuntimeError(
-                    f"GEFS download failed for {member} f{fhour:03d}: {exc}"
-                ) from exc
+                raise RuntimeError(f"GEFS download failed for {member} f{fhour:03d}: {exc}") from exc
             blobs[(member, fhour)] = blob
+            provenance[f"{member}-f{fhour:03d}"] = source
             if n % 100 == 0 or n == len(jobs):
-                print(f"Downloaded {n}/{len(jobs)} fields")
+                print(f"Downloaded {n}/{len(jobs)} fields", flush=True)
     if len(blobs) != len(jobs):
         raise RuntimeError(f"Incomplete download: {len(blobs)}/{len(jobs)}")
-
-    tracks: dict[str, list[TrackPoint]] = {}
+    tracks = {}
+    diagnostics = config["_trackDiagnostics"] = {}
     seed = (float(config["seed"]["lat"]), float(config["seed"]["lon"]) % 360)
     first_radius = float(config.get("initialSearchRadiusKm", 1800))
     step_radius = float(config.get("stepSearchRadiusKm", 1000))
+    expected_coordinates = None
     for member in MEMBERS:
         previous = seed
-        points: list[TrackPoint] = []
+        points = []
         for fhour in FORECAST_HOURS:
-            lats, lons, values = decode_prmsl(blobs[(member, fhour)])
-            lat, lon, pressure = select_minimum(
-                lats, lons, values, previous, first_radius if fhour == 0 else step_radius
-            )
+            lats, lons, values = normalize_domain(*decode_prmsl(blobs[(member, fhour)]), box)
+            coordinates = (lats, lons)
+            if expected_coordinates is None:
+                expected_coordinates = coordinates
+            elif not all(np.array_equal(a, b) for a, b in zip(expected_coordinates, coordinates)):
+                raise RuntimeError(f"Inconsistent normalized grid: {member} f{fhour:03d}")
+            try:
+                lat, lon, pressure = select_minimum(lats, lons, values, previous, first_radius if fhour == 0 else step_radius)
+            except TrackingTerminated as exc:
+                diagnostics[member] = {"reason": exc.reason, "atForecastHour": fhour, "lastValidForecastHour": points[-1].fhour if points else None, "detail": str(exc)}
+                if not points:
+                    raise RuntimeError(f"Initial center unresolved for {member}: {exc}") from exc
+                break
             points.append(TrackPoint(fhour, lat, lon, pressure))
             previous = (lat, lon)
         tracks[member] = points
+        # Retain prefixes even if a later member fails, for failure artifacts.
+        config["_partialTracks"] = tracks
     return tracks
+
 
 
 def noise_reasons(points: list[TrackPoint]) -> list[str]:
@@ -980,7 +1113,8 @@ def point_json(member: str, p: TrackPoint) -> dict:
 
 
 def build_payload(init: datetime, config: dict, tracks: dict[str, list[TrackPoint]], previous: dict) -> dict:
-    reasons = {m: noise_reasons(tracks[m]) for m in MEMBERS}
+    terminations = config.get("_trackDiagnostics", {})
+    reasons = {m: noise_reasons(tracks[m]) + ([terminations[m]["reason"]] if m in terminations else []) for m in MEMBERS}
     clean = [m for m in MEMBERS if not reasons[m]]
     noise = [m for m in MEMBERS if reasons[m]]
     if len(clean) < 20:
@@ -1012,6 +1146,8 @@ def build_payload(init: datetime, config: dict, tracks: dict[str, list[TrackPoin
         "generatedFrom": "NOAA GEFS PRMSL experimental tracker",
         "stormInfo": config.get("stormInfo", meta.get("stormInfo", {})),
         "officialIdentity": config.get("_officialIdentity", meta.get("officialIdentity", {})),
+        "trackingTargetId": config.get("trackingTargetId"),
+        "trackingAlgorithm": "normalized-domain-closed-minimum-v2",
         "trackingSeed": config["seed"],
         "trackingSeedSource": config.get("_seedResolution", {}).get(
             "source", "tracking_config"
@@ -1033,6 +1169,7 @@ def build_payload(init: datetime, config: dict, tracks: dict[str, list[TrackPoin
                 "member": m,
                 "cluster": member_cluster[m],
                 "noiseReasons": reasons[m],
+                "termination": terminations.get(m),
                 "points": [point_json(m, p) for p in tracks[m]],
             }
             for m in MEMBERS
@@ -1045,7 +1182,22 @@ def validate(payload: dict, expected_init: str) -> None:
     assert payload["summary"]["members"] == 31
     assert len(payload["tracks"]) == 31
     assert {t["member"] for t in payload["tracks"]} == set(MEMBERS)
-    assert all(len(t["points"]) == len(FORECAST_HOURS) for t in payload["tracks"])
+    for track in payload["tracks"]:
+        points = track["points"]
+        assert points and [p["fhour"] for p in points] == FORECAST_HOURS[:len(points)]
+        assert all(math.isfinite(float(p[k])) for p in points for k in ("lat", "lon", "mslp_hpa"))
+        if len(points) != len(FORECAST_HOURS):
+            assert track["cluster"] == "NOISE" and track.get("termination")
+            assert track["termination"]["reason"] in track["noiseReasons"]
+            assert track["termination"]["lastValidForecastHour"] == points[-1]["fhour"]
+            assert track["termination"]["atForecastHour"] == FORECAST_HOURS[len(points)]
+        else:
+            assert not track.get("termination")
+    clean_tracks = [t for t in payload["tracks"] if t["cluster"] != "NOISE"]
+    assert payload["summary"]["cleanMembers"] == len(clean_tracks)
+    assert payload["summary"]["noiseMembers"] == len(payload["tracks"]) - len(clean_tracks)
+    assert all(not t["noiseReasons"] and len(t["points"]) == len(FORECAST_HOURS) for t in clean_tracks)
+    assert payload["summary"]["cleanMembers"] >= 20
     assert payload["summary"]["cleanMembers"] + payload["summary"]["noiseMembers"] == 31
     assert payload["meta"].get("trackingIdentity", {}).get("status") == "verified"
     assert "officialIdentity" in payload["meta"]
@@ -1056,7 +1208,8 @@ def archive_path_for_payload(payload: dict, init: datetime) -> Path:
     init_key = init.strftime("%Y%m%d%H")
     base = HISTORY_DIR / f"{init_key}.json"
     current_id = normalize_storm_id(
-        payload.get("meta", {}).get("stormInfo", {}).get("id")
+        payload.get("meta", {}).get("trackingTargetId")
+        or payload.get("meta", {}).get("stormInfo", {}).get("id")
         or payload.get("meta", {}).get("storm")
     )
     if not base.exists():
@@ -1064,7 +1217,8 @@ def archive_path_for_payload(payload: dict, init: datetime) -> Path:
     try:
         saved = json.loads(base.read_text(encoding="utf-8"))
         saved_id = normalize_storm_id(
-            saved.get("meta", {}).get("stormInfo", {}).get("id")
+            saved.get("meta", {}).get("trackingTargetId")
+            or saved.get("meta", {}).get("stormInfo", {}).get("id")
             or saved.get("meta", {}).get("storm")
         )
     except (OSError, json.JSONDecodeError):
@@ -1195,6 +1349,29 @@ def self_test() -> None:
     print("Self-test OK")
 
 
+def write_run_diagnostics(init, config, tracks, status, error=None):
+    """Keep raw tracked points and signed events even when publication fails."""
+    output = Path(os.environ.get("GEFS_DIAGNOSTICS_PATH", str(ROOT / ".diagnostics" / "gefs-analysis.json")))
+    output.parent.mkdir(parents=True, exist_ok=True)
+    member_details = {}
+    terminations = config.get("_trackDiagnostics", {})
+    for member, points in tracks.items():
+        events = []
+        for a, b in zip(points, points[1:]):
+            hours = b.fhour - a.fhour
+            distance = haversine_km(a.lat, a.lon, b.lat, b.lon)
+            delta = b.mslp_hpa - a.mslp_hpa
+            if abs(delta) > 25 or distance / max(1, hours) > 85:
+                events.append({"from": point_json(member, a), "to": point_json(member, b), "pressureChangeHpa": round(delta, 3), "distanceKm": round(distance, 2), "speedKmh": round(distance / max(1, hours), 2), "interpretation": "quality-screen event; physical pressure change vs tracker error requires source-field review"})
+        reasons = noise_reasons(points)
+        if member in terminations:
+            reasons.append(terminations[member]["reason"])
+        member_details[member] = {"points": [point_json(member, p) for p in points], "qualityFlags": reasons, "events": events, "termination": terminations.get(member)}
+    document = {"schemaVersion": 1, "init": init.strftime("%Y%m%d%H"), "checkedAt": datetime.now(timezone.utc).isoformat(), "status": status, "error": str(error) if error else None, "trackingTargetId": config.get("trackingTargetId"), "seed": config.get("seed"), "seedResolution": config.get("_seedResolution"), "officialIdentity": config.get("_officialIdentity"), "domain": config.get("domain"), "policy": {"minimumCompleteCleanMembers": 20, "maxPressureChangeHpa": 25, "maxSpeedKmh": 85, "forecastHours": FORECAST_HOURS}, "downloadedFields": len(config.get("_fieldProvenance", {})), "fieldProvenance": config.get("_fieldProvenance", {}), "members": member_details}
+    output.write_text(json.dumps(document, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"Wrote diagnostic evidence: {output}", flush=True)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--self-test", action="store_true")
@@ -1212,23 +1389,38 @@ def main() -> int:
         else latest_complete_cycle()
     )
     init_string = init.strftime("%Y%m%d%H")
-    if previous.get("meta", {}).get("init") == init_string and previous.get("summary", {}).get("members") == 31:
+    if not args.force_init and previous.get("meta", {}).get("init") == init_string and previous.get("meta", {}).get("trackingAlgorithm") == "normalized-domain-closed-minimum-v2":
         previous_id = normalize_storm_id(
             previous.get("meta", {}).get("stormInfo", {}).get("id")
         )
         configured_id = normalize_storm_id(config.get("stormInfo", {}).get("id"))
-        if previous_id == configured_id:
-            refresh_existing_identity(previous, config, init)
-            print(f"data.json already contains complete run {init_string}")
-            return 0
+        if previous_id == configured_id and same_tracking_target(previous, config):
+            try:
+                validate(previous, init_string)
+            except (AssertionError, KeyError, TypeError, ValueError):
+                pass
+            else:
+                refresh_existing_identity(previous, config, init)
+                print(f"data.json already contains complete run {init_string}")
+                return 0
 
     print(f"Building GEFS analysis for {init_string}")
-    config = resolve_tracking_seed(config, previous, init)
-    tracks = build_tracks(init, config)
-    config["_trackingIdentity"] = verify_tracking_identity(config, tracks)
-    payload = build_payload(init, config, tracks, previous)
-    validate(payload, init_string)
-    write_atomically(payload, init)
+    tracks = {}
+    try:
+        config = resolve_tracking_seed(config, previous, init)
+        tracks = build_tracks(init, config)
+        config["_trackingIdentity"] = verify_tracking_identity(config, tracks)
+        payload = build_payload(init, config, tracks, previous)
+        validate(payload, init_string)
+        # Evidence is a publication prerequisite; write it before changing data.
+        write_run_diagnostics(init, config, tracks, "accepted")
+        write_atomically(payload, init)
+    except Exception as exc:
+        try:
+            write_run_diagnostics(init, config, tracks or config.get("_partialTracks", {}), "rejected", exc)
+        except Exception as diagnostic_error:
+            print(f"Could not save diagnostics (original error retained): {diagnostic_error}", file=sys.stderr)
+        raise
     latest = {
         "model": "GEFS",
         "init": init_string,

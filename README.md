@@ -10,18 +10,29 @@ This is an **unofficial, experimental visualization** made for exploring weather
 
 ## 現在の監視状態
 
-- 個別監視: **Invest 93W（2026年9月）**
-- 2026年9月29日JST、TWINの指定に基づき台風26号スリゲの個別監視を終了し93Wへ切替
-- JTWC ABPW 28日23:00 JST: 15.2N・156.1E、推定15–20 kt、約1008 hPa、24時間以内の発達評価LOW
-- JTWCのモデル要約: 西北西へ進みながら徐々に発達する見通し
-- GEFS自動取得対象を93Wへ変更し、最新のJTWC公式位置から追跡・検証
+- 個別監視: **Invest 94W（2026年10月）**
+- 2026年10月4日JST、TWINの承認に基づき台風27号チョーイワン（93W / JTWC 26W / CHOI-WAN）の個別監視を終了し、10月の94Wへ切替
+- JTWC ABPW 10月3日22:00 JST: 8.3N・167.4E、推定18–23 kt、約1008 hPa、24時間以内の発達評価MEDIUM
+- 公式原文は10月4日12:07 JST取得。有効期間は10月3日22:00〜4日15:00 JST。発表時点の評価と現在の実況を区別
+- JTWCのモデル要約: 今後24時間はほぼ停滞しつつまとまる見通し（独自のGEFS解析結果ではない）
+- GEFS自動取得対象を94Wへ変更し、解析実行時に最新のJTWC公式位置から追跡・検証
+- 10月4日12:30 JST、GEFS 10月3日18Zの31メンバー取得・初期同一性検証に合格。27本を+240hまで追跡し、4本は中心喪失時点で打切り・別枠保存
+- 初期中心は公式位置から約35〜315km、中央値123km、中央気圧1007.3hPa。閾値は緩めず、4シナリオ群を抽出
+- [実データ検証run](https://github.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/37174197376)は10月4日12:30 JSTに合格（初期値: 10月3日18Z）
 - 過去のGEFSラン、`history/`、解析セッションは保存
-- 93Wの31メンバー完全解析が完成するまでは、旧対象の進路図を保存済み解析として表示
 
 現行監視状態の正本は `monitor_status.json`、追跡設定は `tracking_config.json` です。
-今回の切替記録は `analysis/sessions/2026-09-29-93w-monitoring-started.json` に保存しています。
-切替直前の対象は91W / JTWC 25W / SURIGAE（気象庁台風26号）。気象庁台風25号（90W / JTWC 24W / DUJUAN）は9月21日に監視解除済みです。
-過去の対象IDや予測中心を93Wへ流用しません。監視解除は、台風の消滅や影響終了を意味しません。
+検証結果は `analysis/sessions/2026-10-04-94w-gefs-validated.json`、
+解析待ちだった切替時点の記録は `analysis/sessions/2026-10-04-94w-monitoring-started.json`、
+公式原文と取得記録は `analysis/materials/2026-10-03-1300z-jtwc-abpw*` に保存しています。
+検証実行時の公式再取得は10月4日12:29 JST。元の発表・初回取得記録は保持しています。
+検証候補の公開先は `data.json`、`latest_run.json`、`history/2026100318.json` です。
+
+**10月の94Wは8月の94Wとは別の擾乱です。** Invest番号は再利用されるため、
+`trackingTargetId: 2026-10-invest-94w` で対象の世代を区別し、正式な昇格後も同じ世代IDを保ちます。
+過去の94Wや93Wの対象ID・名称・警報番号・予測中心を今回の94Wへ流用しません。
+過去の解析を削除せず、現在の監視対象と区別して参照できます。
+監視解除は、台風の消滅や影響終了を意味しません。
 
 ### 海盆をまたぐInvestの扱い
 
@@ -115,3 +126,14 @@ python -m http.server 8000
 ---
 
 GitHub Pages deployment re-triggered after Pages was enabled.
+
+## 追跡品質と再現検証（2026-10-04）
+
+- NOMADS切出しとNOAA S3全球場は、復号後に同一領域・同一格子順へ正規化します
+- 領域端、中心喪失、開いた気圧の谷では追跡を打ち切り、有効な前半だけをNOISEとして保存します。打切りは台風の消滅を意味しません
+- シナリオ集計には+240hまで揃う正常メンバーだけを使います。正常20本以上、12時間25hPa、85km/hの品質条件は緩和していません
+- 海面気圧の局所極小は閉じた循環や熱帯低気圧の証明ではありません。気圧急変は保守的な品質フラグであり、物理的急変と誤追跡を診断素材で区別します
+- PR検証はread-only権限で実際の最新GEFSを解析し、公開・commit・Pages dispatchは行いません。既存の定時更新間隔は変更しません
+- Actions artifactsに追跡点、符号付き気圧差、終了理由、取得元とSHA256を14日保存します。失敗runも旧公開データを置き換えず証拠を残します
+- ローカル検証: `python scripts/run_gefs_analysis.py --self-test` と `python -m unittest discover -s scripts -p 'test_*.py'`
+- 任意の再現用rawキャッシュは `GEFS_CACHE_DIR`、診断出力先は `GEFS_DIAGNOSTICS_PATH` で指定できます。`--force-init YYYYMMDDHH` は既存同一ランでも再解析します

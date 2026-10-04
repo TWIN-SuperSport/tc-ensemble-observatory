@@ -1,29 +1,54 @@
 {
   "schemaVersion": 1,
   "state": "active",
+  "trackingTargetId": "2026-10-invest-94w",
   "targetAliases": [
-    "93W",
-    "WP93"
+    "94W",
+    "WP94"
   ],
-  "titleJa": "Invest 93W 個別監視中",
-  "titleEn": "Monitoring Invest 93W",
-  "badgeJa": "監視中 / LOW",
-  "conclusionJa": "TWINの指定に基づき台風26号スリゲの個別監視を終了し、93Wへ切り替え。JTWCの9月28日23時JST発表では15.2N・156.1E付近、24時間以内の発達評価はLOW。93WのGEFS完全解析が完成するまでは、地図に旧対象の保存済み解析を表示します。",
+  "titleJa": "Invest 94W（2026年10月）個別監視中",
+  "titleEn": "Monitoring Invest 94W (October 2026)",
+  "badgeJa": "監視中 / GEFS検証済み",
+  "conclusionJa": "2026年10月のInvest 94Wについて、GEFS 10月3日18Z初期値の31メンバー取得と公式位置の同一性検証に合格しました。27本を+240hまで追跡し、中心を見失った4本はその時点で打ち切って別枠に保存しています。8月の94Wと旧対象の台風27号チョーイワンの解析は区別して保持します。",
   "signals": [
-    "現役対象: Invest 93W（2026年9月）",
-    "JTWC: 推定15–20 kt / 約1008 hPa / 24時間LOW",
-    "西北西へ進みながら徐々に発達する見通し（JTWCのモデル要約）",
-    "GEFS自動取得対象を93Wへ変更・31メンバー完全解析待ち"
+    "現役対象: Invest 94W（2026年10月）。8月の94Wとは別の擾乱",
+    "JTWC 10月3日22時JST発表: 8.3N・167.4E / 18–23 kt / 約1008 hPa / MEDIUM",
+    "GEFS 10月3日18Z: 31メンバー取得・27本を+240hまで追跡・4本は中心喪失時点で打切り",
+    "初期中心: 公式位置から35–315km、中央値123km / 中央気圧1007.3hPa。4シナリオ群",
+    "解析検証: 10月4日12:30 JST合格（初期値: 10月3日18Z）"
   ],
-  "checkedAt": "2026-09-29T07:06:27+09:00",
-  "metaJa": "確認: 2026年09月29日 07:06 JST • JTWC ABPW 28日23:00 JST発表",
-  "nextJa": "最新の公式位置を照合し、93WのGEFS追跡結果を検証します。LOWは24時間以内の発達評価であり、日本への接近確率ではありません。",
+  "checkedAt": "2026-10-04T12:07:10+09:00",
+  "officialIssuedAt": "2026-10-03T13:00:00Z",
+  "officialValidUntil": "2026-10-04T06:00:00Z",
+  "analysisState": "analysis_validated",
+  "metaJa": "公式原文取得: 2026年10月04日12:07 JST • 実行時再取得: 12:29 JST • 発表: 10月03日22:00 JST（04日15:00 JSTまで有効） • GEFS検証: 04日12:30 JST",
+  "nextJa": "次のランでも対象世代・公式位置・中心連続性を検証します。中心喪失は実際の擾乱消滅を意味しません。MEDIUMは記載した発表時点から24時間以内の発達評価であり、日本への接近確率ではありません。",
   "sessionPath": "analysis.html",
   "sources": [
     {
-      "label": "Invest 93W / LOW",
-      "note": "JTWC ABPW 2026-09-28 23:00 JST",
+      "label": "Invest 94W（2026年10月） / MEDIUM",
+      "note": "JTWC ABPW 2026-10-03 22:00 JST発表 / 10-04 12:07 JST取得",
       "url": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt"
+    },
+    {
+      "label": "切替時の公式原文",
+      "note": "ABPW 031300Z OCT 2026・取得日時とSHA-256は解析室に保存",
+      "url": "analysis/materials/2026-10-03-1300z-jtwc-abpw.txt"
+    },
+    {
+      "label": "GEFS 31メンバー検証結果",
+      "note": "2026100318 / 初期同一性検証合格・4本は中心喪失時点で打切り",
+      "url": "https://github.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/37174197376"
     }
-  ]
+  ],
+  "analysisValidatedAt": "2026-10-04T03:30:16.852385Z",
+  "validatedInit": "2026100318",
+  "analysisSummary": {
+    "members": 31,
+    "cleanMembers": 27,
+    "noiseMembers": 4,
+    "clusterCount": 4
+  },
+  "validationRunUrl": "https://github.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/37174197376",
+  "officialRecheckedAt": "2026-10-04T03:29:16.858474Z"
 }

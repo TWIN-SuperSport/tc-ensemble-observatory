@@ -40,6 +40,7 @@ def build_history_index(history_dir: Path, latest_path: str | None = None) -> di
                 "model": meta.get("model", "GEFS"),
                 "storm": meta.get("storm"),
                 "stormId": meta.get("stormInfo", {}).get("id"),
+                **({"trackingTargetId": meta["trackingTargetId"]} if meta.get("trackingTargetId") else {}),
                 "targetLabel": target_label(meta),
                 "members": summary.get("members"),
                 "cleanMembers": summary.get("cleanMembers"),

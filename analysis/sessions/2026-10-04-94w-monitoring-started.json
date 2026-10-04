@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "analysisId": "2026-10-04-94w-monitoring-started",
+  "trackingTargetId": "2026-10-invest-94w",
+  "title": "台風27号追跡終了・Invest 94W（2026年10月）監視開始",
+  "target": [
+    "Invest 94W（2026年10月）",
+    "台風27号チョーイワン・アーカイブ"
+  ],
+  "generatedAt": "2026-10-04T12:07:10+09:00",
+  "status": "2026年10月のInvest 94W個別監視中・GEFS完全解析検証待ち",
+  "confidence": "公式掲載確認済み／新対象のGEFS解析・将来進路は未検証",
+  "conclusion": [
+    "TWINの監視切替・追跡処理修正の承認に基づき、台風27号チョーイワン（93W / JTWC 26W / CHOI-WAN）の個別監視を終了し、2026年10月のInvest 94Wを主監視対象とする。監視解除は消滅や影響終了の判定ではない。",
+    "JTWC ABPW 2026年10月3日13Z（22時JST）では、94Wは8.3N・167.4E、クェゼリンの南西約47海里。推定18–23 kt、最低海面気圧約1008 hPa、24時間以内の発達評価はMEDIUM。原文を10月4日03:07Z（12:07 JST）に取得し保存した。",
+    "2026年8月に監視した同じ番号の94Wは別の擾乱。10月の対象には世代ID 2026-10-invest-94wを付け、過去の94Wの名称・警報番号・公式位置・予測中心を継承しない。",
+    "切替時点では新対象の31メンバー完全解析は未検証。検証に合格するまでdata.json、latest_run.json、過去ランを新対象の解析として扱わず、旧対象の保存済み解析を区別して表示する。"
+  ],
+  "reasoning": [
+    "公式実況、JTWCが要約したモデル見解、監視対象変更という運用判断を分離して記録する。",
+    "JTWCは低層循環のまとまりつつある状態を記載。環境はやや好適で、鉛直シアー15–20 kt、弱い赤道向き流出、海面水温29–30℃としている。",
+    "JTWCの全球モデル要約は、今後24時間ほぼ停滞しつつまとまるというもの。本記録は独自のGEFS・ECMWF比較結果ではない。",
+    "追跡設定はWP94、参照初期位置8.3N・167.4Eへ変更。これは切替時点の参照値であり、解析実行時に最新の公式位置を再取得して照合する。距離・初期気圧の同一性閾値は緩めない。",
+    "追跡修正と94Wの実データ検証は切替記録の作成時点では未完了。修正の成功や新しい予測結果を、この公式情報の確認だけから推定しない。"
+  ],
+  "uncertainties": [
+    "新対象94WのGEFS 31メンバー完全解析・公式位置照合は本記録の作成時点で未完了。",
+    "保存したABPWの有効期間は10月3日13Z〜4日06Z（3日22時〜4日15時JST）。その後の実況として再利用せず、公式情報を更新する。",
+    "発達の成否・時期、長期進路、日本への影響は未確定。MEDIUMは発表時点から24時間以内の発達評価であり、上陸・接近確率ではない。"
+  ],
+  "falsifiers": [
+    "公式情報で94Wが消失・昇格・中心再配置された場合、世代IDを保ちながら公式IDと位置連続性を再確認する。",
+    "初期中心が公式位置・気圧の検証条件を満たさない場合は新解析を公開せず、保存済み解析を保持する。",
+    "取得範囲外の中心や追跡打切りを無理に継ぎ足さず、別の低圧部へのtracker jumpを94Wの進路シナリオに含めない。"
+  ],
+  "materials": [
+    {
+      "id": "E-01",
+      "title": "JTWC ABPW 2026年10月3日22時JST 原文",
+      "type": "official-text-product",
+      "role": "10月94Wの公式位置・発達評価・環境とモデル見解の確認",
+      "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
+      "data": "../materials/2026-10-03-1300z-jtwc-abpw.txt",
+      "validTime": "2026-10-03T13:00:00Z/2026-10-04T06:00:00Z",
+      "tags": [
+        "JTWC",
+        "94W",
+        "October 2026",
+        "MEDIUM",
+        "official-seed"
+      ]
+    },
+    {
+      "id": "E-02",
+      "title": "公式原文の取得記録",
+      "type": "source-metadata",
+      "role": "発表日時・取得日時・有効期限・raw SHA-256の再確認",
+      "data": "../materials/2026-10-03-1300z-jtwc-abpw-source.json",
+      "tags": [
+        "provenance",
+        "freshness",
+        "SHA-256"
+      ]
+    },
+    {
+      "id": "E-03",
+      "title": "2026年8月の94W監視記録（別の擾乱）",
+      "type": "analysis-session",
+      "role": "Invest番号の再利用による対象混同を防ぎ、旧履歴を保存",
+      "data": "2026-08-29-94w-monitoring-started.json",
+      "tags": [
+        "94W",
+        "August 2026",
+        "separate-generation",
+        "archive"
+      ]
+    },
+    {
+      "id": "E-04",
+      "title": "直前の93W監視開始記録",
+      "type": "analysis-session",
+      "role": "93WからJTWC 26W / CHOI-WANへ継続した旧対象の監視履歴を保存",
+      "data": "2026-09-29-93w-monitoring-started.json",
+      "tags": [
+        "93W",
+        "26W",
+        "CHOI-WAN",
+        "archive"
+      ]
+    },
+    {
+      "id": "E-05",
+      "title": "切替前の最後の完全解析 2026-10-01 18Z",
+      "type": "gefs-archive",
+      "role": "台風27号チョーイワンの保存済み解析。新対象94Wの結果として利用しない",
+      "data": "../../history/2026100118.json",
+      "model": "GEFS",
+      "validTime": "2026-10-01T18:00:00Z",
+      "tags": [
+        "93W",
+        "26W",
+        "CHOI-WAN",
+        "31-members",
+        "archive"
+      ]
+    }
+  ]
+}

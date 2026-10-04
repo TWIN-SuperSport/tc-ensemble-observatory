@@ -1,0 +1,69 @@
+{
+  "checkedAt": "2026-10-04T03:33:00Z",
+  "sourceCommit": "9770c62f90cbac9d057c26c586d8508a375b21c4",
+  "pullRequest": "https://github.com/TWIN-SuperSport/tc-ensemble-observatory/pull/31",
+  "validationRun": "https://github.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/37174197376",
+  "artifactId": 11292612667,
+  "artifactSha256": "607cf4f2e5e5a8006e02e89052c832c37f7e345d28f0571c820a16613b1695cb",
+  "init": "2026100318",
+  "trackingTargetId": "2026-10-invest-94w",
+  "summary": {
+    "members": 31,
+    "cleanMembers": 27,
+    "noiseMembers": 4,
+    "clusterCount": 4
+  },
+  "initialIdentity": {
+    "status": "verified",
+    "source": "JTWC ABPW",
+    "sourceStormId": "94W",
+    "seed": {
+      "lat": 8.3,
+      "lon": 167.4
+    },
+    "initialMedianDistanceKm": 123.0,
+    "initialMedianMslpHpa": 1007.3,
+    "maxMedianDistanceKm": 600.0,
+    "maxMedianMslpHpa": 1008.0
+  },
+  "initialMemberDistanceKm": {
+    "min": 35.1276,
+    "max": 315.2511
+  },
+  "offlineTests": 52,
+  "staticChecks": "HTML parse, local references, all JSON, JavaScript syntax passed",
+  "domIntegration": "raw/noise/clustered at0,12,120,240h; episode isolation and termination notice passed",
+  "preview": "Owner-private Sites project reused; pre-release cloud-browser access blocked by client. Best-effort release authorized; production browser verification pending.",
+  "retainedPriorArchives": 235,
+  "terminationRecords": [
+    {
+      "member": "p12",
+      "reason": "center_lost",
+      "atForecastHour": 192,
+      "lastValidForecastHour": 180,
+      "detail": "No enclosed local pressure minimum within 750 km near 20.0,182.5"
+    },
+    {
+      "member": "p14",
+      "reason": "center_lost",
+      "atForecastHour": 240,
+      "lastValidForecastHour": 228,
+      "detail": "No enclosed local pressure minimum within 750 km near 21.0,155.5"
+    },
+    {
+      "member": "p17",
+      "reason": "center_lost",
+      "atForecastHour": 240,
+      "lastValidForecastHour": 228,
+      "detail": "No enclosed local pressure minimum within 750 km near 14.5,175.5"
+    },
+    {
+      "member": "p27",
+      "reason": "center_lost",
+      "atForecastHour": 240,
+      "lastValidForecastHour": 228,
+      "detail": "No enclosed local pressure minimum within 750 km near 34.0,161.0"
+    }
+  ],
+  "scientificCaveat": "PRMSL local minima are experimental tracks, not proof of closed tropical circulation; center loss does not mean cyclone dissipation. Pressure-change quality thresholds were not relaxed."
+}

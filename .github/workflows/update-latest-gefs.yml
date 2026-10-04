@@ -20,6 +20,7 @@ on:
     paths:
       - "scripts/build_gefs_data.py"
       - "scripts/run_gefs_analysis.py"
+      - "scripts/test_tracking_quality.py"
       - "tracking_config.json"
       - "requirements.txt"
       - ".github/workflows/update-latest-gefs.yml"
@@ -73,7 +74,11 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run offline pipeline self-test
-        run: python scripts/run_gefs_analysis.py --self-test
+        run: |
+          python scripts/run_gefs_analysis.py --self-test
+          python -m unittest discover -s scripts -p "test_*.py"
+          node --check app.js
+          node scripts/test_renderer.mjs
 
       - name: Build latest complete 31-member GEFS analysis
         env:
@@ -84,6 +89,16 @@ jobs:
           else
             python scripts/run_gefs_analysis.py
           fi
+
+      - name: Preserve analysis diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gefs-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .diagnostics/
+          if-no-files-found: ignore
+          include-hidden-files: true
+          retention-days: 14
 
       - name: Validate generated site payload
         run: |
