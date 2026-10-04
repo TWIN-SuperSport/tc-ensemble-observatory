@@ -1,29 +1,38 @@
 {
   "schemaVersion": 1,
   "state": "active",
+  "trackingTargetId": "2026-10-invest-94w",
   "targetAliases": [
-    "93W",
-    "WP93"
+    "94W",
+    "WP94"
   ],
-  "titleJa": "Invest 93W 個別監視中",
-  "titleEn": "Monitoring Invest 93W",
-  "badgeJa": "監視中 / LOW",
-  "conclusionJa": "TWINの指定に基づき台風26号スリゲの個別監視を終了し、93Wへ切り替え。JTWCの9月28日23時JST発表では15.2N・156.1E付近、24時間以内の発達評価はLOW。93WのGEFS完全解析が完成するまでは、地図に旧対象の保存済み解析を表示します。",
+  "titleJa": "Invest 94W（2026年10月）個別監視中",
+  "titleEn": "Monitoring Invest 94W (October 2026)",
+  "badgeJa": "監視中 / MEDIUM / GEFS検証待ち",
+  "conclusionJa": "TWINの指定に基づき台風27号チョーイワン（93W / JTWC 26W）の個別監視を終了し、2026年10月の94Wへ切り替え。JTWCの10月3日22時JST発表では8.3N・167.4E付近、24時間以内の発達評価はMEDIUM。今回の94WのGEFS完全解析が検証に合格するまでは、地図に旧対象の保存済み解析を表示します。",
   "signals": [
-    "現役対象: Invest 93W（2026年9月）",
-    "JTWC: 推定15–20 kt / 約1008 hPa / 24時間LOW",
-    "西北西へ進みながら徐々に発達する見通し（JTWCのモデル要約）",
-    "GEFS自動取得対象を93Wへ変更・31メンバー完全解析待ち"
+    "現役対象: Invest 94W（2026年10月）。8月の94Wとは別の擾乱",
+    "JTWC 10月3日22時JST発表: 推定18–23 kt / 約1008 hPa / 24時間MEDIUM",
+    "今後24時間はほぼ停滞しつつまとまる見通し（JTWCのモデル要約）",
+    "GEFS: 新対象の31メンバー完全解析・公式位置検証待ち"
   ],
-  "checkedAt": "2026-09-29T07:06:27+09:00",
-  "metaJa": "確認: 2026年09月29日 07:06 JST • JTWC ABPW 28日23:00 JST発表",
-  "nextJa": "最新の公式位置を照合し、93WのGEFS追跡結果を検証します。LOWは24時間以内の発達評価であり、日本への接近確率ではありません。",
+  "checkedAt": "2026-10-04T12:07:10+09:00",
+  "officialIssuedAt": "2026-10-03T13:00:00Z",
+  "officialValidUntil": "2026-10-04T06:00:00Z",
+  "analysisState": "awaiting-first-complete-analysis",
+  "metaJa": "確認: 2026年10月04日 12:07 JST • JTWC ABPW 10月03日22:00 JST発表（04日15:00 JSTまで有効）",
+  "nextJa": "次回解析で最新の公式位置と対象世代を照合します。MEDIUMは発表時点から24時間以内の発達評価であり、日本への接近確率ではありません。",
   "sessionPath": "analysis.html",
   "sources": [
     {
-      "label": "Invest 93W / LOW",
-      "note": "JTWC ABPW 2026-09-28 23:00 JST",
+      "label": "Invest 94W（2026年10月） / MEDIUM",
+      "note": "JTWC ABPW 2026-10-03 22:00 JST発表 / 10-04 12:07 JST取得",
       "url": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt"
+    },
+    {
+      "label": "切替時の公式原文",
+      "note": "ABPW 031300Z OCT 2026・取得日時とSHA-256は解析室に保存",
+      "url": "analysis/materials/2026-10-03-1300z-jtwc-abpw.txt"
     }
   ]
 }

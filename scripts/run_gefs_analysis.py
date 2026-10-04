@@ -11,7 +11,8 @@ _original_build_payload = pipeline.build_payload
 
 
 def _diagnostic_build_payload(init, config, tracks, previous):
-    reasons = {member: pipeline.noise_reasons(tracks[member]) for member in pipeline.MEMBERS}
+    terminations = config.get("_trackDiagnostics", {})
+    reasons = {member: pipeline.noise_reasons(tracks[member]) + ([terminations[member]["reason"]] if member in terminations else []) for member in pipeline.MEMBERS}
     clean = [member for member in pipeline.MEMBERS if not reasons[member]]
     noise = [member for member in pipeline.MEMBERS if reasons[member]]
     counts = Counter(reason for member in noise for reason in reasons[member])

@@ -1,9 +1,10 @@
 {
   "monitoringState": "active",
   "monitoringEnabled": true,
-  "storm": "WP93",
+  "storm": "WP94",
   "stormInfo": {
-    "id": "93W",
+    "id": "94W",
+    "trackingTargetId": "2026-10-invest-94w",
     "status": "invest",
     "name": null,
     "nameJa": null,
@@ -13,20 +14,20 @@
     "originBasin": "WPAC",
     "currentBasin": "WPAC",
     "aliases": [
-      "93W"
+      "94W"
     ],
-    "continuity": "Western Pacific Invest 93W identified in JTWC ABPW 281400Z September 2026. Distinct from former targets 90W / 24W / DUJUAN (JMA Typhoon 25) and 91W / 25W / SURIGAE (JMA Typhoon 26). Retain this Invest ID until official promotion and verify position continuity."
+    "continuity": "Western Pacific Invest 94W in JTWC ABPW 031300Z October 2026 at 8.3N 167.4E. This is a new October system, distinct from the August 2026 Invest 94W and from September 93W / JTWC 26W / CHOI-WAN (JMA Typhoon 27). Retain the trackingTargetId across official promotion; never inherit aliases, seeds, or official identity from an earlier generation with the same Invest serial."
   },
   "seed": {
-    "lat": 15.2,
-    "lon": 156.1
+    "lat": 8.3,
+    "lon": 167.4
   },
   "seedResolver": {
     "enabled": true,
     "warningUrl": null,
     "officialUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
     "aliases": [
-      "93W"
+      "94W"
     ],
     "previousForecastFallbackHours": 12,
     "requireResolvedSeed": true
@@ -47,5 +48,15 @@
   "initialIdentityMedianMaxDistanceKm": 600,
   "initialIdentityMedianMslpMaxHpa": 1008,
   "stepSearchRadiusKm": 750,
-  "clusterThresholdKm": 650
+  "clusterThresholdKm": 650,
+  "trackingTargetId": "2026-10-invest-94w",
+  "monitoringStartedAt": "2026-10-04T03:07:10Z",
+  "seedReference": {
+    "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
+    "issuedAt": "2026-10-03T13:00:00Z",
+    "retrievedAt": "2026-10-04T03:07:10Z",
+    "validUntil": "2026-10-04T06:00:00Z",
+    "rawPath": "analysis/materials/2026-10-03-1300z-jtwc-abpw.txt",
+    "note": "Reference for target switch only. Resolve the current official position at run time; do not use this fixed reference as a verified fallback."
+  }
 }

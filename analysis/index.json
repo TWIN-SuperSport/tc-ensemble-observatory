@@ -1,7 +1,18 @@
 {
   "schemaVersion": 1,
-  "latest": "./analysis/sessions/2026-09-29-93w-monitoring-started.json",
+  "latest": "./analysis/sessions/2026-10-04-94w-monitoring-started.json",
   "sessions": [
+    {
+      "id": "2026-10-04-94w-monitoring-started",
+      "label": "2026-10-04｜台風27号追跡終了・Invest 94W（10月）監視開始",
+      "path": "./analysis/sessions/2026-10-04-94w-monitoring-started.json",
+      "trackingTargetId": "2026-10-invest-94w",
+      "target": [
+        "Invest 94W（2026年10月）",
+        "台風27号チョーイワン・アーカイブ"
+      ],
+      "status": "active-monitoring"
+    },
     {
       "id": "2026-09-29-93w-monitoring-started",
       "label": "2026-09-29｜台風26号追跡終了・Invest 93W監視開始",

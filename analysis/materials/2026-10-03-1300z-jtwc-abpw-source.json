@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
+  "retrievedAt": "2026-10-04T03:07:10Z",
+  "issuedAt": "2026-10-03T13:00:00Z",
+  "validUntil": "2026-10-04T06:00:00Z",
+  "httpLastModified": "2026-10-03T13:11:13Z",
+  "rawFile": "2026-10-03-1300z-jtwc-abpw.txt",
+  "rawBytes": 2234,
+  "sha256": "76dd13c381da1f81ce8dc230cd0c6721e61ecc02028a9533cf9971440367d8b0",
+  "bulletin": "ABPW10 PGTW 031300",
+  "trackingTargetId": "2026-10-invest-94w",
+  "extractedInvest": {
+    "id": "94W",
+    "lat": 8.3,
+    "lon": 167.4,
+    "maxSustainedWindKt": [
+      18,
+      23
+    ],
+    "minimumSeaLevelPressureHpa": 1008,
+    "developmentPotential24h": "MEDIUM",
+    "positionQualifier": "JTWC ABPW current position; bulletin does not provide a separate observation time",
+    "modelSummary": "JTWC reports fair agreement on quasi-stationary motion over the next 24 hours while consolidating; this is not an independent GEFS analysis."
+  },
+  "identityNote": "October 2026 Invest 94W. Separate from the August 2026 Invest 94W archived in analysis/sessions/2026-08-29-94w-monitoring-started.json. Invest serials are reused."
+}
