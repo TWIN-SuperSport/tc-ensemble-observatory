@@ -1,7 +1,18 @@
 {
   "schemaVersion": 1,
-  "latest": "./analysis/sessions/2026-10-04-94w-gefs-validated.json",
+  "latest": "./analysis/sessions/2026-10-09-95w-monitoring-started.json",
   "sessions": [
+    {
+      "id": "2026-10-09-95w-monitoring-started",
+      "label": "2026-10-09｜台風29号追跡終了・Invest 95W監視開始",
+      "path": "./analysis/sessions/2026-10-09-95w-monitoring-started.json",
+      "trackingTargetId": "2026-10-invest-95w",
+      "target": [
+        "Invest 95W（2026年10月）",
+        "台風29号コグマ・アーカイブ"
+      ],
+      "status": "active-monitoring"
+    },
     {
       "id": "2026-10-04-94w-gefs-validated",
       "label": "2026-10-04｜94W GEFS実解析検証完了",

@@ -1,0 +1,10 @@
+{
+  "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
+  "issuedAt": "2026-10-09T10:30:00Z",
+  "retrievedAt": "2026-10-09T11:42:39.555689Z",
+  "validUntil": "2026-10-10T10:30:00Z",
+  "sha256": "8f9c5c3cc0ab3f0ff727c2baa1c446e29c87a4f9380fdba7746e49268e1d1589",
+  "rawPath": "analysis/materials/2026-10-09-1030z-jtwc-abpw.txt",
+  "note": "Exact HTTP response bytes retained, including original line endings. NOAA relay independently cross-checked in the monitoring review.",
+  "relayUrl": "https://tgftp.nws.noaa.gov/data/raw/ab/abpw10.pgtw..txt"
+}

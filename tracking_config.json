@@ -1,10 +1,10 @@
 {
   "monitoringState": "active",
   "monitoringEnabled": true,
-  "storm": "WP94",
+  "storm": "WP95",
   "stormInfo": {
-    "id": "94W",
-    "trackingTargetId": "2026-10-invest-94w",
+    "id": "95W",
+    "trackingTargetId": "2026-10-invest-95w",
     "status": "invest",
     "name": null,
     "nameJa": null,
@@ -14,20 +14,20 @@
     "originBasin": "WPAC",
     "currentBasin": "WPAC",
     "aliases": [
-      "94W"
+      "95W"
     ],
-    "continuity": "Western Pacific Invest 94W in JTWC ABPW 031300Z October 2026 at 8.3N 167.4E. This is a new October system, distinct from the August 2026 Invest 94W and from September 93W / JTWC 26W / CHOI-WAN (JMA Typhoon 27). Retain the trackingTargetId across official promotion; never inherit aliases, seeds, or official identity from an earlier generation with the same Invest serial."
+    "continuity": "Western Pacific Invest 95W in JTWC ABPW 091030Z October 2026 at 13.5N 144.5E. This is a separate disturbance from October Invest 94W / JTWC 27W / KOGUMA (JMA Typhoon 29). Retain this trackingTargetId across official promotion; never inherit aliases, seeds, or official identity from another generation."
   },
   "seed": {
-    "lat": 8.3,
-    "lon": 167.4
+    "lat": 13.5,
+    "lon": 144.5
   },
   "seedResolver": {
     "enabled": true,
     "warningUrl": null,
     "officialUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
     "aliases": [
-      "94W"
+      "95W"
     ],
     "previousForecastFallbackHours": 12,
     "requireResolvedSeed": true
@@ -49,14 +49,14 @@
   "initialIdentityMedianMslpMaxHpa": 1008,
   "stepSearchRadiusKm": 750,
   "clusterThresholdKm": 650,
-  "trackingTargetId": "2026-10-invest-94w",
-  "monitoringStartedAt": "2026-10-04T03:07:10Z",
+  "trackingTargetId": "2026-10-invest-95w",
+  "monitoringStartedAt": "2026-10-09T11:42:39.555689Z",
   "seedReference": {
     "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
-    "issuedAt": "2026-10-03T13:00:00Z",
-    "retrievedAt": "2026-10-04T03:07:10Z",
-    "validUntil": "2026-10-04T06:00:00Z",
-    "rawPath": "analysis/materials/2026-10-03-1300z-jtwc-abpw.txt",
+    "issuedAt": "2026-10-09T10:30:00Z",
+    "retrievedAt": "2026-10-09T11:42:39.555689Z",
+    "validUntil": "2026-10-10T10:30:00Z",
+    "rawPath": "analysis/materials/2026-10-09-1030z-jtwc-abpw.txt",
     "note": "Reference for target switch only. Resolve the current official position at run time; do not use this fixed reference as a verified fallback."
   }
 }
