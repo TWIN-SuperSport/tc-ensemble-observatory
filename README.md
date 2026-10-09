@@ -10,29 +10,20 @@ This is an **unofficial, experimental visualization** made for exploring weather
 
 ## 現在の監視状態
 
-- 個別監視: **Invest 94W（2026年10月）**
-- 2026年10月4日JST、TWINの承認に基づき台風27号チョーイワン（93W / JTWC 26W / CHOI-WAN）の個別監視を終了し、10月の94Wへ切替
-- JTWC ABPW 10月3日22:00 JST: 8.3N・167.4E、推定18–23 kt、約1008 hPa、24時間以内の発達評価MEDIUM
-- 公式原文は10月4日12:07 JST取得。有効期間は10月3日22:00〜4日15:00 JST。発表時点の評価と現在の実況を区別
-- JTWCのモデル要約: 今後24時間はほぼ停滞しつつまとまる見通し（独自のGEFS解析結果ではない）
-- GEFS自動取得対象を94Wへ変更し、解析実行時に最新のJTWC公式位置から追跡・検証
-- 10月4日12:30 JST、GEFS 10月3日18Zの31メンバー取得・初期同一性検証に合格。27本を+240hまで追跡し、4本は中心喪失時点で打切り・別枠保存
-- 初期中心は公式位置から約35〜315km、中央値123km、中央気圧1007.3hPa。閾値は緩めず、4シナリオ群を抽出
-- [実データ検証run](https://github.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/37174197376)は10月4日12:30 JSTに合格（初期値: 10月3日18Z）
-- 過去のGEFSラン、`history/`、解析セッションは保存
+- 個別監視: **Invest 95W（2026年10月）**
+- 2026年10月9日JST、TWINの指示に基づき台風29号コグマ（94W / JTWC 27W / KOGUMA）の個別監視を終了し、別の擾乱95Wへ切替
+- JTWC ABPW 10月9日19:30 JST: 13.5N・144.5E、推定13–18 kt、約1007 hPa、24時間以内の発達評価LOW
+- 原文取得は10月9日20:42 JST。有効区間は10月9日19:30〜10日19:30 JST
+- 95WのGEFS 2026100906は31メンバー取得・初期同一性照合後、正常10本・中心喪失による打切り21本で品質条件（正常20本以上）未達。解析は判定保留。定時更新周期と品質閾値は維持
+- 旧対象の最終保存済み解析はGEFS 2026100506。既定画面では旧進路図・集計を隠し、明示的に履歴を開く操作でのみ表示。過去ラン・履歴・解析セッションを保持し、95Wの予測へ再ラベルしない
 
 現行監視状態の正本は `monitor_status.json`、追跡設定は `tracking_config.json` です。
-検証結果は `analysis/sessions/2026-10-04-94w-gefs-validated.json`、
-解析待ちだった切替時点の記録は `analysis/sessions/2026-10-04-94w-monitoring-started.json`、
-公式原文と取得記録は `analysis/materials/2026-10-03-1300z-jtwc-abpw*` に保存しています。
-検証実行時の公式再取得は10月4日12:29 JST。元の発表・初回取得記録は保持しています。
-検証候補の公開先は `data.json`、`latest_run.json`、`history/2026100318.json` です。
+切替記録は `analysis/sessions/2026-10-09-95w-monitoring-started.json`、
+公式原文と取得記録は `analysis/materials/2026-10-09-1030z-jtwc-abpw*` に保存しています。
 
-**10月の94Wは8月の94Wとは別の擾乱です。** Invest番号は再利用されるため、
-`trackingTargetId: 2026-10-invest-94w` で対象の世代を区別し、正式な昇格後も同じ世代IDを保ちます。
-過去の94Wや93Wの対象ID・名称・警報番号・予測中心を今回の94Wへ流用しません。
-過去の解析を削除せず、現在の監視対象と区別して参照できます。
-監視解除は、台風の消滅や影響終了を意味しません。
+`trackingTargetId: 2026-10-invest-95w` で対象世代を区別し、正式昇格後も同じ世代IDを保ちます。
+旧94W / 27W / KOGUMAの名称・警報番号・予測中心を95Wへ継承しません。
+監視解除は台風29号の消滅や影響終了を意味しません。
 
 ### 海盆をまたぐInvestの扱い
 
@@ -137,3 +128,4 @@ GitHub Pages deployment re-triggered after Pages was enabled.
 - Actions artifactsに追跡点、符号付き気圧差、終了理由、取得元とSHA256を14日保存します。失敗runも旧公開データを置き換えず証拠を残します
 - ローカル検証: `python scripts/run_gefs_analysis.py --self-test` と `python -m unittest discover -s scripts -p 'test_*.py'`
 - 任意の再現用rawキャッシュは `GEFS_CACHE_DIR`、診断出力先は `GEFS_DIAGNOSTICS_PATH` で指定できます。`--force-init YYYYMMDDHH` は既存同一ランでも再解析します
+

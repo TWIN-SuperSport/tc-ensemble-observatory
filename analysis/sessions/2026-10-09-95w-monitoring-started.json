@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "analysisId": "2026-10-09-95w-monitoring-started",
+  "trackingTargetId": "2026-10-invest-95w",
+  "title": "台風29号追跡終了・Invest 95W（2026年10月）監視開始",
+  "target": [
+    "Invest 95W（2026年10月）",
+    "台風29号コグマ・アーカイブ"
+  ],
+  "generatedAt": "2026-10-09T11:42:39.555689Z",
+  "status": "Invest 95W個別監視中・GEFS解析は品質条件未達で判定保留",
+  "confidence": "公式位置・初期同一性照合済み／95Wの進路シナリオは未公開",
+  "conclusion": [
+    "TWINの指示に基づき、台風29号コグマ（94W / JTWC 27W / KOGUMA）の個別監視を終了し、別の擾乱Invest 95Wを主監視対象とする。監視解除は消滅や影響終了の判定ではない。",
+    "JTWC ABPW 2026年10月9日10:30Z（19:30 JST）では、95Wは13.5N・144.5E、グアムの西北西約13海里。推定13–18 kt、最低海面気圧約1007 hPa、24時間以内の発達評価はLOW。原文を11:42:39Z（20:42 JST）に取得し保存した。",
+    "95Wには別世代ID 2026-10-invest-95wを割り当てる。旧94W / 27W / KOGUMAの名称・警報番号・公式位置・予測中心は継承しない。",
+    "切替記録作成時点では95Wの31メンバー完全解析は検証待ち。旧対象のdata.json、latest_run.json、historyを保持し、新対象の予測として再ラベルしない。",
+    "20:46 JSTの実解析検証ではGEFS 2026100906の651フィールドを取得し、95Wの初期同一性照合後、正常10本・center_lostによる打切り21本で公開条件未達となった。品質閾値を維持し、解析判定保留の状態だけを公開する。旧29号の進路図と集計は履歴表示へ分離する。"
+  ],
+  "reasoning": [
+    "公式実況、JTWCのモデル要約、ユーザーによる監視対象変更を区別する。",
+    "JTWCはまとまりの悪い低層循環と南側の対流を記載。発達環境は限定的で、弱い上層流出、東寄り鉛直シアー15–20 kt、海面水温29–30℃。",
+    "JTWCによるモデル要約では、アンサンブルは今後24–48時間の東北東進と限定的な発達、全球決定論モデルはほぼ発達なしを示す。これは独自に実行したGEFS・ECMWF比較ではない。",
+    "参照位置13.5N・144.5Eは固定の検証済みfallbackに使わず、実行時に公式位置を再取得する。品質閾値、定時更新周期、過去解析は変更しない。",
+    "旧対象の直近実行はGEFS 2026100900の全651フィールド取得後、正常6本・除外25本で品質ゲートにより公開を停止した。旧公開データは2026100506のまま保持されている。95Wの解析成否は別途検証する。"
+  ],
+  "uncertainties": [
+    "95WのGEFS完全解析・初期同一性と将来進路は未検証。",
+    "公式原文の有効区間は10月9日19:30〜10日19:30 JST。発達評価は発表時点から24時間以内であり、日本への接近確率ではない。"
+  ],
+  "falsifiers": [
+    "公式情報で95Wが昇格・中心再配置・消失した場合は、対象世代を保って公式IDと位置連続性を再確認する。",
+    "初期位置・気圧の同一性検証、31メンバー取得、正常20本以上など既存品質条件に不合格なら新解析を公開しない。",
+    "中心喪失・領域外への追跡は打ち切り、別の低圧部へ継ぎ足さない。"
+  ],
+  "materials": [
+    {
+      "id": "E-01",
+      "title": "JTWC ABPW 2026年10月9日19:30 JST 原文",
+      "type": "official-text-product",
+      "role": "95Wの公式位置・発達評価・環境の確認",
+      "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
+      "data": "../materials/2026-10-09-1030z-jtwc-abpw.txt",
+      "validTime": "2026-10-09T10:30:00Z/2026-10-10T10:30:00Z",
+      "tags": [
+        "JTWC",
+        "95W",
+        "LOW",
+        "official-seed"
+      ]
+    },
+    {
+      "id": "E-02",
+      "title": "公式原文取得記録",
+      "type": "source-metadata",
+      "role": "発表・取得・有効期限・SHA-256",
+      "data": "../materials/2026-10-09-1030z-jtwc-abpw-source.json",
+      "tags": [
+        "provenance",
+        "freshness",
+        "SHA-256"
+      ]
+    },
+    {
+      "id": "E-03",
+      "title": "台風29号の最終保存済み完全解析 2026-10-05 06Z",
+      "type": "gefs-archive",
+      "role": "94Wから27W / KOGUMA / 台風29号へ継続した旧対象。95Wの結果として利用しない",
+      "data": "../../history/2026100506.json",
+      "model": "GEFS",
+      "validTime": "2026-10-05T06:00:00Z",
+      "tags": [
+        "94W",
+        "27W",
+        "KOGUMA",
+        "archive"
+      ]
+    },
+    {
+      "id": "E-04",
+      "title": "旧94W監視開始記録",
+      "type": "analysis-session",
+      "role": "旧対象の監視履歴を保持",
+      "data": "2026-10-04-94w-monitoring-started.json",
+      "tags": [
+        "94W",
+        "archive"
+      ]
+    },
+    {
+      "id": "E-05",
+      "title": "旧対象の直近GEFS品質ゲート不合格",
+      "type": "workflow-run",
+      "role": "取得成功と公開停止を区別した診断証拠",
+      "sourceUrl": "https://github.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/37890986176",
+      "tags": [
+        "quality-gate",
+        "archive"
+      ]
+    },
+    {
+      "id": "E-06",
+      "title": "95W初回GEFS品質判定",
+      "type": "workflow-run",
+      "role": "初期同一性照合と全フィールド取得後、正常10本・打切り21本で公開停止",
+      "sourceUrl": "https://github.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/37925726531",
+      "tags": [
+        "95W",
+        "quality-rejected",
+        "2026100906"
+      ]
+    }
+  ]
+}

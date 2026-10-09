@@ -38,7 +38,7 @@ class Element {
   closest() { return null; }
 }
 
-function harness(fixture) {
+function harness(fixture, monitorOverride=monitor) {
   const elements = new Map();
   const document = {
     getElementById(id) {
@@ -53,7 +53,7 @@ function harness(fixture) {
   const context = vm.createContext({ document, console, Intl, Date });
   vm.runInContext(offlineSource, context, { filename: 'app.js' });
   context.fixture = structuredClone(fixture);
-  context.monitorFixture = structuredClone(monitor);
+  context.monitorFixture = structuredClone(monitorOverride);
   vm.runInContext('data = fixture; monitorStatus = monitorFixture; setup();', context);
   return { context, elements, run: code => vm.runInContext(code, context) };
 }
@@ -114,3 +114,38 @@ const stale = harness(staleFixture);
 assert.match(stale.elements.get('trackingIdentityNotice').textContent, /保存済み解析:.*時間が経過/);
 
 console.log(`Renderer DOM smoke passed: actual ${candidate.meta.init} (${candidate.summary.cleanMembers} clean, ${candidate.tracks.filter(t => t.termination).length} terminated); 12 actual + 12 single-point-prefix mode/time cases; 3 episode cases; stale notice`);
+
+
+// Explicit pending target never presents the old storm as a current forecast.
+const archiveFixture = JSON.parse(read('history/2026100506.json'));
+const pending = harness(archiveFixture, {state:'active',trackingTargetId:'2026-10-invest-95w',titleJa:'Invest 95W 個別監視中',analysisState:'analysis_pending_quality',checkedAt:'2026-10-09T11:52:00Z'});
+pending.run('renderArchiveSeparation()');
+assert.equal(pending.elements.get('analysisMap').hidden,true);
+assert.equal(pending.elements.get('analysisSituation').hidden,true);
+assert.equal(pending.elements.get('metrics').hidden,true);
+assert.match(pending.elements.get('subtitle').textContent,/95W.*判定保留/);
+assert.match(pending.elements.get('lastUpdated').textContent,/監視状態更新:.*新対象の合格解析なし/);
+pending.elements.get('archiveToggle').onclick();
+assert.equal(pending.elements.get('analysisMap').hidden,false);
+assert.match(pending.elements.get('archiveSeparationNotice').textContent,/履歴:.*29号.*現在の監視対象の予測ではありません/);
+pending.elements.get('archiveToggle').onclick();
+assert.equal(pending.elements.get('analysisMap').hidden,true);
+for(let i=0;i<3;i++){pending.run('setup(); render();');assert.equal(pending.elements.get('analysisMap').hidden,true)}
+// Selecting a history record remains explicitly archived; returning current hides it.
+pending.run("currentDataPath='./history/2026100506.json';archiveExpanded=true;setup()");
+assert.equal(pending.elements.get('analysisMap').hidden,false);
+pending.run("currentDataPath='./data.json';archiveExpanded=false;setup()");
+assert.equal(pending.elements.get('analysisMap').hidden,true);
+// A future complete same-target payload exits pending without a monitor-file rewrite.
+pending.run("data.meta.trackingTargetId=monitorStatus.trackingTargetId;data.meta.stormInfo={id:'95W',aliases:['95W']};setup()");
+assert.equal(pending.elements.get('analysisMap').hidden,false);
+assert.equal(pending.elements.get('archiveToggle').hidden,true);
+assert.doesNotMatch(pending.elements.get('subtitle').textContent,/判定保留/);
+assert.doesNotMatch(pending.elements.get('lastUpdated').textContent,/新対象の合格解析なし/);
+console.log('Pending/archive toggle, repeated setup, history return, and same-target success transition passed');
+pending.context.fixture=structuredClone(archiveFixture);
+pending.run("currentTargetAvailable=true;data=fixture;archiveExpanded=true;setup()");
+assert.doesNotMatch(pending.elements.get('subtitle').textContent,/判定保留/);
+assert.match(pending.elements.get('monitorStateBadge').textContent,/履歴表示/);
+assert.match(pending.elements.get('lastUpdated').textContent,/履歴表示中/);
+console.log('Successful-current-analysis followed by old archive does not revive stale pending state');
