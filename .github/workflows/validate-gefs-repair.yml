@@ -70,3 +70,51 @@ jobs:
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 14
+
+
+  monitoring-display:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate pending archive and renderer
+        run: |
+          node --check app.js
+          node scripts/test_renderer.mjs
+          python scripts/verify_published_site.py --self-test
+          python - <<'PY'
+          import json, sys
+          from pathlib import Path
+          sys.path.insert(0, 'scripts')
+          from verify_published_site import validate_payload
+          read = lambda p: json.loads(Path(p).read_text())
+          data, latest, monitor, history, config = map(read, ['data.json', 'latest_run.json', 'monitor_status.json', 'history/index.json', 'tracking_config.json'])
+          archive = read('history/' + history['latestPath'])
+          print(validate_payload(data, latest, monitor, history, config['trackingTargetId'], data['meta']['init'], expected_data=data, archive=archive))
+          PY
+      - name: Install browser test dependencies
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium
+      - name: Test monitoring display in desktop and mobile browsers
+        run: |
+          python -m http.server 8765 > /tmp/monitor-preview.log 2>&1 &
+          server=$!
+          trap 'kill "$server"' EXIT
+          for attempt in $(seq 1 20); do curl -fsS http://127.0.0.1:8765/ >/dev/null && break; sleep 1; done
+          node scripts/test_monitoring_browser.cjs
+      - name: Preserve display verification screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: monitoring-display-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .diagnostics/browser/
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 14

@@ -8,20 +8,20 @@
   ],
   "titleJa": "Invest 95W（2026年10月）個別監視中",
   "titleEn": "Monitoring Invest 95W (October 2026)",
-  "badgeJa": "監視中 / 新対象解析待ち",
-  "conclusionJa": "台風29号コグマ（94W / JTWC 27W / KOGUMA）の個別監視を終了し、別の擾乱であるInvest 95Wへ監視対象を切り替えます。95Wの新しいGEFS完全解析は検証待ちです。保存済みの29号の解析を95Wの予測として扱いません。",
+  "badgeJa": "監視中 / 解析は判定保留",
+  "conclusionJa": "台風29号コグマの個別監視を終了し、別の擾乱Invest 95Wを監視中です。95WのGEFS 10月9日06Z解析は、31メンバーの取得と初期位置照合後、21本の追跡が途中で打ち切られ、品質条件を満たさないため判定保留です。29号の結果は履歴として分離します。",
   "signals": [
     "現役対象: Invest 95W（2026年10月）。94Wから昇格した台風29号とは別の擾乱",
     "JTWC 10月9日19:30 JST発表: 13.5N・144.5E / 13–18 kt / 約1007 hPa / LOW",
-    "新対象のGEFS 31メンバー完全解析・初期同一性は検証待ち",
+    "GEFS 10月9日06Z: 31メンバー取得、正常10本・追跡打切り21本。正常20本以上の品質条件未達",
     "29号の最終保存済み解析: GEFS 10月5日06Z。過去ランと解析記録は保持"
   ],
-  "checkedAt": "2026-10-09T11:42:39.555689Z",
+  "checkedAt": "2026-10-09T11:52:00Z",
   "officialIssuedAt": "2026-10-09T10:30:00Z",
   "officialValidUntil": "2026-10-10T10:30:00Z",
-  "analysisState": "awaiting_analysis",
+  "analysisState": "analysis_pending_quality",
   "metaJa": "公式発表: 2026年10月9日19:30 JST • 原文取得: 20:42 JST • 10月10日19:30 JSTまで有効",
-  "nextJa": "実行時に最新の公式位置を再取得し、95Wの世代・位置・中心連続性を検証します。監視解除は29号の消滅や影響終了の判定ではありません。LOWは発表時点から24時間以内の発達評価です。",
+  "nextJa": "次の定時ランでも同じ品質条件で再判定します。合格するまで95Wの進路図・シナリオ比率は表示しません。追跡打切りは擾乱の消滅を意味せず、29号の監視解除も影響終了の判定ではありません。",
   "sessionPath": "analysis.html",
   "sources": [
     {
@@ -33,6 +33,28 @@
       "label": "切替時の公式原文",
       "note": "ABPW 091030Z OCT 2026・取得日時とSHA-256は解析室に保存",
       "url": "analysis/materials/2026-10-09-1030z-jtwc-abpw.txt"
+    },
+    {
+      "label": "95W解析の品質判定記録",
+      "note": "GEFS 2026100906 / 10月9日20:46 JST / 正常10・打切り21",
+      "url": "https://github.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/37925726531"
     }
-  ]
+  ],
+  "pendingAnalysis": {
+    "trackingTargetId": "2026-10-invest-95w",
+    "init": "2026100906",
+    "checkedAt": "2026-10-09T11:46:43Z",
+    "status": "quality_rejected",
+    "cleanMembers": 10,
+    "noiseMembers": 21,
+    "members": 31,
+    "minimumCleanMembers": 20,
+    "reason": "center_lost",
+    "runUrl": "https://github.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/37925726531"
+  },
+  "archivedAnalysis": {
+    "trackingTargetId": "2026-10-invest-94w",
+    "init": "2026100506",
+    "path": "history/2026100506.json"
+  }
 }

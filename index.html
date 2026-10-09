@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="refresh-control.css?v=20260730-last-updated">
 <link rel="stylesheet" href="target-layout.css?v=20260716-1748">
 <link rel="stylesheet" href="monitor-status.css?v=20260818-92w">
-<style>.trackingIdentityNotice{margin:0 0 10px;padding:9px 11px;border:1px solid #8f7747;border-radius:9px;background:#2a2419;color:#ffe1a3;font-size:.8rem;line-height:1.5}</style>
+<style>[hidden]{display:none!important}.trackingIdentityNotice{margin:0 0 10px;padding:9px 11px;border:1px solid #8f7747;border-radius:9px;background:#2a2419;color:#ffe1a3;font-size:.8rem;line-height:1.5}</style>
 </head>
 <body>
 <header>
@@ -68,7 +68,9 @@
   <aside class="archivedRunNotice" aria-label="保存済み解析データについて">
     解析ラン選択から過去のGEFS世界線を再表示できます。進路図はGEFS海面更正気圧の実験的トラッカーであり、公式進路予報ではありません。
   </aside>
-  <section class="layout mapFirst">
+  <p id="archiveSeparationNotice" class="trackingIdentityNotice" hidden aria-live="polite"></p>
+  <p><button id="archiveToggle" type="button" hidden aria-expanded="false">旧対象の保存済み解析を開く</button></p>
+  <section id="analysisMap" class="layout mapFirst">
     <div class="plotPanel">
       <div class="mapHeader">
         <div class="mapTitleBlock">
@@ -100,7 +102,7 @@
     </div>
     <aside><h2>Scenario groups</h2><div id="clusters"></div><h2>Selected member</h2><div id="detail" class="detail">地図上の線をタップしてください。</div></aside>
   </section>
-  <section class="situationPanel" aria-labelledby="situationTitle">
+  <section id="analysisSituation" class="situationPanel" aria-labelledby="situationTitle">
     <div class="situationHeader">
       <div><p class="eyebrow">TODAY'S SITUATION</p><h2 id="situationTitle">現在の見え方</h2></div>
       <span id="situationUpdated" class="updatedBadge">計算中…</span>
@@ -112,6 +114,7 @@
   <section><h2>What this view does</h2><div class="explain"><div><b>1. Preserve uncertainty</b><span>Tracks are not forced into one artificial average.</span></div><div><b>2. Separate scenarios</b><span>Physically similar paths are grouped and given representative median tracks.</span></div><div><b>3. Quarantine noise</b><span>Likely tracker jumps are displayed separately instead of silently deleted.</span></div></div></section>
 </main>
 <footer>Experimental, unofficial analysis • Not for operational or safety use</footer>
-<script src="app.js?v=20261004-tracking-quality-v2"></script>
+<script src="app.js?v=20261009-pending-target-v1"></script>
 <script src="refresh-control.js?v=20260727"></script>
 </body></html>
+

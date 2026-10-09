@@ -1,0 +1,43 @@
+// Read-only browser regression against a local preview; never publishes.
+const {chromium}=require('playwright');
+const fs=require('node:fs');
+const assert=require('node:assert/strict');
+(async()=>{
+ const browser=await chromium.launch({headless:true});
+ const page=await browser.newPage({viewport:{width:1440,height:1000}});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const archive=JSON.parse(fs.readFileSync('history/2026100506.json','utf8'));
+ const monitor={state:'active',trackingTargetId:'2026-10-invest-95w',titleJa:'Invest 95W 個別監視中',badgeJa:'監視中 / 解析は判定保留',analysisState:'analysis_pending_quality',checkedAt:'2026-10-09T11:52:00Z',conclusionJa:'品質条件未達のため解析は判定保留。旧対象の解析は履歴です。',sources:[],signals:[]};
+ let displayed=archive;
+ await page.route('**/data.json?*',route=>route.fulfill({json:displayed}));
+ await page.route('**/monitor_status.json?*',route=>route.fulfill({json:monitor}));
+ await page.goto('http://127.0.0.1:8765/');
+ await page.getByText('監視中 / 解析は判定保留',{exact:true}).waitFor();
+ assert.equal(await page.locator('#analysisMap').isVisible(),false);
+ assert.equal(await page.locator('#analysisSituation').isVisible(),false);
+ assert.match(await page.locator('#lastUpdated').innerText(),/監視状態更新.*合格解析なし/);
+ fs.mkdirSync('.diagnostics/browser',{recursive:true});
+ await page.screenshot({path:'.diagnostics/browser/pending-desktop.png',fullPage:true});
+ await page.locator('#archiveToggle').click();
+ assert.equal(await page.locator('#analysisMap').isVisible(),true);
+ assert.match(await page.locator('#archiveSeparationNotice').innerText(),/29号.*現在の監視対象の予測ではありません/);
+ await page.locator('#view').selectOption('noise');
+ await page.locator('#hour').fill('120');
+ await page.locator('#archiveToggle').click();
+ await page.locator('#refreshButton').click();
+ await page.getByText('監視中 / 解析は判定保留',{exact:true}).waitFor();
+ assert.equal(await page.locator('#analysisMap').isVisible(),false);
+ await page.setViewportSize({width:390,height:844});
+ await page.screenshot({path:'.diagnostics/browser/pending-mobile.png',fullPage:true});
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+ await page.getByRole('link',{name:'監視対象の切替記録を開く →'}).click();
+ await page.waitForURL('**/analysis.html');await page.goBack();
+ await page.getByText('監視中 / 解析は判定保留',{exact:true}).waitFor();
+ // Fixture only: a successful current generation clears pending display.
+ displayed=structuredClone(archive);displayed.meta.trackingTargetId=monitor.trackingTargetId;displayed.meta.stormInfo={id:'95W',aliases:['95W']};
+ await page.reload();await page.locator('#analysisMap').waitFor({state:'visible'});
+ assert.equal(await page.locator('#archiveToggle').isVisible(),false);
+ assert.doesNotMatch(await page.locator('#subtitle').innerText(),/判定保留/);
+ assert.deepEqual(errors,[]);await browser.close();
+ console.log('Browser QA passed: desktop/mobile pending, explicit archive, mode/time controls, refresh, analysis/back navigation, current-generation recovery');
+})().catch(e=>{console.error(e);process.exit(1)});
