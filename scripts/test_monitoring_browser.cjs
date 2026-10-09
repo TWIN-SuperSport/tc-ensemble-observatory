@@ -29,7 +29,7 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('#analysisMap').isVisible(),false);
  await page.setViewportSize({width:390,height:844});
  await page.screenshot({path:'.diagnostics/browser/pending-mobile.png',fullPage:true});
- assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+ const overflow=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,items:[...document.querySelectorAll('body *')].filter(e=>e.getBoundingClientRect().right>innerWidth).map(e=>({tag:e.tagName,id:e.id,width:e.getBoundingClientRect().width})).slice(0,12)}));console.log(JSON.stringify({mobileLayout:overflow}));assert.equal(overflow.scroll>overflow.width,false);
  await page.getByRole('link',{name:'監視対象の切替記録を開く →'}).click();
  await page.waitForURL('**/analysis.html');await page.goBack();
  await page.getByText('監視中 / 解析は判定保留',{exact:true}).waitFor();

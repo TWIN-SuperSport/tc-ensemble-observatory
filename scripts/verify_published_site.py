@@ -20,6 +20,7 @@ HOURS = list(range(0, 241, 12))
 
 def validate_pending_archive(data, monitor, history, expected_target, expected_data, archive):
     """Allow only a declared, quality-rejected switch to an unchanged archive."""
+    assert monitor.get("state") == "active", "Pending target monitoring is not active"
     assert monitor.get("analysisState") == "analysis_pending_quality", "Undeclared target mismatch"
     pending, archived = monitor["pendingAnalysis"], monitor["archivedAnalysis"]
     assert pending["trackingTargetId"] == expected_target, "Pending target episode differs"
@@ -143,6 +144,7 @@ def self_test():
     archived_entry = {"path": old_init + ".json", "init": old_init, "trackingTargetId": old_target, **archived_data["summary"]}
     archived_history = {"latest": old_init, "latestPath": archived_entry["path"], "runCount": 1, "runs": [archived_entry]}
     pending_monitor = {
+        "state": "active",
         "trackingTargetId": new_target,
         "analysisState": "analysis_pending_quality",
         "pendingAnalysis": {
@@ -178,6 +180,7 @@ def self_test():
     assert fixture == before, "Repeated validation mutated the payload"
 
     mutations = [
+        (("monitor", "state"), "closed"),
         (("monitor", "analysisState"), "awaiting_analysis"),
         (("monitor", "trackingTargetId"), old_target),
         (("monitor", "pendingAnalysis", "trackingTargetId"), old_target),
@@ -216,7 +219,7 @@ def self_test():
             parent = parent[key]
         parent[keys[-1]] = value
         reject("pending " + ".".join(map(str, keys)), broken)
-    for field in ("analysisState", "pendingAnalysis", "archivedAnalysis"):
+    for field in ("state", "analysisState", "pendingAnalysis", "archivedAnalysis"):
         broken = copy.deepcopy(fixture)
         del broken["monitor"][field]
         reject("missing " + field, broken)
