@@ -112,16 +112,27 @@ def parse_jtwc_named_systems(text: str) -> list[dict]:
     assigns a warning number instead of assuming that e.g. 96W becomes 96W.
     """
     systems: list[dict] = []
-    pattern = re.compile(
+    heading_pattern = re.compile(
         r"(?:SUPER\s+)?(?:TYPHOON|TROPICAL\s+STORM|TROPICAL\s+DEPRESSION)\s+"
-        r"([0-9]{2}[A-Z])\s+\(([^)]+)\).*?"
+        r"([0-9]{2}[A-Z])\s+\(([^)]+)\)",
+        flags=re.IGNORECASE,
+    )
+    position_pattern = re.compile(
         r"(?:WARNING\s+POSITION:\s*(?:[0-9]{6}Z\s+---\s*)?|WAS\s+LOCATED\s+NEAR\s+)"
         r"(?:NEAR\s+)?([0-9]+(?:\.[0-9]+)?)([NS])\s+"
         r"([0-9]+(?:\.[0-9]+)?)([EW])",
-        flags=re.IGNORECASE | re.DOTALL,
+        flags=re.IGNORECASE,
     )
-    for match in pattern.finditer(text):
-        storm_id, storm_name, lat_raw, lat_hemi, lon_raw, lon_hemi = match.groups()
+    headings = list(heading_pattern.finditer(text))
+    for index, heading in enumerate(headings):
+        # A cancelled or incomplete section must never borrow the next storm's
+        # centre. Repeated same-storm headings in warning headers are harmless.
+        end = headings[index + 1].start() if index + 1 < len(headings) else len(text)
+        position = position_pattern.search(text, heading.end(), end)
+        if not position:
+            continue
+        storm_id, storm_name = heading.groups()
+        lat_raw, lat_hemi, lon_raw, lon_hemi = position.groups()
         lat = float(lat_raw) * (-1 if lat_hemi.upper() == "S" else 1)
         lon = float(lon_raw)
         if lon_hemi.upper() == "W":
@@ -227,24 +238,9 @@ def closest_system(systems: list[dict], lat: float, lon: float, max_distance_km:
 def parse_jtwc_named_seed(text: str, aliases: Iterable[str]) -> tuple[float, float, str] | None:
     """Extract a named cyclone center from a JTWC warning or ABPW summary."""
     normalized_aliases = {normalize_storm_id(value) for value in aliases}
-    pattern = re.compile(
-        r"(?:SUPER\s+)?(?:TYPHOON|TROPICAL\s+STORM|TROPICAL\s+DEPRESSION)\s+"
-        r"([0-9]{2}[A-Z])\s+\(([^)]+)\).*?"
-        r"(?:WARNING\s+POSITION:\s*(?:[0-9]{6}Z\s+---\s*)?"
-        r"|WAS\s+LOCATED\s+NEAR\s+)"
-        r"(?:NEAR\s+)?([0-9]+(?:\.[0-9]+)?)([NS])\s+"
-        r"([0-9]+(?:\.[0-9]+)?)([EW])",
-        flags=re.IGNORECASE | re.DOTALL,
-    )
-    for match in pattern.finditer(text):
-        storm_id, storm_name, lat_raw, lat_hemi, lon_raw, lon_hemi = match.groups()
-        if not matches_storm_alias(storm_id, storm_name, normalized_aliases):
-            continue
-        lat = float(lat_raw) * (-1 if lat_hemi.upper() == "S" else 1)
-        lon = float(lon_raw)
-        if lon_hemi.upper() == "W":
-            lon = (360.0 - lon) % 360.0
-        return lat, lon % 360.0, normalize_storm_id(storm_id)
+    for system in parse_jtwc_named_systems(text):
+        if matches_storm_alias(system["id"], system["name"], normalized_aliases):
+            return system["lat"], system["lon"], system["id"]
     return None
 
 

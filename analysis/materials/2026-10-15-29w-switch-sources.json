@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-10-15T02:26:20.009205Z",
+  "sources": [
+    {
+      "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/wp2926web.txt",
+      "issuedAt": "2026-10-14T21:00:00Z",
+      "analysisAt": "2026-10-14T18:00:00Z",
+      "retrievedAt": "2026-10-15T02:23:21.552144Z",
+      "sha256": "2efebcf1710cbd4f4c90cb85a080f1ed3735889dc7c7468e4d34e05b5b1c78dc",
+      "rawPath": "analysis/materials/2026-10-14-2100z-jtwc-29w-warning.txt"
+    },
+    {
+      "sourceUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2636/forecast.json",
+      "issuedAt": "2026-10-15T01:20:00Z",
+      "analysisAt": "2026-10-15T00:00:00Z",
+      "retrievedAt": "2026-10-15T02:23:23.096303Z",
+      "sha256": "016d0af4991a6c3a8b087f5a64dfae880125c47b69bc4249010b94ff0e55cfbf",
+      "rawPath": "analysis/materials/2026-10-15-0120z-jma-TC2636-forecast.json"
+    }
+  ],
+  "note": "Exact source bytes supplied by the concurrent official-source check; retrieval time uses the saved source file timestamp. JTWC numbering is separate from JMA annual typhoon numbering."
+}

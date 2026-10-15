@@ -19,23 +19,31 @@ HOURS = list(range(0, 241, 12))
 
 
 def validate_pending_archive(data, monitor, history, expected_target, expected_data, archive):
-    """Allow only a declared, quality-rejected switch to an unchanged archive."""
+    """Allow a declared new-target wait or quality rejection with an unchanged archive."""
     assert monitor.get("state") == "active", "Pending target monitoring is not active"
-    assert monitor.get("analysisState") == "analysis_pending_quality", "Undeclared target mismatch"
+    state = monitor.get("analysisState")
+    assert state in ("analysis_pending_initial", "analysis_pending_quality"), "Undeclared target mismatch"
     pending, archived = monitor["pendingAnalysis"], monitor["archivedAnalysis"]
     assert pending["trackingTargetId"] == expected_target, "Pending target episode differs"
-    assert pending["status"] == "quality_rejected" and pending["reason"] == "center_lost"
-    assert all(type(pending[key]) is int for key in ("members", "cleanMembers", "noiseMembers", "minimumCleanMembers"))
-    assert pending["members"] == 31 and pending["minimumCleanMembers"] == 20
-    assert 0 <= pending["cleanMembers"] < pending["minimumCleanMembers"]
-    assert pending["noiseMembers"] == pending["members"] - pending["cleanMembers"]
-    pending_init = pending["init"]
+    if state == "analysis_pending_initial":
+        assert pending["status"] == "awaiting_analysis" and pending["reason"] == "target_changed"
+        assert type(pending["expectedMembers"]) is int and pending["expectedMembers"] == 31
+        assert type(pending["minimumCleanMembers"]) is int and pending["minimumCleanMembers"] == 20
+        assert not any(key in pending for key in ("cleanMembers", "noiseMembers", "members", "runUrl", "init")), "Initial wait cannot claim analysis results"
+        pending_init = pending["requestedInit"]
+    else:
+        assert pending["status"] == "quality_rejected" and pending["reason"] == "center_lost"
+        assert all(type(pending[key]) is int for key in ("members", "cleanMembers", "noiseMembers", "minimumCleanMembers"))
+        assert pending["members"] == 31 and pending["minimumCleanMembers"] == 20
+        assert 0 <= pending["cleanMembers"] < pending["minimumCleanMembers"]
+        assert pending["noiseMembers"] == pending["members"] - pending["cleanMembers"]
+        assert re.fullmatch(r"https://github\.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/[1-9]\d*", pending["runUrl"])
+        pending_init = pending["init"]
     assert isinstance(pending_init, str) and re.fullmatch(r"\d{10}", pending_init)
     pending_time = datetime.strptime(pending_init, "%Y%m%d%H").replace(tzinfo=timezone.utc)
     checked_at = pending["checkedAt"]
     assert isinstance(checked_at, str) and checked_at.endswith("Z")
     assert datetime.fromisoformat(checked_at[:-1] + "+00:00") >= pending_time
-    assert re.fullmatch(r"https://github\.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/[1-9]\d*", pending["runUrl"])
 
     init, target = str(data["meta"]["init"]), data["meta"]["trackingTargetId"]
     assert target != expected_target and archived["trackingTargetId"] == target, "Archived target episode differs"
@@ -109,7 +117,7 @@ def validate_payload(data, latest, monitor, history, expected_target, minimum_in
     assert any(run["path"] == history["latestPath"] and run["init"] == init for run in history["runs"])
     if archive is not None:
         assert archive == data, "Published archive and live data differ"
-    return {"init": init, "trackingTargetId": meta["trackingTargetId"], "monitoringTargetId": expected_target, "analysisState": "analysis_pending_quality" if pending else "analysis_complete", "summary": summary, "historyRunCount": history["runCount"]}
+    return {"init": init, "trackingTargetId": meta["trackingTargetId"], "monitoringTargetId": expected_target, "analysisState": monitor["analysisState"] if pending else "analysis_complete", "summary": summary, "historyRunCount": history["runCount"]}
 
 
 def self_test():
@@ -178,6 +186,34 @@ def self_test():
     assert pending_report["trackingTargetId"] == old_target and pending_report["monitoringTargetId"] == new_target
     assert check(fixture) == check(fixture) == pending_report
     assert fixture == before, "Repeated validation mutated the payload"
+
+    initial = copy.deepcopy(fixture)
+    initial["monitor"]["analysisState"] = "analysis_pending_initial"
+    initial["monitor"]["pendingAnalysis"] = {
+        "trackingTargetId": new_target, "requestedInit": new_init,
+        "checkedAt": "2026-10-09T11:46:43Z", "status": "awaiting_analysis",
+        "reason": "target_changed", "expectedMembers": 31, "minimumCleanMembers": 20,
+    }
+    initial_before = copy.deepcopy(initial)
+    assert check(initial)["analysisState"] == "analysis_pending_initial"
+    assert check(initial) == check(initial) and initial == initial_before
+    for key, value in (("trackingTargetId", old_target), ("requestedInit", "2026130906"),
+                       ("requestedInit", "2026100318"), ("checkedAt", "2026-10-09T05:00:00Z"),
+                       ("status", "analysis_complete"), ("reason", "center_lost"),
+                       ("expectedMembers", 30), ("expectedMembers", True),
+                       ("minimumCleanMembers", 19), ("cleanMembers", 20),
+                       ("noiseMembers", 11), ("members", 31), ("runUrl", "fabricated"),
+                       ("init", new_init)):
+        broken = copy.deepcopy(initial)
+        broken["monitor"]["pendingAnalysis"][key] = value
+        reject("initial " + key, broken)
+    for key in initial["monitor"]["pendingAnalysis"]:
+        broken = copy.deepcopy(initial)
+        del broken["monitor"]["pendingAnalysis"][key]
+        reject("missing initial " + key, broken)
+    broken = copy.deepcopy(initial)
+    broken["data"]["meta"]["trackingTargetId"] = new_target
+    reject("initial wait cannot relabel archived tracks", broken)
 
     mutations = [
         (("monitor", "state"), "closed"),
