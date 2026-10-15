@@ -92,6 +92,21 @@
         "seed-unresolved",
         "archive"
       ]
+    },
+    {
+      "id": "E-06",
+      "title": "NWSグアム29W 警報第1号（旧96Wの公式対応）",
+      "type": "official-text-product",
+      "role": "Invest96WからTropical Depression29Wへの昇格を明記",
+      "sourceUrl": "https://forecast.weather.gov/product.php?site=NWS&issuedby=PQ2&product=TCP&format=CI&version=2&glossary=0",
+      "data": "../materials/2026-10-14-1514z-nws-29w-advisory-1.txt",
+      "validTime": "2026-10-14T15:14:00Z",
+      "tags": [
+        "NWS",
+        "29W",
+        "96W",
+        "identity"
+      ]
     }
   ]
 }
