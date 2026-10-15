@@ -149,3 +149,20 @@ assert.doesNotMatch(pending.elements.get('subtitle').textContent,/判定保留/)
 assert.match(pending.elements.get('monitorStateBadge').textContent,/履歴表示/);
 assert.match(pending.elements.get('lastUpdated').textContent,/履歴表示中/);
 console.log('Successful-current-analysis followed by old archive does not revive stale pending state');
+
+// The active JTWC warning serial takes precedence over its retained Invest ID.
+// JMA's independently issued official number/name still takes first priority.
+const labels = harness(candidate);
+labels.run('delete data.meta.targetLabel;');
+for (const [storm, expected] of [
+  [{id:'96W',jtwcNumber:'29W',status:'tropical_depression',number:null,candidateNumber:null}, '29W'],
+  [{id:'96W',jtwcNumber:'29W',status:'candidate',candidateNumber:30}, '29W（台風30号候補）'],
+  [{id:'96W',jtwcNumber:'29W',status:'typhoon',number:30,nameJa:'テスト',name:'TEST'}, '台風30号（テスト / TEST）'],
+  [{id:'94W',jtwcNumber:'27W',status:'typhoon',number:29,nameJa:'コグマ',name:'KOGUMA'}, '台風29号（コグマ / KOGUMA）'],
+  [{id:'96W',jtwcNumber:null,status:'invest'}, '96W'],
+]) {
+  labels.context.storm = storm;
+  labels.run('data.meta.stormInfo = storm;');
+  assert.equal(labels.run('targetLabel()'), expected);
+}
+console.log('JTWC29W labels preserve Invest96W lineage and independent JMA number/name priority');

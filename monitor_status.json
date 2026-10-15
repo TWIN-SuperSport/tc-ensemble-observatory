@@ -1,56 +1,54 @@
 {
   "schemaVersion": 1,
   "state": "active",
-  "trackingTargetId": "2026-10-invest-95w",
+  "trackingTargetId": "2026-10-jtwc-29w",
   "targetAliases": [
-    "95W",
-    "WP95"
+    "29W",
+    "WP29",
+    "96W",
+    "TWENTYNINE"
   ],
-  "titleJa": "Invest 95W（2026年10月）個別監視中",
-  "titleEn": "Monitoring Invest 95W (October 2026)",
-  "badgeJa": "監視中 / 解析は判定保留",
-  "conclusionJa": "台風29号コグマの個別監視を終了し、別の擾乱Invest 95Wを監視中です。95WのGEFS 10月9日06Z解析は、31メンバーの取得と初期位置照合後、21本の追跡が途中で打ち切られ、品質条件を満たさないため判定保留です。29号の結果は履歴として分離します。",
+  "titleJa": "熱帯低気圧29W（旧96W）個別監視中",
+  "titleEn": "Monitoring Tropical Depression29W (formerly Invest96W)",
+  "badgeJa": "監視中 / 初回解析を検証中",
+  "conclusionJa": "28W（旧95W）の個別監視を終了し、別の擾乱29Wを監視対象に切り替えました。29Wの新しいGEFS解析は検証中です。過去の台風29号コグマ（JTWC27W）の保存済み解析は履歴として分離し、新対象の予測として表示しません。",
   "signals": [
-    "現役対象: Invest 95W（2026年10月）。94Wから昇格した台風29号とは別の擾乱",
-    "JTWC 10月9日19:30 JST発表: 13.5N・144.5E / 13–18 kt / 約1007 hPa / LOW",
-    "GEFS 10月9日06Z: 31メンバー取得、正常10本・追跡打切り21本。正常20本以上の品質条件未達",
-    "29号の最終保存済み解析: GEFS 10月5日06Z。過去ランと解析記録は保持"
+    "現役対象: JTWC29W / WP292026。旧95W→28Wおよび台風29号コグマとは別の擾乱",
+    "JTWC警報002: 10月15日03:00 JSTの解析で10.4N・160.5E、最大風速30 kt（1分平均）",
+    "気象庁TC2636: 10月15日09:00 JSTの解析で10.8N・159.4E。台風番号は未付与",
+    "31メンバー取得・公式位置照合・正常20本以上など、従来の品質条件と定時更新周期を維持"
   ],
-  "checkedAt": "2026-10-09T11:52:00Z",
-  "officialIssuedAt": "2026-10-09T10:30:00Z",
-  "officialValidUntil": "2026-10-10T10:30:00Z",
-  "analysisState": "analysis_pending_quality",
-  "metaJa": "公式発表: 2026年10月9日19:30 JST • 原文取得: 20:42 JST • 10月10日19:30 JSTまで有効",
-  "nextJa": "次の定時ランでも同じ品質条件で再判定します。合格するまで95Wの進路図・シナリオ比率は表示しません。追跡打切りは擾乱の消滅を意味せず、29号の監視解除も影響終了の判定ではありません。",
+  "checkedAt": "2026-10-15T02:30:27.693635Z",
+  "officialIssuedAt": "2026-10-14T21:00:00Z",
+  "analysisState": "analysis_pending_initial",
+  "metaJa": "JTWC: 10月15日06:00 JST発表 / 03:00 JST解析。気象庁: 10:20 JST発表 / 09:00 JST解析",
+  "nextJa": "29Wの初回解析を検証し、品質条件に合格した場合だけ新しい進路図とシナリオ比率を公開します。監視解除は28Wの消滅や影響終了の判定ではありません。",
   "sessionPath": "analysis.html",
   "sources": [
     {
-      "label": "Invest 95W / LOW",
-      "note": "JTWC ABPW 2026-10-09 19:30 JST発表",
-      "url": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt"
+      "label": "JTWC29W / 警報002",
+      "note": "2026年10月15日06:00 JST発表",
+      "url": "https://www.metoc.navy.mil/jtwc/products/wp2926web.txt"
+    },
+    {
+      "label": "気象庁TC2636 / 熱帯低気圧",
+      "note": "2026年10月15日10:20 JST発表",
+      "url": "https://www.jma.go.jp/bosai/typhoon/data/TC2636/forecast.json"
     },
     {
       "label": "切替時の公式原文",
-      "note": "ABPW 091030Z OCT 2026・取得日時とSHA-256は解析室に保存",
-      "url": "analysis/materials/2026-10-09-1030z-jtwc-abpw.txt"
-    },
-    {
-      "label": "95W解析の品質判定記録",
-      "note": "GEFS 2026100906 / 10月9日20:46 JST / 正常10・打切り21",
-      "url": "https://github.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/37925726531"
+      "note": "JTWC警報002・解析室に保存",
+      "url": "analysis/materials/2026-10-14-2100z-jtwc-29w-warning.txt"
     }
   ],
   "pendingAnalysis": {
-    "trackingTargetId": "2026-10-invest-95w",
-    "init": "2026100906",
-    "checkedAt": "2026-10-09T11:46:43Z",
-    "status": "quality_rejected",
-    "cleanMembers": 10,
-    "noiseMembers": 21,
-    "members": 31,
-    "minimumCleanMembers": 20,
-    "reason": "center_lost",
-    "runUrl": "https://github.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/37925726531"
+    "trackingTargetId": "2026-10-jtwc-29w",
+    "requestedInit": "2026101418",
+    "checkedAt": "2026-10-15T02:30:27.693635Z",
+    "status": "awaiting_analysis",
+    "reason": "target_changed",
+    "expectedMembers": 31,
+    "minimumCleanMembers": 20
   },
   "archivedAnalysis": {
     "trackingTargetId": "2026-10-invest-94w",

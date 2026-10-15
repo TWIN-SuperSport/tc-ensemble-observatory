@@ -19,23 +19,31 @@ HOURS = list(range(0, 241, 12))
 
 
 def validate_pending_archive(data, monitor, history, expected_target, expected_data, archive):
-    """Allow only a declared, quality-rejected switch to an unchanged archive."""
+    """Allow a declared new-target wait or quality rejection with an unchanged archive."""
     assert monitor.get("state") == "active", "Pending target monitoring is not active"
-    assert monitor.get("analysisState") == "analysis_pending_quality", "Undeclared target mismatch"
+    state = monitor.get("analysisState")
+    assert state in ("analysis_pending_initial", "analysis_pending_quality"), "Undeclared target mismatch"
     pending, archived = monitor["pendingAnalysis"], monitor["archivedAnalysis"]
     assert pending["trackingTargetId"] == expected_target, "Pending target episode differs"
-    assert pending["status"] == "quality_rejected" and pending["reason"] == "center_lost"
-    assert all(type(pending[key]) is int for key in ("members", "cleanMembers", "noiseMembers", "minimumCleanMembers"))
-    assert pending["members"] == 31 and pending["minimumCleanMembers"] == 20
-    assert 0 <= pending["cleanMembers"] < pending["minimumCleanMembers"]
-    assert pending["noiseMembers"] == pending["members"] - pending["cleanMembers"]
-    pending_init = pending["init"]
+    if state == "analysis_pending_initial":
+        assert pending["status"] == "awaiting_analysis" and pending["reason"] == "target_changed"
+        assert type(pending["expectedMembers"]) is int and pending["expectedMembers"] == 31
+        assert type(pending["minimumCleanMembers"]) is int and pending["minimumCleanMembers"] == 20
+        assert not any(key in pending for key in ("cleanMembers", "noiseMembers", "members", "runUrl", "init")), "Initial wait cannot claim analysis results"
+        pending_init = pending["requestedInit"]
+    else:
+        assert pending["status"] == "quality_rejected" and pending["reason"] == "center_lost"
+        assert all(type(pending[key]) is int for key in ("members", "cleanMembers", "noiseMembers", "minimumCleanMembers"))
+        assert pending["members"] == 31 and pending["minimumCleanMembers"] == 20
+        assert 0 <= pending["cleanMembers"] < pending["minimumCleanMembers"]
+        assert pending["noiseMembers"] == pending["members"] - pending["cleanMembers"]
+        assert re.fullmatch(r"https://github\.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/[1-9]\d*", pending["runUrl"])
+        pending_init = pending["init"]
     assert isinstance(pending_init, str) and re.fullmatch(r"\d{10}", pending_init)
     pending_time = datetime.strptime(pending_init, "%Y%m%d%H").replace(tzinfo=timezone.utc)
     checked_at = pending["checkedAt"]
     assert isinstance(checked_at, str) and checked_at.endswith("Z")
     assert datetime.fromisoformat(checked_at[:-1] + "+00:00") >= pending_time
-    assert re.fullmatch(r"https://github\.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/[1-9]\d*", pending["runUrl"])
 
     init, target = str(data["meta"]["init"]), data["meta"]["trackingTargetId"]
     assert target != expected_target and archived["trackingTargetId"] == target, "Archived target episode differs"
@@ -57,6 +65,8 @@ def validate_payload(data, latest, monitor, history, expected_target, minimum_in
     meta, summary, tracks = data["meta"], data["summary"], data["tracks"]
     assert all(isinstance(data["disclaimer"][key], str) and data["disclaimer"][key] for key in ("ja", "en"))
     assert monitor.get("trackingTargetId") == expected_target, "Published monitoring episode differs"
+    nested_target = meta.get("stormInfo", {}).get("trackingTargetId")
+    assert nested_target is None or nested_target == meta.get("trackingTargetId"), "Storm metadata episode differs"
     pending = meta.get("trackingTargetId") != expected_target
     if pending:
         validate_pending_archive(data, monitor, history, expected_target, expected_data, archive)
@@ -65,6 +75,16 @@ def validate_payload(data, latest, monitor, history, expected_target, minimum_in
     assert meta.get("trackingAlgorithm") == "normalized-domain-closed-minimum-v2"
     init = str(meta["init"])
     assert re.fullmatch(r"\d{10}", init) and init >= minimum_init, "Older published analysis"
+    if not pending:
+        declaration = monitor.get("pendingAnalysis") or {}
+        requested_init = declaration.get("requestedInit")
+        if declaration.get("trackingTargetId") == expected_target and isinstance(requested_init, str) and re.fullmatch(r"\d{10}", requested_init):
+            assert init >= requested_init, "Current analysis predates the requested target initialization"
+        if expected_data is not None and expected_data["meta"].get("trackingTargetId") != expected_target:
+            # Changing labels, dates, or cluster assignments cannot turn the
+            # deployed old episode's exact member points into a new analysis.
+            prior_points = {track["member"]: track["points"] for track in expected_data["tracks"]}
+            assert {track["member"]: track["points"] for track in tracks} != prior_points, "Current target reuses archived tracks"
     assert latest["init"] == init and latest["status"] == "analysis_complete"
     assert latest["members"] == summary["members"] == 31 and len(tracks) == 31
     assert {t["member"] for t in tracks} == MEMBERS
@@ -106,10 +126,14 @@ def validate_payload(data, latest, monitor, history, expected_target, minimum_in
         else:
             assert not track.get("termination")
     assert history["latest"] == init and history["runCount"] == len(history["runs"])
-    assert any(run["path"] == history["latestPath"] and run["init"] == init for run in history["runs"])
+    latest_entries = [run for run in history["runs"] if run["path"] == history["latestPath"]]
+    assert len(latest_entries) == 1, "Latest history entry missing or duplicated"
+    entry = latest_entries[0]
+    assert entry["init"] == init and entry["trackingTargetId"] == meta["trackingTargetId"], "Latest history episode differs"
+    assert all(entry[key] == summary[key] for key in ("members", "cleanMembers", "noiseMembers", "clusterCount")), "Latest history summary differs"
     if archive is not None:
         assert archive == data, "Published archive and live data differ"
-    return {"init": init, "trackingTargetId": meta["trackingTargetId"], "monitoringTargetId": expected_target, "analysisState": "analysis_pending_quality" if pending else "analysis_complete", "summary": summary, "historyRunCount": history["runCount"]}
+    return {"init": init, "trackingTargetId": meta["trackingTargetId"], "monitoringTargetId": expected_target, "analysisState": monitor["analysisState"] if pending else "analysis_complete", "summary": summary, "historyRunCount": history["runCount"]}
 
 
 def self_test():
@@ -119,7 +143,7 @@ def self_test():
     data = {"meta": {"init": "2026100318", "trackingTargetId": target, "trackingAlgorithm": "normalized-domain-closed-minimum-v2", "trackingIdentity": {"status": "verified"}}, "summary": {"members": 31, "cleanMembers": 31, "noiseMembers": 0, "clusterCount": 1}, "tracks": tracks, "disclaimer": {"ja": "test", "en": "test"}, "clusters": [{"id": "C1", "label": "test", "members": sorted(MEMBERS), "count": 31, "share": 100.0, "medianTrack": [{"fhour": h, "lat": 10, "lon": 160} for h in HOURS]}]}
     latest = {"init": "2026100318", "status": "analysis_complete", "members": 31}
     monitor = {"trackingTargetId": target}
-    history = {"latest": "2026100318", "latestPath": "2026100318.json", "runCount": 1, "runs": [{"path": "2026100318.json", "init": "2026100318"}]}
+    history = {"latest": "2026100318", "latestPath": "2026100318.json", "runCount": 1, "runs": [{"path": "2026100318.json", "init": "2026100318", "trackingTargetId": target, **data["summary"]}]}
     validate_payload(data, latest, monitor, history, target, "2026100312")
     for mutation in ("target", "old", "count", "nan", "clusters", "median", "termination", "disclaimer"):
         broken = copy.deepcopy(data)
@@ -178,6 +202,41 @@ def self_test():
     assert pending_report["trackingTargetId"] == old_target and pending_report["monitoringTargetId"] == new_target
     assert check(fixture) == check(fixture) == pending_report
     assert fixture == before, "Repeated validation mutated the payload"
+
+    initial = copy.deepcopy(fixture)
+    initial["monitor"]["analysisState"] = "analysis_pending_initial"
+    initial["monitor"]["pendingAnalysis"] = {
+        "trackingTargetId": new_target, "requestedInit": new_init,
+        "checkedAt": "2026-10-09T11:46:43Z", "status": "awaiting_analysis",
+        "reason": "target_changed", "expectedMembers": 31, "minimumCleanMembers": 20,
+    }
+    initial_before = copy.deepcopy(initial)
+    assert check(initial)["analysisState"] == "analysis_pending_initial"
+    assert check(initial) == check(initial) and initial == initial_before
+    for key, value in (("trackingTargetId", old_target), ("requestedInit", "2026130906"),
+                       ("requestedInit", "2026100318"), ("checkedAt", "2026-10-09T05:00:00Z"),
+                       ("status", "analysis_complete"), ("reason", "center_lost"),
+                       ("expectedMembers", 30), ("expectedMembers", True),
+                       ("minimumCleanMembers", 19), ("cleanMembers", 20),
+                       ("noiseMembers", 11), ("members", 31), ("runUrl", "fabricated"),
+                       ("init", new_init)):
+        broken = copy.deepcopy(initial)
+        broken["monitor"]["pendingAnalysis"][key] = value
+        reject("initial " + key, broken)
+    for key in initial["monitor"]["pendingAnalysis"]:
+        broken = copy.deepcopy(initial)
+        del broken["monitor"]["pendingAnalysis"][key]
+        reject("missing initial " + key, broken)
+    broken = copy.deepcopy(initial)
+    broken["data"]["meta"]["trackingTargetId"] = new_target
+    reject("initial wait cannot relabel archived tracks", broken)
+    for update_history in (False, True):
+        broken = copy.deepcopy(initial)
+        for payload in (broken["data"], broken["archive"]):
+            payload["meta"]["trackingTargetId"] = new_target
+        if update_history:
+            broken["history"]["runs"][0]["trackingTargetId"] = new_target
+        reject("coordinated data/archive/history relabel", broken)
 
     mutations = [
         (("monitor", "state"), "closed"),
@@ -255,6 +314,13 @@ def self_test():
 
     current = copy.deepcopy(fixture)
     current["data"]["meta"].update(init=new_init, trackingTargetId=new_target)
+    current["data"]["meta"]["stormInfo"] = {"trackingTargetId": new_target}
+    for track in current["data"]["tracks"]:
+        for point in track["points"]:
+            point["lat"] += 1
+    for cluster in current["data"]["clusters"]:
+        for point in cluster["medianTrack"]:
+            point["lat"] += 1
     current["archive"] = copy.deepcopy(current["data"])
     current["latest"]["init"] = new_init
     new_entry = {"path": new_init + ".json", "init": new_init, "trackingTargetId": new_target, **current["data"]["summary"]}
@@ -266,6 +332,23 @@ def self_test():
     current_report = check(current)
     assert current_report["analysisState"] == "analysis_complete" and current_report["trackingTargetId"] == new_target
     assert check(current) == current_report
+    recovered_initial = copy.deepcopy(current)
+    recovered_initial["monitor"] = copy.deepcopy(initial["monitor"])
+    assert check(recovered_initial)["analysisState"] == "analysis_complete"
+    for mutation in ("old_history", "nested_episode", "reused_points", "older_than_requested"):
+        broken = copy.deepcopy(recovered_initial)
+        if mutation == "old_history": broken["history"]["runs"][0]["trackingTargetId"] = old_target
+        if mutation == "nested_episode": broken["data"]["meta"]["stormInfo"]["trackingTargetId"] = old_target
+        if mutation == "reused_points":
+            # Even synchronized fresh dates/labels and reordered members must
+            # not republish the old episode's member points as a new storm.
+            broken["data"]["tracks"] = list(reversed(copy.deepcopy(archived_data["tracks"])))
+        if mutation == "older_than_requested": broken["monitor"]["pendingAnalysis"]["requestedInit"] = "2026100912"
+        broken["archive"] = copy.deepcopy(broken["data"])
+        reject("coordinated current " + mutation, broken)
+    already_current = copy.deepcopy(current)
+    already_current["expected_data"] = copy.deepcopy(current["data"])
+    assert check(already_current)["analysisState"] == "analysis_complete"
     for mutation in ("quality", "identity", "older", "archive"):
         broken = copy.deepcopy(current)
         if mutation == "quality": broken["data"]["summary"]["cleanMembers"] = 19

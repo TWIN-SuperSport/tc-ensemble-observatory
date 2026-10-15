@@ -1,0 +1,60 @@
+https://forecast.weather.gov/product.php?site=NWS&issuedby=PQ2&product=TCP&format=CI&version=2&glossary=0
+
+348
+WTPQ32 PGUM 141514
+TCPPQ2
+
+BULLETIN
+Tropical Depression 29W Advisory Number 1
+National Weather Service Tiyan GU WP292026
+114 AM ChST Thu Oct 15 2026
+
+...TROPICAL DEPRESSION 29W FORMS WEST-NORTHWEST OF UJELANG...
+
+CHANGES WITH THIS ADVISORY
+--------------------------
+Invest 96W has been upgraded to Tropical Depression 29W.
+
+WATCHES AND WARNINGS
+--------------------
+None.
+
+SUMMARY OF 100 AM CHST...1500 UTC...INFORMATION
+-----------------------------------------------
+Location...9.8N 160.9E
+
+About 5 miles west-northwest of Ujelang
+About 145 miles southwest of Enewetak
+About 270 miles northeast of Pohnpei
+About 285 miles northeast of Pakin
+About 640 miles east-northeast of Chuuk
+About 1085 miles east-southeast of Saipan
+About 1090 miles east-southeast of Tinian
+About 1100 miles east-southeast of Rota
+About 1120 miles east-southeast of Guam
+
+Maximum sustained winds...35 mph
+Present movement...north...360 degrees at 10 mph
+
+DISCUSSION AND OUTLOOK
+----------------------
+At 100 AM CHST...1500 UTC...the center of Tropical Depression 29W
+was located near Latitude 9.8 degrees North and Longitude
+160.9 degrees East. 29W is moving north at 10 mph. It is expected
+to make a turn toward the west-northwest and head in the general
+direction of the Mariana Islands with a slight increase in forward
+speed through Friday.
+
+Maximum sustained winds are 35 mph. 29W is forecast to slowly
+intensify through Friday.
+
+NEXT ADVISORY
+-------------
+The next scheduled advisory will be issued by the National
+Weather Service at 800 AM ChST.
+
+$$
+
+Bowsher
+
+

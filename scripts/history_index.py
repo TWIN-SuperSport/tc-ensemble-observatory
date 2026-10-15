@@ -9,7 +9,7 @@ from pathlib import Path
 
 def target_label(meta: dict) -> str:
     info = meta.get("stormInfo", {})
-    storm_id = str(info.get("id") or meta.get("storm") or "対象不明")
+    storm_id = str(info.get("jtwcNumber") or info.get("id") or meta.get("storm") or "対象不明")
     number = info.get("number") or info.get("candidateNumber")
     if info.get("status") == "typhoon" and number:
         name = info.get("nameJa") or info.get("name")

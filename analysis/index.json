@@ -1,7 +1,18 @@
 {
   "schemaVersion": 1,
-  "latest": "./analysis/sessions/2026-10-09-95w-monitoring-started.json",
+  "latest": "./analysis/sessions/2026-10-15-29w-monitoring-started.json",
   "sessions": [
+    {
+      "id": "2026-10-15-29w-monitoring-started",
+      "label": "2026-10-15｜28W監視終了・29W監視開始",
+      "path": "./analysis/sessions/2026-10-15-29w-monitoring-started.json",
+      "trackingTargetId": "2026-10-jtwc-29w",
+      "target": [
+        "JTWC29W（旧96W）",
+        "28W（旧95W）・監視終了"
+      ],
+      "status": "active-monitoring"
+    },
     {
       "id": "2026-10-09-95w-monitoring-started",
       "label": "2026-10-09｜台風29号追跡終了・Invest 95W監視開始",

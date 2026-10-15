@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "analysisId": "2026-10-15-29w-monitoring-started",
+  "trackingTargetId": "2026-10-jtwc-29w",
+  "title": "28W監視終了・29W（旧96W）監視開始",
+  "target": [
+    "JTWC29W（旧96W）",
+    "28W（旧95W）・監視終了"
+  ],
+  "generatedAt": "2026-10-15T02:30:27.693635Z",
+  "status": "29W個別監視中・初回GEFS解析を検証中",
+  "confidence": "公式警報による29Wの位置を照合済み／新対象のGEFS進路シナリオは未公開",
+  "conclusion": [
+    "依頼に基づき28W（旧95W）の個別監視を終了し、別の擾乱JTWC29Wへ切り替える。監視解除は消滅や影響終了の判定ではない。",
+    "JTWC警報002は10月15日06:00 JST発表。03:00 JSTの解析位置10.4N・160.5E、最大風速30 kt（1分平均）、北西へ11 kt。",
+    "気象庁TC2636は10月15日10:20 JST発表、09:00 JST解析位置10.8N・159.4E、熱帯低気圧。JTWC29Wは気象庁の台風29号を意味しない。",
+    "新世代ID2026-10-jtwc-29wで旧95W→28Wおよび旧94W→27W→コグマの解析・種位置・公式IDと分離する。初回GEFS解析の検証が完了するまで既存の保存済み解析を履歴として保持する。"
+  ],
+  "reasoning": [
+    "固定の過去位置を検証済みfallbackにせず、各ランで29Wの公式警報位置を再取得する。",
+    "旧設定は95Wだけを別名として保持し、番号付き28Wへの昇格後に公式seedを解決できず、最新定時ランはダウンロード前に停止した。今回の29W設定は正式警報URLと29W/96Wの別名を明示する。",
+    "正常20本以上、12時間25hPa、85km/hなどの品質基準および既存の定時更新周期を変更しない。"
+  ],
+  "uncertainties": [
+    "29Wの新しい31メンバーGEFS解析と進路シナリオは検証中。取得・初期同一性・追跡品質に不合格なら公開しない。",
+    "公式位置とモデル初期時刻の差、中心再配置、今後の発達・転向には不確実性がある。"
+  ],
+  "falsifiers": [
+    "公式位置を解決できない、初期同一性を確認できない、または品質条件未達なら新解析を公開しない。",
+    "別の擾乱の見出しにある座標を29Wに結び付けない。過去の予測を29Wへ再ラベルしない。"
+  ],
+  "materials": [
+    {
+      "id": "E-01",
+      "title": "JTWC29W 警報002 原文",
+      "type": "official-text-product",
+      "role": "29Wの公式位置・風速・予報",
+      "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/wp2926web.txt",
+      "data": "../materials/2026-10-14-2100z-jtwc-29w-warning.txt",
+      "validTime": "2026-10-14T18:00:00Z",
+      "tags": [
+        "JTWC",
+        "29W",
+        "official-seed"
+      ]
+    },
+    {
+      "id": "E-02",
+      "title": "気象庁TC2636 10月15日10:20 JST発表",
+      "type": "official-json",
+      "role": "熱帯低気圧の最新位置と予報",
+      "sourceUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2636/forecast.json",
+      "data": "../materials/2026-10-15-0120z-jma-TC2636-forecast.json",
+      "validTime": "2026-10-15T00:00:00Z",
+      "tags": [
+        "JMA",
+        "TC2636",
+        "TD"
+      ]
+    },
+    {
+      "id": "E-03",
+      "title": "公式原文取得記録",
+      "type": "source-metadata",
+      "role": "発表・解析・取得日時とSHA-256",
+      "data": "../materials/2026-10-15-29w-switch-sources.json",
+      "tags": [
+        "provenance",
+        "SHA-256"
+      ]
+    },
+    {
+      "id": "E-04",
+      "title": "旧95W監視開始記録",
+      "type": "analysis-session",
+      "role": "95W→28Wの履歴を保持",
+      "data": "2026-10-09-95w-monitoring-started.json",
+      "tags": [
+        "95W",
+        "28W",
+        "archive"
+      ]
+    },
+    {
+      "id": "E-05",
+      "title": "旧設定の最新失敗ラン",
+      "type": "workflow-run",
+      "role": "95Wの公式seed未解決によりGEFS取得前に停止した証拠",
+      "sourceUrl": "https://github.com/TWIN-SuperSport/tc-ensemble-observatory/actions/runs/38667267215",
+      "tags": [
+        "95W",
+        "seed-unresolved",
+        "archive"
+      ]
+    },
+    {
+      "id": "E-06",
+      "title": "NWSグアム29W 警報第1号（旧96Wの公式対応）",
+      "type": "official-text-product",
+      "role": "Invest96WからTropical Depression29Wへの昇格を明記",
+      "sourceUrl": "https://forecast.weather.gov/product.php?site=NWS&issuedby=PQ2&product=TCP&format=CI&version=2&glossary=0",
+      "data": "../materials/2026-10-14-1514z-nws-29w-advisory-1.txt",
+      "validTime": "2026-10-14T15:14:00Z",
+      "tags": [
+        "NWS",
+        "29W",
+        "96W",
+        "identity"
+      ]
+    }
+  ]
+}

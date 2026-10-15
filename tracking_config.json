@@ -1,33 +1,37 @@
 {
   "monitoringState": "active",
   "monitoringEnabled": true,
-  "storm": "WP95",
+  "storm": "WP29",
   "stormInfo": {
-    "id": "95W",
-    "trackingTargetId": "2026-10-invest-95w",
-    "status": "invest",
-    "name": null,
+    "id": "96W",
+    "trackingTargetId": "2026-10-jtwc-29w",
+    "status": "tropical_depression",
+    "name": "TWENTYNINE",
     "nameJa": null,
     "number": null,
     "candidateNumber": null,
-    "jtwcNumber": null,
+    "jtwcNumber": "29W",
     "originBasin": "WPAC",
     "currentBasin": "WPAC",
     "aliases": [
-      "95W"
+      "29W",
+      "96W",
+      "TWENTYNINE"
     ],
-    "continuity": "Western Pacific Invest 95W in JTWC ABPW 091030Z October 2026 at 13.5N 144.5E. This is a separate disturbance from October Invest 94W / JTWC 27W / KOGUMA (JMA Typhoon 29). Retain this trackingTargetId across official promotion; never inherit aliases, seeds, or official identity from another generation."
+    "continuity": "JTWC Tropical Depression 29W (WP292026), formerly October 2026 Invest 96W. This is a separate disturbance from October Invest 95W / TD28W and from Invest 94W / JTWC27W / KOGUMA (JMA Typhoon 29). Retain this trackingTargetId across future official promotion. Never inherit seeds, tracks, or identity from these other generations."
   },
   "seed": {
-    "lat": 13.5,
-    "lon": 144.5
+    "lat": 10.4,
+    "lon": 160.5
   },
   "seedResolver": {
     "enabled": true,
-    "warningUrl": null,
+    "warningUrl": "https://www.metoc.navy.mil/jtwc/products/wp2926web.txt",
     "officialUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
     "aliases": [
-      "95W"
+      "29W",
+      "96W",
+      "TWENTYNINE"
     ],
     "previousForecastFallbackHours": 12,
     "requireResolvedSeed": true
@@ -49,14 +53,14 @@
   "initialIdentityMedianMslpMaxHpa": 1008,
   "stepSearchRadiusKm": 750,
   "clusterThresholdKm": 650,
-  "trackingTargetId": "2026-10-invest-95w",
-  "monitoringStartedAt": "2026-10-09T11:42:39.555689Z",
+  "trackingTargetId": "2026-10-jtwc-29w",
+  "monitoringStartedAt": "2026-10-15T02:20:18.709523Z",
   "seedReference": {
-    "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/abpwweb.txt",
-    "issuedAt": "2026-10-09T10:30:00Z",
-    "retrievedAt": "2026-10-09T11:42:39.555689Z",
-    "validUntil": "2026-10-10T10:30:00Z",
-    "rawPath": "analysis/materials/2026-10-09-1030z-jtwc-abpw.txt",
+    "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/wp2926web.txt",
+    "issuedAt": "2026-10-14T21:00:00Z",
+    "analysisAt": "2026-10-14T18:00:00Z",
+    "retrievedAt": "2026-10-15T02:23:21.552144Z",
+    "rawPath": "analysis/materials/2026-10-14-2100z-jtwc-29w-warning.txt",
     "note": "Reference for target switch only. Resolve the current official position at run time; do not use this fixed reference as a verified fallback."
   }
 }
