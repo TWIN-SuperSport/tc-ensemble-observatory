@@ -62,6 +62,11 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Preserve last published cycle
+        run: |
+          mkdir -p .diagnostics
+          cp latest_run.json .diagnostics/published-latest.json
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -81,6 +86,7 @@ jobs:
           node scripts/test_renderer.mjs
 
       - name: Build latest complete 31-member GEFS analysis
+        id: build
         env:
           GEFS_DOWNLOAD_WORKERS: "3"
         run: |
@@ -101,6 +107,7 @@ jobs:
           retention-days: 14
 
       - name: Validate generated site payload
+        id: validate
         run: |
           python - <<'PY'
           import json
@@ -120,24 +127,32 @@ jobs:
           print('Validated init', latest['init'])
           PY
 
-      - name: Commit completed analysis
+      - name: Record update health independently
+        if: always()
+        run: python scripts/write_update_status.py --outcome "${{ steps.validate.outcome }}"
+
+      - name: Commit completed analysis and update health
+        if: always()
         id: commit
         run: |
-          if git diff --quiet -- data.json latest_run.json history; then
+          if git diff --quiet -- data.json latest_run.json history update_status.json && [ -f update_status.json ] && git ls-files --error-unmatch update_status.json >/dev/null 2>&1; then
             echo "No new complete GEFS analysis"
             echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data.json latest_run.json history
-          git commit -m "Update complete GEFS ensemble analysis"
-          git pull --rebase
+          git add update_status.json
+          if [ "${{ steps.validate.outcome }}" = "success" ]; then
+            git add data.json latest_run.json history
+          fi
+          git commit -m "Update GEFS forecast and acquisition health"
+          git pull --rebase --autostash
           git push
           echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Dispatch GitHub Pages deployment
-        if: steps.commit.outputs.changed == 'true'
+        if: always() && steps.commit.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run pages.yml --ref main

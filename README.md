@@ -127,3 +127,26 @@ GitHub Pages deployment re-triggered after Pages was enabled.
 - ローカル検証: `python scripts/run_gefs_analysis.py --self-test` と `python -m unittest discover -s scripts -p 'test_*.py'`
 - 任意の再現用rawキャッシュは `GEFS_CACHE_DIR`、診断出力先は `GEFS_DIAGNOSTICS_PATH` で指定できます。`--force-init YYYYMMDDHH` は既存同一ランでも再解析します
 
+
+### Track coverage and update health (2026-10-19)
+
+The GRIB acquisition requirement remains all 31 members × 21 forecast times.
+An enclosed pressure minimum leaving the analysis domain or becoming unresolved
+now ends that member's track at its last valid point. That is **censoring**, not
+a diagnosis of dissipation or extratropical transition. No missing tail is
+extrapolated. Speed, pressure-jump, equator-crossing and initial-identity guards
+are unchanged; genuine quality-flagged members stay excluded as NOISE.
+
+At least 20 quality-screened prefixes are required. Clusters compare only a
+common lead-time window: the latest lead with at least 20 valid members. The
+UI displays that horizon and counts remaining at each lead. Cluster shares use
+the original 31-member denominator; they are not landfall probabilities.
+`cleanMembers` counts full-length tracks, `terminatedMembers` valid prefixes,
+and `validMembers` their sum. This differs from old v2 payloads, where terminated
+tracks were all classified as noise and fewer than 20 full tracks blocked the
+entire update. Historical payloads remain unchanged.
+
+`update_status.json` reports the most recent attempt separately from the last
+published forecast initialization. Failed runs retain their previous forecast
+and publish a failure status rather than relabeling old tracks as new. Detailed
+raw errors remain in Actions diagnostics, not public status messages.

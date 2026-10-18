@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>西太平洋台風進路予測観測所</title>
-<link rel="stylesheet" href="styles.css?v=20260821-median-only">
+<link rel="stylesheet" href="styles.css?v=20261018-partial-tracks">
 <link rel="stylesheet" href="refresh-control.css?v=20260730-last-updated">
 <link rel="stylesheet" href="target-layout.css?v=20260716-1748">
 <link rel="stylesheet" href="monitor-status.css?v=20260818-92w">
@@ -18,6 +18,7 @@
       更新
     </button>
   </div>
+  <p id="updateAttemptStatus" class="updateAttemptStatus" hidden aria-live="polite"></p>
   <div class="headerLayout">
     <div>
       <p class="eyebrow">EXPERIMENTAL MODEL PLAYGROUND</p>
@@ -97,6 +98,8 @@
         </span>
         <input id="hour" type="range" min="0" max="240" step="6" value="240">
       </label>
+      <p id="coverageAtHour" class="coverageAtHour" aria-live="polite"></p>
+      <section id="trackingCoverage" class="trackingCoverage" aria-label="追跡の有効範囲と集計分母"></section>
       <div class="legend" id="legend"></div>
       <p id="mapHint" class="mapHint">Scenario groupをタップすると、そのグループだけに絞れます。メンバー線を表示中は、線をタップするとメンバーの判定と最新位置を確認できます。</p>
     </div>
@@ -108,13 +111,13 @@
       <span id="situationUpdated" class="updatedBadge">計算中…</span>
     </div>
     <div id="situationCards" class="situationCards"><article class="situationCard"><small>状況カード</small><strong>計算中…</strong><span>最新データを読み込んでいます</span></article></div>
-    <p class="situationNote">「日本に来そうな予感」は、Noiseを除いた進路が日本周辺の広い監視範囲へ入る割合から算出する実験的な参考表示です。公式の発表ではありません。</p>
+    <p class="situationNote">「日本周辺に入る予測」は、有効な予測区間が北緯24–46度・東経128–150度の広い範囲へ入るメンバーの本数です。打切り後は未判定であり、日本への接近確率や影響予報ではありません。公式の発表ではありません。</p>
   </section>
   <section id="metrics" class="metrics"></section>
   <section><h2>What this view does</h2><div class="explain"><div><b>1. Preserve uncertainty</b><span>Tracks are not forced into one artificial average.</span></div><div><b>2. Separate scenarios</b><span>Physically similar paths are grouped and given representative median tracks.</span></div><div><b>3. Quarantine noise</b><span>Likely tracker jumps are displayed separately instead of silently deleted.</span></div></div></section>
 </main>
 <footer>Experimental, unofficial analysis • Not for operational or safety use</footer>
-<script src="app.js?v=20261009-pending-target-v1"></script>
+<script src="app.js?v=20261018-partial-tracks"></script>
 <script src="refresh-control.js?v=20260727"></script>
 </body></html>
 
