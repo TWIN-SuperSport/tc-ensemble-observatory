@@ -45,6 +45,7 @@ def build_history_index(history_dir: Path, latest_path: str | None = None) -> di
                 "members": summary.get("members"),
                 "cleanMembers": summary.get("cleanMembers"),
                 "noiseMembers": summary.get("noiseMembers"),
+                **({"terminatedMembers": summary["terminatedMembers"], "validMembers": summary["validMembers"], "clusterForecastHour": meta["clusterForecastHour"]} if "terminatedMembers" in summary else {}),
                 "clusterCount": summary.get("clusterCount"),
             }
         )

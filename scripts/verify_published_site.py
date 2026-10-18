@@ -16,6 +16,8 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 MEMBERS = {"c00"} | {f"p{i:02d}" for i in range(1, 31)}
 HOURS = list(range(0, 241, 12))
+LEGACY_ALGORITHM = "normalized-domain-closed-minimum-v2"
+PREFIX_ALGORITHM = "normalized-domain-closed-minimum-v3-prefix"
 
 
 def validate_pending_archive(data, monitor, history, expected_target, expected_data, archive):
@@ -61,37 +63,12 @@ def validate_pending_archive(data, monitor, history, expected_target, expected_d
     assert archive is not None and archive == data, "Published archive and live data differ"
 
 
-def validate_payload(data, latest, monitor, history, expected_target, minimum_init, *, expected_data=None, archive=None):
-    meta, summary, tracks = data["meta"], data["summary"], data["tracks"]
-    assert all(isinstance(data["disclaimer"][key], str) and data["disclaimer"][key] for key in ("ja", "en"))
-    assert monitor.get("trackingTargetId") == expected_target, "Published monitoring episode differs"
-    nested_target = meta.get("stormInfo", {}).get("trackingTargetId")
-    assert nested_target is None or nested_target == meta.get("trackingTargetId"), "Storm metadata episode differs"
-    pending = meta.get("trackingTargetId") != expected_target
-    if pending:
-        validate_pending_archive(data, monitor, history, expected_target, expected_data, archive)
-    # Same-target completed data always follows the strict current-data checks,
-    # even if a previous rejection remains in the monitoring metadata.
-    assert meta.get("trackingAlgorithm") == "normalized-domain-closed-minimum-v2"
-    init = str(meta["init"])
-    assert re.fullmatch(r"\d{10}", init) and init >= minimum_init, "Older published analysis"
-    if not pending:
-        declaration = monitor.get("pendingAnalysis") or {}
-        requested_init = declaration.get("requestedInit")
-        if declaration.get("trackingTargetId") == expected_target and isinstance(requested_init, str) and re.fullmatch(r"\d{10}", requested_init):
-            assert init >= requested_init, "Current analysis predates the requested target initialization"
-        if expected_data is not None and expected_data["meta"].get("trackingTargetId") != expected_target:
-            # Changing labels, dates, or cluster assignments cannot turn the
-            # deployed old episode's exact member points into a new analysis.
-            prior_points = {track["member"]: track["points"] for track in expected_data["tracks"]}
-            assert {track["member"]: track["points"] for track in tracks} != prior_points, "Current target reuses archived tracks"
-    assert latest["init"] == init and latest["status"] == "analysis_complete"
-    assert latest["members"] == summary["members"] == 31 and len(tracks) == 31
-    assert {t["member"] for t in tracks} == MEMBERS
+def validate_legacy_tracks(data):
+    """Keep the v2 full-horizon/noise contract for published old archives."""
+    summary, tracks = data["summary"], data["tracks"]
     clean = [t for t in tracks if t["cluster"] != "NOISE"]
     assert len(clean) == summary["cleanMembers"] >= 20
     assert summary["noiseMembers"] == 31 - len(clean)
-    assert meta["trackingIdentity"]["status"] == "verified"
     clusters = data["clusters"]
     assert isinstance(clusters, list) and len(clusters) == summary["clusterCount"] > 0
     cluster_ids = [cluster["id"] for cluster in clusters]
@@ -125,12 +102,155 @@ def validate_payload(data, latest, monitor, history, expected_target, minimum_in
             assert termination["atForecastHour"] == HOURS[len(points)]
         else:
             assert not track.get("termination")
+
+
+def point_quality_flags(points):
+    """The scientific quality guards, independent of ordinary track termination."""
+    speeds = []
+    for a, b in zip(points, points[1:]):
+        lat1, lat2 = math.radians(float(a["lat"])), math.radians(float(b["lat"]))
+        dlat = lat2 - lat1
+        dlon = math.radians(((float(b["lon"]) - float(a["lon"]) + 180) % 360) - 180)
+        hav = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+        distance = 6371.0 * 2 * math.atan2(math.sqrt(hav), math.sqrt(max(0.0, 1 - hav)))
+        speeds.append(distance / (b["fhour"] - a["fhour"]))
+    flags = []
+    if speeds and max(speeds) > 85:
+        flags.append("translation_speed")
+    if any(float(a["lat"]) * float(b["lat"]) < 0 for a, b in zip(points, points[1:])):
+        flags.append("equator_crossing")
+    if any(abs(float(a["mslp_hpa"]) - float(b["mslp_hpa"])) > 25 for a, b in zip(points, points[1:])):
+        flags.append("pressure_discontinuity")
+    return flags
+
+
+def validate_prefix_tracks(data):
+    """Validate v3 censoring, coverage and common-horizon cluster accounting."""
+    meta, summary, tracks = data["meta"], data["summary"], data["tracks"]
+    for key in ("members", "cleanMembers", "terminatedMembers", "noiseMembers", "validMembers", "clusteredMembers", "clusterCount"):
+        assert type(summary[key]) is int and 0 <= summary[key] <= 31, "Invalid prefix count: " + key
+    complete, terminated, noise = [], [], []
+    for track in tracks:
+        points = track["points"]
+        assert isinstance(points, list) and 1 <= len(points) <= len(HOURS), "Invalid track prefix length"
+        assert all(type(point["fhour"]) is int for point in points)
+        assert [point["fhour"] for point in points] == HOURS[:len(points)], "Track is not a contiguous forecast prefix"
+        assert all(math.isfinite(float(point[key])) for point in points for key in ("lat", "lon", "mslp_hpa"))
+        visible_flags = point_quality_flags(points)
+        flags = track["noiseReasons"]
+        assert isinstance(flags, list) and all(isinstance(flag, str) for flag in flags)
+        assert len(flags) == len(set(flags)) and set(flags) <= {"translation_speed", "equator_crossing", "pressure_discontinuity"}, "Unknown or duplicate quality flags"
+        # Flags are calculated before coordinates/pressures are rounded for
+        # publication. A real 25.01-hPa jump can become 25.0 hPa, so visible
+        # violations must be flagged but existing raw-data flags must survive.
+        assert set(visible_flags) <= set(flags), "Visible quality violation lacks a flag"
+        termination = track.get("termination")
+        if len(points) < len(HOURS):
+            assert isinstance(termination, dict), "Short prefix lacks termination"
+            assert termination["reason"] in ("center_lost", "domain_exit"), "Unknown termination reason"
+            assert type(termination["lastValidForecastHour"]) is int and termination["lastValidForecastHour"] == points[-1]["fhour"]
+            assert type(termination["atForecastHour"]) is int and termination["atForecastHour"] == HOURS[len(points)], "Termination extends beyond valid prefix"
+        else:
+            assert not termination, "Complete track has a termination"
+        if flags:
+            assert track["cluster"] == "NOISE" and track.get("scenarioCluster") is None
+            noise.append(track)
+        elif termination:
+            assert track["cluster"] == "TERMINATED", "Valid short prefix must remain TERMINATED"
+            terminated.append(track)
+        else:
+            assert track["cluster"] not in ("NOISE", "TERMINATED")
+            complete.append(track)
+    valid = complete + terminated
+    assert summary["cleanMembers"] == len(complete)
+    assert summary["terminatedMembers"] == len(terminated)
+    assert summary["noiseMembers"] == len(noise)
+    assert summary["validMembers"] == len(valid) >= 20, "Insufficient valid track prefixes"
+    assert len(complete) + len(terminated) + len(noise) == summary["members"] == 31
+    availability = [{"fhour": h, "count": sum(t["points"][-1]["fhour"] >= h for t in valid), "total": 31} for h in HOURS]
+    rows = summary["availableMembersByLead"]
+    assert isinstance(rows, list) and all(type(row[key]) is int for row in rows for key in ("fhour", "count", "total"))
+    assert rows == availability, "Lead availability differs from valid prefixes"
+    horizon = max(row["fhour"] for row in availability if row["count"] >= 20)
+    assert type(meta["clusterForecastHour"]) is int and meta["clusterForecastHour"] == horizon, "Clustering does not use the latest supported common horizon"
+    eligible = {track["member"] for track in valid if track["points"][-1]["fhour"] >= horizon} if horizon > 0 else set()
+    assert summary["clusteredMembers"] == len(eligible)
+    clusters = data["clusters"]
+    assert isinstance(clusters, list) and len(clusters) == summary["clusterCount"]
+    assert bool(clusters) == (horizon > 0), "Clusters require a supported positive forecast horizon"
+    cluster_ids = [cluster["id"] for cluster in clusters]
+    assert all(isinstance(cid, str) and cid and cid not in ("NOISE", "TERMINATED", "UNCLASSIFIED") for cid in cluster_ids)
+    assert len(cluster_ids) == len(set(cluster_ids)), "Duplicate scenario clusters"
+    assigned = {}
+    for cluster in clusters:
+        assert isinstance(cluster["label"], str) and cluster["label"]
+        members = cluster["members"]
+        assert isinstance(members, list) and members and len(members) == len(set(members))
+        assert type(cluster["count"]) is int and cluster["count"] == len(members)
+        assert type(cluster["denominator"]) is int and cluster["denominator"] == 31
+        assert type(cluster["conditionalDenominator"]) is int and cluster["conditionalDenominator"] == len(eligible) >= 20
+        assert abs(float(cluster["share"]) - round(len(members) / 31 * 100, 1)) < 1e-9
+        assert abs(float(cluster["conditionalShare"]) - round(len(members) / len(eligible) * 100, 1)) < 1e-9
+        assert type(cluster["forecastHour"]) is int and cluster["forecastHour"] == horizon
+        for member in members:
+            assert member in eligible and member not in assigned, "Invalid or duplicate scenario participant"
+            assigned[member] = cluster["id"]
+        median = cluster["medianTrack"]
+        assert isinstance(median, list) and all(type(point["fhour"]) is int for point in median)
+        assert [point["fhour"] for point in median] == [h for h in HOURS if h <= horizon], "Median extends beyond common supported horizon"
+        assert all(math.isfinite(float(point[key])) for point in median for key in ("lat", "lon"))
+    assert set(assigned) == eligible, "Scenario membership differs from common-horizon participants"
+    for track in valid:
+        member = track["member"]
+        scenario = track.get("scenarioCluster")
+        assert scenario is None or scenario == assigned.get(member), "Track scenario differs from cluster membership"
+        if member not in assigned:
+            assert scenario is None
+        if not track.get("termination"):
+            assert track["cluster"] == assigned.get(member, "UNCLASSIFIED"), "Complete-track cluster differs from membership"
+
+
+def validate_payload(data, latest, monitor, history, expected_target, minimum_init, *, expected_data=None, archive=None):
+    meta, summary, tracks = data["meta"], data["summary"], data["tracks"]
+    assert all(isinstance(data["disclaimer"][key], str) and data["disclaimer"][key] for key in ("ja", "en"))
+    assert monitor.get("trackingTargetId") == expected_target, "Published monitoring episode differs"
+    nested_target = meta.get("stormInfo", {}).get("trackingTargetId")
+    assert nested_target is None or nested_target == meta.get("trackingTargetId"), "Storm metadata episode differs"
+    pending = meta.get("trackingTargetId") != expected_target
+    if pending:
+        validate_pending_archive(data, monitor, history, expected_target, expected_data, archive)
+    # Same-target completed data always follows the strict current-data checks,
+    # even if a previous rejection remains in the monitoring metadata.
+    assert meta.get("trackingAlgorithm") in (LEGACY_ALGORITHM, PREFIX_ALGORITHM), "Unknown tracking algorithm"
+    init = str(meta["init"])
+    assert re.fullmatch(r"\d{10}", init) and init >= minimum_init, "Older published analysis"
+    if not pending:
+        declaration = monitor.get("pendingAnalysis") or {}
+        requested_init = declaration.get("requestedInit")
+        if declaration.get("trackingTargetId") == expected_target and isinstance(requested_init, str) and re.fullmatch(r"\d{10}", requested_init):
+            assert init >= requested_init, "Current analysis predates the requested target initialization"
+        if expected_data is not None and expected_data["meta"].get("trackingTargetId") != expected_target:
+            # Changing labels, dates, or cluster assignments cannot turn the
+            # deployed old episode's exact member points into a new analysis.
+            prior_points = {track["member"]: track["points"] for track in expected_data["tracks"]}
+            assert {track["member"]: track["points"] for track in tracks} != prior_points, "Current target reuses archived tracks"
+    assert latest["init"] == init and latest["status"] == "analysis_complete"
+    assert latest["members"] == summary["members"] == 31 and len(tracks) == 31
+    assert {t["member"] for t in tracks} == MEMBERS
+    assert meta["trackingIdentity"]["status"] == "verified"
+    if meta["trackingAlgorithm"] == PREFIX_ALGORITHM:
+        validate_prefix_tracks(data)
+    else:
+        validate_legacy_tracks(data)
     assert history["latest"] == init and history["runCount"] == len(history["runs"])
     latest_entries = [run for run in history["runs"] if run["path"] == history["latestPath"]]
     assert len(latest_entries) == 1, "Latest history entry missing or duplicated"
     entry = latest_entries[0]
     assert entry["init"] == init and entry["trackingTargetId"] == meta["trackingTargetId"], "Latest history episode differs"
     assert all(entry[key] == summary[key] for key in ("members", "cleanMembers", "noiseMembers", "clusterCount")), "Latest history summary differs"
+    if meta["trackingAlgorithm"] == PREFIX_ALGORITHM:
+        assert all(type(entry[key]) is int and entry[key] == summary[key] for key in ("terminatedMembers", "validMembers")), "Latest history prefix counts differ"
+        assert type(entry["clusterForecastHour"]) is int and entry["clusterForecastHour"] == meta["clusterForecastHour"], "Latest history horizon differs"
     if archive is not None:
         assert archive == data, "Published archive and live data differ"
     return {"init": init, "trackingTargetId": meta["trackingTargetId"], "monitoringTargetId": expected_target, "analysisState": monitor["analysisState"] if pending else "analysis_complete", "summary": summary, "historyRunCount": history["runCount"]}
@@ -360,6 +480,12 @@ def self_test():
     rollback["expected_data"] = copy.deepcopy(current["data"])
     reject("old archive after current-target deployment", rollback)
     print(f"Published-payload self-test passed (current, pending, repeated checks, recovery and {rejection_count} rejection cases)")
+    # Keep the deployment's existing --self-test entry point exercising v3,
+    # without importing the scientific pipeline or third-party dependencies.
+    import unittest
+    from test_verify_published_site import PrefixPayloadTests
+    result = unittest.TextTestRunner().run(unittest.defaultTestLoader.loadTestsFromTestCase(PrefixPayloadTests))
+    assert result.wasSuccessful(), "Prefix-payload regression tests failed"
 
 
 def main(base):

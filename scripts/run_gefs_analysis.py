@@ -12,18 +12,19 @@ _original_build_payload = pipeline.build_payload
 
 def _diagnostic_build_payload(init, config, tracks, previous):
     terminations = config.get("_trackDiagnostics", {})
-    reasons = {member: pipeline.noise_reasons(tracks[member]) + ([terminations[member]["reason"]] if member in terminations else []) for member in pipeline.MEMBERS}
+    reasons = {member: pipeline.noise_reasons(tracks[member]) for member in pipeline.MEMBERS}
     clean = [member for member in pipeline.MEMBERS if not reasons[member]]
     noise = [member for member in pipeline.MEMBERS if reasons[member]]
     counts = Counter(reason for member in noise for reason in reasons[member])
+    terminated = [member for member in clean if member in terminations]
 
     print(
-        "Noise diagnostics: "
-        f"clean={len(clean)}, noise={len(noise)}, reasonCounts={dict(counts)}",
+        "Track diagnostics (termination is censoring, not necessarily noise): "
+        f"valid={len(clean)}, complete={len(clean)-len(terminated)}, terminated={len(terminated)}, noise={len(noise)}, reasonCounts={dict(counts)}",
         flush=True,
     )
 
-    for member in noise:
+    for member in noise + terminated:
         points = tracks[member]
         segments = list(zip(points, points[1:]))
         speed_events = [
@@ -47,7 +48,7 @@ def _diagnostic_build_payload(init, config, tracks, previous):
         max_speed, speed_from, speed_to = max(speed_events, default=(0.0, 0, 0))
         max_jump, jump_from, jump_to = max(pressure_events, default=(0.0, 0, 0))
         print(
-            f"  {member}: reasons={','.join(reasons[member])}; "
+            f"  {member}: reasons={','.join(reasons[member]) or terminations.get(member, {}).get('reason', '-')}; "
             f"maxSpeed={max_speed:.1f}km/h@f{speed_from:03d}-f{speed_to:03d}; "
             f"maxPressureJump={max_jump:.1f}hPa@f{jump_from:03d}-f{jump_to:03d}; "
             f"equatorCrossings={crossing_hours or '-'}; "

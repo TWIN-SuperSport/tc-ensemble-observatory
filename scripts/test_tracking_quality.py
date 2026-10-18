@@ -246,9 +246,35 @@ class PublicationQualityTests(unittest.TestCase):
             with self.subTest(length=length):
                 payload = payload_with_prefix(length)
                 pipeline.validate(payload, INIT_KEY)
-                self.assertEqual(payload["tracks"][-1]["cluster"], "NOISE")
+                self.assertEqual(payload["tracks"][-1]["cluster"], "TERMINATED")
                 self.assertEqual(payload["summary"]["cleanMembers"], 30)
                 self.assertTrue(all(len(c["medianTrack"]) == 21 for c in payload["clusters"]))
+
+    def test_six_complete_twenty_five_terminated_publish_prefixes(self):
+        cfg, ts = config(), tracks()
+        cfg["_trackDiagnostics"] = {}
+        for member in pipeline.MEMBERS[6:]:
+            ts[member] = ts[member][:11]
+            cfg["_trackDiagnostics"][member] = {"reason": "center_lost", "atForecastHour": 132, "lastValidForecastHour": 120}
+        payload = pipeline.build_payload(INIT, cfg, ts, {})
+        pipeline.validate(payload, INIT_KEY)
+        self.assertEqual(payload["summary"]["cleanMembers"], 6)
+        self.assertEqual(payload["summary"]["terminatedMembers"], 25)
+        self.assertEqual(payload["summary"]["noiseMembers"], 0)
+        self.assertEqual(payload["meta"]["clusterForecastHour"], 120)
+        self.assertEqual(payload["summary"]["availableMembersByLead"][-1]["count"], 6)
+        self.assertTrue(all(c["medianTrack"][-1]["fhour"] == 120 for c in payload["clusters"]))
+        self.assertTrue(all(c["denominator"] == 31 for c in payload["clusters"]))
+
+    def test_short_prefix_cannot_erase_bad_jump(self):
+        cfg, ts = config(), tracks()
+        cfg["_trackDiagnostics"] = {}
+        for member in pipeline.MEMBERS[:12]:
+            ts[member] = ts[member][:3]
+            ts[member][-1].mslp_hpa -= 26
+            cfg["_trackDiagnostics"][member] = {"reason":"domain_exit", "atForecastHour":36,"lastValidForecastHour":24}
+        with self.assertRaisesRegex(RuntimeError,"clean=19"):
+            pipeline.build_payload(INIT,cfg,ts,{})
 
     def test_clean_track_cannot_be_truncated(self):
         payload = payload_with_prefix()
@@ -262,7 +288,7 @@ class PublicationQualityTests(unittest.TestCase):
             if mutation == "termination":
                 payload["tracks"][-1]["termination"] = None
             else:
-                payload["tracks"][-1]["noiseReasons"] = []
+                payload["tracks"][-1]["termination"]["reason"] = "invented"
             with self.subTest(mutation=mutation), self.assertRaises(AssertionError):
                 pipeline.validate(payload, INIT_KEY)
 
@@ -451,7 +477,7 @@ class DiagnosticEvidenceTests(unittest.TestCase):
             document = json.loads(output.read_text())
         self.assertEqual(document["status"], "rejected")
         self.assertEqual(document["error"], "fixture failure")
-        self.assertEqual(document["policy"]["minimumCompleteCleanMembers"], 20)
+        self.assertEqual(document["policy"]["minimumValidPrefixMembers"], 20)
         self.assertEqual(document["policy"]["maxPressureChangeHpa"], 25)
         self.assertEqual(document["downloadedFields"], 1)
         self.assertEqual(document["fieldProvenance"], cfg["_fieldProvenance"])

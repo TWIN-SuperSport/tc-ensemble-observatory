@@ -1054,7 +1054,7 @@ def track_distance(a: list[TrackPoint], b: list[TrackPoint]) -> float:
 
 def median_track(members: list[str], tracks: dict[str, list[TrackPoint]]) -> list[TrackPoint]:
     result = []
-    for i, fhour in enumerate(FORECAST_HOURS):
+    for i, fhour in enumerate(FORECAST_HOURS[:min(len(tracks[m]) for m in members)]):
         pts = [tracks[m][i] for m in members]
         lats = np.array([p.lat for p in pts])
         lons = np.unwrap(np.radians([p.lon for p in pts]))
@@ -1110,25 +1110,43 @@ def point_json(member: str, p: TrackPoint) -> dict:
 
 def build_payload(init: datetime, config: dict, tracks: dict[str, list[TrackPoint]], previous: dict) -> dict:
     terminations = config.get("_trackDiagnostics", {})
-    reasons = {m: noise_reasons(tracks[m]) + ([terminations[m]["reason"]] if m in terminations else []) for m in MEMBERS}
-    clean = [m for m in MEMBERS if not reasons[m]]
+    # Loss of trackability is censoring, not proof that the valid prefix is noise.
+    # Genuine discontinuity/speed/equator guards remain unchanged.
+    reasons = {m: noise_reasons(tracks[m]) for m in MEMBERS}
+    valid = [m for m in MEMBERS if not reasons[m]]
+    clean = [m for m in valid if m not in terminations]
+    terminated = [m for m in valid if m in terminations]
     noise = [m for m in MEMBERS if reasons[m]]
-    if len(clean) < 20:
-        raise RuntimeError(f"Too many rejected members: clean={len(clean)}, noise={len(noise)}")
-    groups = cluster_tracks(clean, tracks, float(config.get("clusterThresholdKm", 650)))
+    if len(valid) < 20:
+        raise RuntimeError(f"Too many rejected members: clean={len(valid)}, noise={len(noise)}")
+    available = [{"fhour": h, "count": sum(any(p.fhour == h for p in tracks[m]) for m in valid), "total": len(MEMBERS)} for h in FORECAST_HOURS]
+    # Compare equal lead-time windows, never survivors at unequal endpoints.
+    horizon = max(row["fhour"] for row in available if row["count"] >= 20)
+    clustered = [m for m in valid if tracks[m][-1].fhour >= horizon]
+    common_tracks = {m: [p for p in tracks[m] if p.fhour <= horizon] for m in clustered}
+    groups = cluster_tracks(clustered, common_tracks, float(config.get("clusterThresholdKm", 650))) if horizon > 0 else []
     clusters = []
     member_cluster: dict[str, str] = {m: "NOISE" for m in noise}
+    member_cluster.update({m: "UNCLASSIFIED" for m in clean})
+    member_cluster.update({m: "TERMINATED" for m in terminated})
+    scenario_cluster = {}
     for index, group in enumerate(groups, 1):
         cid = f"C{index}"
-        med = median_track(group, tracks)
+        med = median_track(group, common_tracks)
         for member in group:
-            member_cluster[member] = cid
+            scenario_cluster[member] = cid
+            if member not in terminated:
+                member_cluster[member] = cid
         clusters.append({
             "id": cid,
             "label": scenario_label(med),
             "members": group,
             "count": len(group),
             "share": round(len(group) / len(MEMBERS) * 100, 1),
+            "conditionalShare": round(len(group) / len(clustered) * 100, 1),
+            "denominator": len(MEMBERS),
+            "conditionalDenominator": len(clustered),
+            "forecastHour": horizon,
             "medianTrack": [
                 {"fhour": p.fhour, "lat": round(p.lat, 2), "lon": round(p.lon, 2)} for p in med
             ],
@@ -1143,7 +1161,9 @@ def build_payload(init: datetime, config: dict, tracks: dict[str, list[TrackPoin
         "stormInfo": config.get("stormInfo", meta.get("stormInfo", {})),
         "officialIdentity": config.get("_officialIdentity", meta.get("officialIdentity", {})),
         "trackingTargetId": config.get("trackingTargetId"),
-        "trackingAlgorithm": "normalized-domain-closed-minimum-v2",
+        "trackingAlgorithm": "normalized-domain-closed-minimum-v3-prefix",
+        "clusterForecastHour": horizon,
+        "trackCoverageNote": "Terminated tracks end at the last resolved center; termination is not a dissipation or extratropical-transition diagnosis. Cluster shares are counts out of all 31 members at the stated common horizon, not landfall probabilities.",
         "trackingSeed": config["seed"],
         "trackingSeedSource": config.get("_seedResolution", {}).get(
             "source", "tracking_config"
@@ -1157,13 +1177,18 @@ def build_payload(init: datetime, config: dict, tracks: dict[str, list[TrackPoin
             "members": len(MEMBERS),
             "cleanMembers": len(clean),
             "noiseMembers": len(noise),
+            "terminatedMembers": len(terminated),
+            "validMembers": len(valid),
+            "clusteredMembers": len(clustered) if groups else 0,
+            "availableMembersByLead": available,
             "clusterCount": len(clusters),
         },
         "clusters": clusters,
         "tracks": [
             {
                 "member": m,
-                "cluster": member_cluster[m],
+                "cluster": member_cluster.get(m, "TERMINATED"),
+                "scenarioCluster": scenario_cluster.get(m),
                 "noiseReasons": reasons[m],
                 "termination": terminations.get(m),
                 "points": [point_json(m, p) for p in tracks[m]],
@@ -1178,23 +1203,54 @@ def validate(payload: dict, expected_init: str) -> None:
     assert payload["summary"]["members"] == 31
     assert len(payload["tracks"]) == 31
     assert {t["member"] for t in payload["tracks"]} == set(MEMBERS)
+    valid, complete, terminated, noise = [], [], [], []
     for track in payload["tracks"]:
         points = track["points"]
         assert points and [p["fhour"] for p in points] == FORECAST_HOURS[:len(points)]
         assert all(math.isfinite(float(p[k])) for p in points for k in ("lat", "lon", "mslp_hpa"))
+        expected_flags = noise_reasons([TrackPoint(p["fhour"],p["lat"],p["lon"],p["mslp_hpa"]) for p in points])
+        assert set(expected_flags).issubset(track["noiseReasons"])
+        assert set(track["noiseReasons"]).issubset({"translation_speed", "pressure_discontinuity", "equator_crossing"})
         if len(points) != len(FORECAST_HOURS):
-            assert track["cluster"] == "NOISE" and track.get("termination")
-            assert track["termination"]["reason"] in track["noiseReasons"]
+            assert track.get("termination")
+            assert track["termination"]["reason"] in ("domain_exit", "center_lost")
             assert track["termination"]["lastValidForecastHour"] == points[-1]["fhour"]
             assert track["termination"]["atForecastHour"] == FORECAST_HOURS[len(points)]
         else:
             assert not track.get("termination")
-    clean_tracks = [t for t in payload["tracks"] if t["cluster"] != "NOISE"]
-    assert payload["summary"]["cleanMembers"] == len(clean_tracks)
-    assert payload["summary"]["noiseMembers"] == len(payload["tracks"]) - len(clean_tracks)
-    assert all(not t["noiseReasons"] and len(t["points"]) == len(FORECAST_HOURS) for t in clean_tracks)
-    assert payload["summary"]["cleanMembers"] >= 20
-    assert payload["summary"]["cleanMembers"] + payload["summary"]["noiseMembers"] == 31
+        if track["noiseReasons"]:
+            assert track["cluster"] == "NOISE"
+            noise.append(track)
+        else:
+            valid.append(track)
+            if track.get("termination"):
+                assert track["cluster"] == "TERMINATED"
+                terminated.append(track)
+            else:
+                assert track["cluster"] not in ("NOISE", "TERMINATED")
+                complete.append(track)
+    summary = payload["summary"]
+    assert summary["cleanMembers"] == len(complete)
+    assert summary["terminatedMembers"] == len(terminated)
+    assert summary["noiseMembers"] == len(noise)
+    assert summary["validMembers"] == len(valid) >= 20
+    assert len(complete) + len(terminated) + len(noise) == 31
+    availability = [{"fhour": h, "count": sum(any(p["fhour"] == h for p in t["points"]) for t in valid), "total": 31} for h in FORECAST_HOURS]
+    assert summary["availableMembersByLead"] == availability
+    horizon = max(row["fhour"] for row in availability if row["count"] >= 20)
+    assert payload["meta"]["clusterForecastHour"] == horizon
+    eligible = {t["member"] for t in valid if t["points"][-1]["fhour"] >= horizon} if horizon > 0 else set()
+    assert summary["clusteredMembers"] == len(eligible)
+    grouped = []
+    for cluster in payload["clusters"]:
+        grouped.extend(cluster["members"])
+        assert cluster["count"] == len(cluster["members"])
+        assert cluster["denominator"] == 31
+        assert cluster["share"] == round(cluster["count"] / 31 * 100, 1)
+        assert cluster["conditionalDenominator"] == len(eligible)
+        assert cluster["forecastHour"] == horizon
+        assert [p["fhour"] for p in cluster["medianTrack"]] == [h for h in FORECAST_HOURS if h <= horizon]
+    assert set(grouped) == eligible and len(grouped) == len(eligible)
     assert payload["meta"].get("trackingIdentity", {}).get("status") == "verified"
     assert "officialIdentity" in payload["meta"]
 
@@ -1363,7 +1419,7 @@ def write_run_diagnostics(init, config, tracks, status, error=None):
         if member in terminations:
             reasons.append(terminations[member]["reason"])
         member_details[member] = {"points": [point_json(member, p) for p in points], "qualityFlags": reasons, "events": events, "termination": terminations.get(member)}
-    document = {"schemaVersion": 1, "init": init.strftime("%Y%m%d%H"), "checkedAt": datetime.now(timezone.utc).isoformat(), "status": status, "error": str(error) if error else None, "trackingTargetId": config.get("trackingTargetId"), "seed": config.get("seed"), "seedResolution": config.get("_seedResolution"), "officialIdentity": config.get("_officialIdentity"), "domain": config.get("domain"), "policy": {"minimumCompleteCleanMembers": 20, "maxPressureChangeHpa": 25, "maxSpeedKmh": 85, "forecastHours": FORECAST_HOURS}, "downloadedFields": len(config.get("_fieldProvenance", {})), "fieldProvenance": config.get("_fieldProvenance", {}), "members": member_details}
+    document = {"schemaVersion": 1, "init": init.strftime("%Y%m%d%H"), "checkedAt": datetime.now(timezone.utc).isoformat(), "status": status, "error": str(error) if error else None, "trackingTargetId": config.get("trackingTargetId"), "seed": config.get("seed"), "seedResolution": config.get("_seedResolution"), "officialIdentity": config.get("_officialIdentity"), "domain": config.get("domain"), "policy": {"minimumValidPrefixMembers": 20, "minimumCommonHorizonMembers": 20, "maxPressureChangeHpa": 25, "maxSpeedKmh": 85, "forecastHours": FORECAST_HOURS}, "downloadedFields": len(config.get("_fieldProvenance", {})), "fieldProvenance": config.get("_fieldProvenance", {}), "members": member_details}
     output.write_text(json.dumps(document, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Wrote diagnostic evidence: {output}", flush=True)
 
@@ -1385,7 +1441,7 @@ def main() -> int:
         else latest_complete_cycle()
     )
     init_string = init.strftime("%Y%m%d%H")
-    if not args.force_init and previous.get("meta", {}).get("init") == init_string and previous.get("meta", {}).get("trackingAlgorithm") == "normalized-domain-closed-minimum-v2":
+    if not args.force_init and previous.get("meta", {}).get("init") == init_string and previous.get("meta", {}).get("trackingAlgorithm") == "normalized-domain-closed-minimum-v3-prefix":
         previous_id = normalize_storm_id(
             previous.get("meta", {}).get("stormInfo", {}).get("id")
         )
