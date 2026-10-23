@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
+import { makeCoverageFixture, makeAllTerminatedFixture, syntheticMonitor } from './renderer_fixtures.cjs';
 
 const read = path => readFileSync(fileURLToPath(new URL(`../${path}`, import.meta.url)), 'utf8');
 const candidate = JSON.parse(read('data.json'));
@@ -175,17 +176,9 @@ console.log('JTWC29W labels preserve Invest96W lineage and independent JMA numbe
 
 
 // Valid terminated prefixes are a separate class, visible in the default mode.
-const partialFixture = structuredClone(candidate);
-const templatePoints = candidate.tracks.find(t => t.points.at(-1)?.fhour === 240).points;
-partialFixture.meta.clusterForecastHour = 120;
-partialFixture.summary = {members:31, cleanMembers:16, terminatedMembers:10, validMembers:26, noiseMembers:5, clusterCount:2, clusteredMembers:21};
-partialFixture.tracks = candidate.tracks.map((track,index) => {
-  const full=index<16, terminated=index>=16&&index<26, last=full||!terminated?240:index<21?120:24;
-  return {member:track.member,cluster:full?(index<10?'C1':'C2'):terminated?'TERMINATED':'NOISE',scenarioCluster:terminated&&index<21?'C1':null,noiseReasons:terminated||full?[]:['tracker_jump'],termination:terminated?{reason:'center_lost',atForecastHour:last+12,lastValidForecastHour:last}:null,points:templatePoints.filter(p=>p.fhour<=last).map(p=>({...p,member:track.member,lon:p.lon+index*.1}))};
-});
-partialFixture.summary.availableMembersByLead=templatePoints.map(p=>({fhour:p.fhour,count:p.fhour<=24?26:p.fhour<=120?21:16,total:31}));
-partialFixture.clusters=[{id:'C1',label:'Test west',count:15,share:48.4,medianTrack:templatePoints.filter(p=>p.fhour<=120)},{id:'C2',label:'Test east',count:6,share:19.4,medianTrack:templatePoints.filter(p=>p.fhour<=120)}];
-const partial=harness(partialFixture);
+// Synthetic fixtures never require a full-length track from current data.json.
+const partialFixture = makeCoverageFixture();
+const partial=harness(partialFixture,syntheticMonitor);
 const descendants=node=>node.children.flatMap(child=>[child,...descendants(child)]);
 const plotted=(h,tag,klass)=>descendants(h.elements.get('plot')).filter(node=>node.tagName===tag&&String(node.attributes.get('class')||'').split(/\s+/).includes(klass));
 partial.run('render()');
@@ -243,3 +236,23 @@ assert.match(partial.elements.get('trackingCoverage').innerHTML,/比率・中央
 assert.match(partial.elements.get('situationCards').innerHTML,/共通の進路区間が不足/);
 assert.equal(plotted(partial,'path','median').length,0);
 console.log('Zero-horizon coverage displays valid prefixes without fabricating scenario summaries');
+
+// Regression for the 2026-10-22 publication: all 31 valid members can terminate.
+// No full-length template, extrapolated tail, or artificial NOISE is required.
+const allTerminatedFixture = makeAllTerminatedFixture();
+assert.equal(allTerminatedFixture.tracks.some(t=>t.points.at(-1).fhour===240),false);
+const allTerminated=harness(allTerminatedFixture,syntheticMonitor);
+exerciseModes(allTerminated,30);
+assert.equal(plotted(allTerminated,'path','terminatedTrack').length,31);
+assert.equal(plotted(allTerminated,'circle','terminationEndpoint').length,31);
+assert.equal(plotted(allTerminated,'path','noiseTrack').length,0);
+assert.match(allTerminated.elements.get('trackingCoverage').innerHTML,/有効追跡 31 \/ 全31本/);
+assert.match(allTerminated.elements.get('trackingCoverage').innerHTML,/全予報時間 0本・打切り 31本/);
+assert.match(allTerminated.elements.get('coverageAtHour').textContent,/\+240h.*0 \/ 全31本/);
+assert.match(allTerminated.elements.get('detail').textContent,/domain_exit.*最終有効 \+168h/);
+assert.ok(plotted(allTerminated,'path','terminatedTrack').every(path=>path.attributes.get('d').split(' ').length<=15),'Terminated paths never extend beyond their measured prefix');
+allTerminated.elements.get('hour').value=120;allTerminated.run('render();showDetail(data.tracks[0])');
+assert.equal(plotted(allTerminated,'circle','terminationEndpoint').length,29);
+assert.match(allTerminated.elements.get('coverageAtHour').textContent,/\+120h.*31 \/ 全31本/);
+assert.match(allTerminated.elements.get('detail').textContent,/center_lost.*最終有効 \+120h/);
+console.log('All-terminated regression passed: 31 valid prefixes, zero complete tracks, both termination reasons, 12 mode/time cases, and no invented tails');

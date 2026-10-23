@@ -2,6 +2,7 @@
 const {chromium}=require('playwright');
 const fs=require('node:fs');
 const assert=require('node:assert/strict');
+const {makeCoverageFixture,makeAllTerminatedFixture}=require('./renderer_fixtures.cjs');
 (async()=>{
  const browser=await chromium.launch({headless:true,...(process.env.BROWSER_EXECUTABLE?{executablePath:process.env.BROWSER_EXECUTABLE}:{})});
  const page=await browser.newPage({viewport:{width:1440,height:1000}});
@@ -43,12 +44,9 @@ const assert=require('node:assert/strict');
  assert.match(await page.locator('#targetName').innerText(),/29W/);
  // Current generation with valid but censored prefixes: no invented tails or probabilities.
  const candidate=JSON.parse(fs.readFileSync('data.json','utf8'));
- const template=candidate.tracks.find(t=>t.points.at(-1)?.fhour===240).points;
- displayed=structuredClone(candidate);
- displayed.meta.clusterForecastHour=120;
- displayed.summary={members:31,cleanMembers:16,terminatedMembers:10,validMembers:26,noiseMembers:5,clusterCount:2,clusteredMembers:21,availableMembersByLead:template.map(p=>({fhour:p.fhour,count:p.fhour<=24?26:p.fhour<=120?21:16,total:31}))};
- displayed.tracks=candidate.tracks.map((tr,i)=>{const full=i<16,terminated=i>=16&&i<26,last=full||!terminated?240:i<21?120:24;return{member:tr.member,cluster:full?(i<10?'C1':'C2'):terminated?'TERMINATED':'NOISE',scenarioCluster:terminated&&i<21?'C1':null,noiseReasons:full||terminated?[]:['tracker_jump'],termination:terminated?{reason:'center_lost',atForecastHour:last+12,lastValidForecastHour:last}:null,points:template.filter(p=>p.fhour<=last).map(p=>({...p,member:tr.member,lon:p.lon+i*.1}))}});
- displayed.clusters=[{id:'C1',label:'Test west',count:15,share:48.4,medianTrack:template.filter(p=>p.fhour<=120)},{id:'C2',label:'Test east',count:6,share:19.4,medianTrack:template.filter(p=>p.fhour<=120)}];
+ // The test-only fixture must work even when the live candidate has zero full tracks.
+ displayed=makeCoverageFixture();
+ displayed.meta.trackingTargetId=monitor.trackingTargetId;
  let attempt={lastAttemptAt:'2026-10-18T18:00:00Z',init:'2026101812',status:'failed',message:'Quality validation failed',publishedInit:candidate.meta.init};
  await page.route('**/update_status.json?*',route=>attempt?route.fulfill({json:attempt}):route.fulfill({status:404,body:'Not found'}));
  await page.setViewportSize({width:1440,height:1000});
@@ -94,6 +92,23 @@ const assert=require('node:assert/strict');
  // Absent attempt metadata on old sites is optional, not an application failure.
  attempt=null;await page.reload();await page.locator('#plot .terminatedTrack').first().waitFor();
  assert.equal(await page.locator('#updateAttemptStatus').isVisible(),false);
+ // All-valid-but-terminated is a supported current ensemble, not an empty forecast.
+ displayed=makeAllTerminatedFixture();
+ displayed.meta.trackingTargetId=monitor.trackingTargetId;
+ for(const viewport of [{width:1440,height:1000},{width:390,height:844}]){
+  await page.setViewportSize(viewport);await page.reload();
+  await page.locator('#plot .terminatedTrack').first().waitFor();
+  assert.equal(await page.locator('#plot path.terminatedTrack').count(),31);
+  assert.equal(await page.locator('#plot circle.terminationEndpoint').count(),31);
+  assert.equal(await page.locator('#plot .noiseTrack').count(),0);
+  assert.match(await page.locator('#trackingCoverage').innerText(),/全予報時間 0本・打切り 31本/);
+  assert.match(await page.locator('#coverageAtHour').innerText(),/\+240h.*0 \/ 全31本/);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+  await page.screenshot({path:`.diagnostics/browser/all-terminated-${viewport.width}.png`,fullPage:true});
+  await page.locator('#hour').fill('120');
+  assert.equal(await page.locator('#plot circle.terminationEndpoint').count(),29);
+  assert.match(await page.locator('#coverageAtHour').innerText(),/\+120h.*31 \/ 全31本/);
+ }
  assert.deepEqual(errors,[]);await browser.close();
- console.log('Browser QA passed: desktop/mobile pending, explicit archive, mode/time controls, refresh, analysis/back navigation, current-generation recovery, censored prefixes, median/filter/time controls, denominator/coverage, failed-attempt status, optional status compatibility');
+ console.log('Browser QA passed: desktop/mobile pending, explicit archive, mode/time controls, refresh, analysis/back navigation, current-generation recovery, censored prefixes, median/filter/time controls, denominator/coverage, failed-attempt status, optional status compatibility, all-terminated desktop/mobile');
 })().catch(e=>{console.error(e);process.exit(1)});

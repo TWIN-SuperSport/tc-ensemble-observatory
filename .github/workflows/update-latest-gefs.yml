@@ -79,6 +79,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run offline pipeline self-test
+        id: self_test
         run: |
           python scripts/run_gefs_analysis.py --self-test
           python -m unittest discover -s scripts -p "test_*.py"
@@ -129,7 +130,7 @@ jobs:
 
       - name: Record update health independently
         if: always()
-        run: python scripts/write_update_status.py --outcome "${{ steps.validate.outcome }}"
+        run: python scripts/write_update_status.py --outcome "${{ steps.validate.outcome }}" --self-test-outcome "${{ steps.self_test.outcome }}"
 
       - name: Commit completed analysis and update health
         if: always()
