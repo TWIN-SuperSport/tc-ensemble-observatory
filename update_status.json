@@ -1,9 +1,9 @@
 {
-  "lastAttemptAt": "2026-10-23T04:34:57.255445Z",
-  "init": null,
-  "publishedInit": "2026102200",
-  "status": "failed",
-  "failureStage": "acquisition_or_validation",
-  "downloadedFields": null,
-  "message": "最新更新の取得・解析・検証が完了していません。表示中の予測初期時刻は据え置きです。"
+  "lastAttemptAt": "2026-10-23T04:51:31.791109Z",
+  "init": "2026102218",
+  "publishedInit": "2026102218",
+  "status": "success",
+  "failureStage": null,
+  "downloadedFields": 651,
+  "message": "更新処理完了。予測の初期時刻と追跡有効本数を確認してください。"
 }
