@@ -5,7 +5,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-def make_status(root, outcome, now=None):
+def make_status(root, outcome, now=None, *, self_test_outcome=None):
     def read(path):
         try:
             return json.loads((root / path).read_text())
@@ -14,6 +14,7 @@ def make_status(root, outcome, now=None):
     diagnostics = read('.diagnostics/gefs-analysis.json')
     latest = read('latest_run.json')
     success = outcome == 'success'
+    self_test_failed = not success and self_test_outcome == 'failure'
     if not success:
         latest = read('.diagnostics/published-latest.json') or latest
     return {
@@ -21,16 +22,19 @@ def make_status(root, outcome, now=None):
         'init': diagnostics.get('init'),
         'publishedInit': latest.get('init'),
         'status': 'success' if success else 'failed',
-        'failureStage': None if success else ('analysis' if diagnostics.get('downloadedFields') == 651 else 'acquisition_or_validation'),
+        'failureStage': None if success else ('self_test' if self_test_failed else 'analysis' if diagnostics.get('downloadedFields') == 651 else 'acquisition_or_validation'),
         'downloadedFields': diagnostics.get('downloadedFields'),
-        'message': '更新処理完了。予測の初期時刻と追跡有効本数を確認してください。' if success else '最新更新の取得・解析・検証が完了していません。表示中の予測初期時刻は据え置きです。',
+        'message': ('更新処理完了。予測の初期時刻と追跡有効本数を確認してください。' if success else
+                    '更新前の自己テストに失敗したため、最新予測の取得は実行していません。表示中の予測初期時刻は据え置きです。' if self_test_failed else
+                    '最新更新の取得・解析・検証が完了していません。表示中の予測初期時刻は据え置きです。'),
     }
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--outcome', required=True)
+    parser.add_argument('--self-test-outcome')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
-    (root / 'update_status.json').write_text(json.dumps(make_status(root,args.outcome), ensure_ascii=False,indent=2)+'\n')
+    (root / 'update_status.json').write_text(json.dumps(make_status(root,args.outcome,self_test_outcome=args.self_test_outcome), ensure_ascii=False,indent=2)+'\n')
 if __name__ == '__main__':
     main()

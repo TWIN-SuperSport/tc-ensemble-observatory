@@ -35,4 +35,29 @@ class UpdateStatusTests(unittest.TestCase):
             self.assertEqual(result['status'],'success')
             self.assertEqual(result['publishedInit'],'2026101812')
             self.assertIsNone(result['init'])
+    def test_failed_self_test_is_not_reported_as_acquisition_failure(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);(root/'.diagnostics').mkdir()
+            (root/'.diagnostics/published-latest.json').write_text('{"init":"2026102200"}')
+            result=make_status(root,'skipped',self_test_outcome='failure')
+            self.assertEqual(result['status'],'failed')
+            self.assertEqual(result['failureStage'],'self_test')
+            self.assertEqual(result['publishedInit'],'2026102200')
+            self.assertIsNone(result['init'])
+            self.assertIsNone(result['downloadedFields'])
+            self.assertIn('取得は実行していません',result['message'])
+    def test_skipped_self_test_does_not_claim_self_test_failure(self):
+        with tempfile.TemporaryDirectory() as d:
+            result=make_status(Path(d),'skipped',self_test_outcome='skipped')
+            self.assertEqual(result['failureStage'],'acquisition_or_validation')
+    def test_successful_self_test_preserves_analysis_failure_stage(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);(root/'.diagnostics').mkdir()
+            (root/'.diagnostics/gefs-analysis.json').write_text('{"downloadedFields":651}')
+            result=make_status(root,'failure',self_test_outcome='success')
+            self.assertEqual(result['failureStage'],'analysis')
+    def test_workflow_passes_self_test_outcome_to_status_writer(self):
+        workflow=(Path(__file__).resolve().parents[1]/'.github/workflows/update-latest-gefs.yml').read_text()
+        self.assertIn('name: Run offline pipeline self-test\n        id: self_test',workflow)
+        self.assertIn('--self-test-outcome "${{ steps.self_test.outcome }}"',workflow)
 if __name__=='__main__':unittest.main()
