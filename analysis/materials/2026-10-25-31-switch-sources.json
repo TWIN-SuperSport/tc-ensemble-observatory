@@ -1,0 +1,28 @@
+{
+  "sources": [
+    {
+      "path": "2026-10-25-1500z-jtwc-30w-warning.txt",
+      "url": "https://www.metoc.navy.mil/jtwc/products/wp3026web.txt",
+      "retrievedAt": "2026-10-25T15:07:52.858938Z",
+      "sha256": "fae2e3035bfb4d3076283ef2a5bafc03676b99c8ef81933caae6fad4a8d90c7e"
+    },
+    {
+      "path": "2026-10-25-1310z-jma-TC2637-forecast.json",
+      "url": "https://www.jma.go.jp/bosai/typhoon/data/TC2637/forecast.json",
+      "retrievedAt": "2026-10-25T15:07:52.858938Z",
+      "sha256": "2c6657cd22fdeb2ac9045399c9636b72b8f1f3ec777f6185fbf99483393ef86d"
+    },
+    {
+      "path": "2026-10-25-jma-targets.json",
+      "url": "https://www.jma.go.jp/bosai/typhoon/data/targetTc.json",
+      "retrievedAt": "2026-10-25T15:07:52.858938Z",
+      "sha256": "a076f8c07c6c9c284951b545db67c83bfc7015ddaa5b65b1f68794be4fc0c5ec"
+    },
+    {
+      "path": "2026-10-25-1245z-jma-TC2636-forecast.json",
+      "url": "https://www.jma.go.jp/bosai/typhoon/data/TC2636/forecast.json",
+      "retrievedAt": "2026-10-25T15:07:52.858938Z",
+      "sha256": "0b8d6164baa1de5eb2e9cafb06262965fbc3d9c3eb65cd9266edb7d71cc6aa78"
+    }
+  ]
+}

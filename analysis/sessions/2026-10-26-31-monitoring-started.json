@@ -1,0 +1,342 @@
+{
+  "schemaVersion": 1,
+  "analysisId": "2026-10-26-31-monitoring-started",
+  "trackingTargetId": "2026-10-jtwc-30w",
+  "title": "台風30号監視終了・31号インファ監視開始",
+  "target": [
+    "台風31号インファ / JTWC30W",
+    "台風30号チャンパー / JTWC29W・監視終了"
+  ],
+  "generatedAt": "2026-10-25T15:14:51.306577Z",
+  "status": "台風31号個別監視中・初回GEFS解析検証済み",
+  "confidence": "JMAとJTWCの名称・位置を照合。GEFS 2026102506の651場を実取得し、初期同一性・品質検査に合格。",
+  "conclusion": [
+    "依頼に基づき台風30号（JTWC29W）の個別監視を終了し、別の台風31号インファ（JTWC30W）へ切り替える。",
+    "JMA TC2637: 10月25日22:10 JST発表、21時解析13.2N・164.9E。JTWC30W警報009: 10月26日00時JST発表、25日21時解析12.8N・164.5E。",
+    "JMA TC2636（台風30号）は10月25日21時解析でLOW。旧対象の監視解除は残存低気圧の影響終了を意味しない。",
+    "旧対象の全履歴を保持し、別のtrackingTargetIdで新対象を追跡する。同じGEFS初期時刻でも旧対象の保存済みランを上書きしない。",
+    "初回GEFS 2026102506: 全31メンバー、有効29本（240時間完走19本・途中終了10本）、品質除外2本。中心追跡の途中終了後は延長しない。共通クラスタ時点は228時間、参加21本。"
+  ],
+  "reasoning": [
+    "GitHubを正本、GitHub Pagesを本番とする。描画コードを変更しない対象設定・データ更新。",
+    "固定参照位置を検証済みfallbackにせず、各ランで公式位置を解決する。",
+    "31メンバー取得、初期同一性、速度・気圧急変・赤道横断検査、有効区間の保持、既存の定時更新周期は不変。"
+  ],
+  "uncertainties": [
+    "モデル初期時刻と公式位置の時刻には差がある。中心追跡は実験的で、公式進路予報ではない。",
+    "途中で中心追跡が終わっても台風の消滅を意味しない。終了後の進路は延長しない。"
+  ],
+  "falsifiers": [
+    "初期同一性や品質条件に不合格なら新しい進路図を公開しない。",
+    "旧29Wの進路・種位置・名称を30Wへ継承しない。"
+  ],
+  "materials": [
+    {
+      "id": "E-01",
+      "title": "JTWC30W警報009原文",
+      "type": "official-text-product",
+      "role": "新対象の位置と名称",
+      "sourceUrl": "https://www.metoc.navy.mil/jtwc/products/wp3026web.txt",
+      "data": "../materials/2026-10-25-1500z-jtwc-30w-warning.txt",
+      "validTime": "2026-10-25T12:00:00Z",
+      "tags": [
+        "JTWC",
+        "30W"
+      ]
+    },
+    {
+      "id": "E-02",
+      "title": "JMA TC2637 台風31号インファ",
+      "type": "official-json",
+      "role": "番号・名称と位置の照合",
+      "sourceUrl": "https://www.jma.go.jp/bosai/typhoon/data/TC2637/forecast.json",
+      "data": "../materials/2026-10-25-1310z-jma-TC2637-forecast.json",
+      "validTime": "2026-10-25T12:00:00Z",
+      "tags": [
+        "JMA",
+        "31号"
+      ]
+    },
+    {
+      "id": "E-03",
+      "title": "切替時の公式原文ハッシュ記録",
+      "type": "source-metadata",
+      "role": "原文と取得時刻",
+      "data": "../materials/2026-10-25-31-switch-sources.json",
+      "tags": [
+        "SHA-256",
+        "provenance"
+      ]
+    }
+  ],
+  "gefsValidation": {
+    "init": "2026102506",
+    "downloadedFields": 651,
+    "trackingIdentity": {
+      "status": "verified",
+      "source": "JTWC warning",
+      "sourceStormId": "30W",
+      "seed": {
+        "lat": 12.8,
+        "lon": 164.5
+      },
+      "initialMedianDistanceKm": 104.2,
+      "initialMedianMslpHpa": 997.4,
+      "maxMedianDistanceKm": 600.0,
+      "maxMedianMslpHpa": 1008.0
+    },
+    "summary": {
+      "members": 31,
+      "cleanMembers": 19,
+      "noiseMembers": 2,
+      "terminatedMembers": 10,
+      "validMembers": 29,
+      "clusteredMembers": 21,
+      "availableMembersByLead": [
+        {
+          "fhour": 0,
+          "count": 29,
+          "total": 31
+        },
+        {
+          "fhour": 12,
+          "count": 29,
+          "total": 31
+        },
+        {
+          "fhour": 24,
+          "count": 29,
+          "total": 31
+        },
+        {
+          "fhour": 36,
+          "count": 29,
+          "total": 31
+        },
+        {
+          "fhour": 48,
+          "count": 29,
+          "total": 31
+        },
+        {
+          "fhour": 60,
+          "count": 29,
+          "total": 31
+        },
+        {
+          "fhour": 72,
+          "count": 29,
+          "total": 31
+        },
+        {
+          "fhour": 84,
+          "count": 29,
+          "total": 31
+        },
+        {
+          "fhour": 96,
+          "count": 29,
+          "total": 31
+        },
+        {
+          "fhour": 108,
+          "count": 29,
+          "total": 31
+        },
+        {
+          "fhour": 120,
+          "count": 29,
+          "total": 31
+        },
+        {
+          "fhour": 132,
+          "count": 29,
+          "total": 31
+        },
+        {
+          "fhour": 144,
+          "count": 29,
+          "total": 31
+        },
+        {
+          "fhour": 156,
+          "count": 29,
+          "total": 31
+        },
+        {
+          "fhour": 168,
+          "count": 29,
+          "total": 31
+        },
+        {
+          "fhour": 180,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 192,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 204,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 216,
+          "count": 25,
+          "total": 31
+        },
+        {
+          "fhour": 228,
+          "count": 21,
+          "total": 31
+        },
+        {
+          "fhour": 240,
+          "count": 19,
+          "total": 31
+        }
+      ],
+      "clusterCount": 2
+    },
+    "archivePath": "history/2026102506-202610JTWC30W.json"
+  },
+  "deploymentRefresh": {
+    "checkedAt": "2026-10-25T21:38:45.380094Z",
+    "reason": "公開承認待ちの間に更新された旧対象12Z履歴を保持し、新対象12Zを実取得して再検証。",
+    "init": "2026102512",
+    "downloadedFields": 651,
+    "trackingIdentity": {
+      "status": "verified",
+      "source": "JTWC warning",
+      "sourceStormId": "30W",
+      "seed": {
+        "lat": 13.4,
+        "lon": 163.9
+      },
+      "initialMedianDistanceKm": 78.7,
+      "initialMedianMslpHpa": 998.3,
+      "maxMedianDistanceKm": 600.0,
+      "maxMedianMslpHpa": 1008.0
+    },
+    "summary": {
+      "members": 31,
+      "cleanMembers": 16,
+      "noiseMembers": 4,
+      "terminatedMembers": 11,
+      "validMembers": 27,
+      "clusteredMembers": 21,
+      "availableMembersByLead": [
+        {
+          "fhour": 0,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 12,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 24,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 36,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 48,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 60,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 72,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 84,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 96,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 108,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 120,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 132,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 144,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 156,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 168,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 180,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 192,
+          "count": 26,
+          "total": 31
+        },
+        {
+          "fhour": 204,
+          "count": 25,
+          "total": 31
+        },
+        {
+          "fhour": 216,
+          "count": 21,
+          "total": 31
+        },
+        {
+          "fhour": 228,
+          "count": 18,
+          "total": 31
+        },
+        {
+          "fhour": 240,
+          "count": 16,
+          "total": 31
+        }
+      ],
+      "clusterCount": 2
+    },
+    "archivePath": "history/2026102512-202610JTWC30W.json"
+  }
+}

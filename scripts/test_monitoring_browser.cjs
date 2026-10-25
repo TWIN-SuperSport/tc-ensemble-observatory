@@ -41,7 +41,8 @@ const {makeCoverageFixture,makeAllTerminatedFixture}=require('./renderer_fixture
  await page.reload();await page.locator('#analysisMap').waitFor({state:'visible'});
  assert.equal(await page.locator('#archiveToggle').isVisible(),false);
  assert.doesNotMatch(await page.locator('#subtitle').innerText(),/判定保留|新対象解析待ち/);
- assert.match(await page.locator('#targetName').innerText(),/29W/);
+ const expectedTargetLabel = config.stormInfo.status === 'typhoon' && config.stormInfo.number ? `台風${config.stormInfo.number}号` : config.stormInfo.jtwcNumber;
+ assert.ok((await page.locator('#targetName').innerText()).includes(expectedTargetLabel));
  // Current generation with valid but censored prefixes: no invented tails or probabilities.
  const candidate=JSON.parse(fs.readFileSync('data.json','utf8'));
  // The test-only fixture must work even when the live candidate has zero full tracks.

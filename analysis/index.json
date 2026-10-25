@@ -1,7 +1,18 @@
 {
   "schemaVersion": 1,
-  "latest": "./analysis/sessions/2026-10-15-29w-monitoring-started.json",
+  "latest": "./analysis/sessions/2026-10-26-31-monitoring-started.json",
   "sessions": [
+    {
+      "id": "2026-10-26-31-monitoring-started",
+      "label": "2026-10-26｜台風30号監視終了・31号インファ監視開始",
+      "path": "./analysis/sessions/2026-10-26-31-monitoring-started.json",
+      "trackingTargetId": "2026-10-jtwc-30w",
+      "target": [
+        "台風31号インファ / JTWC30W",
+        "台風30号チャンパー / JTWC29W・監視終了"
+      ],
+      "status": "active-monitoring"
+    },
     {
       "id": "2026-10-15-29w-monitoring-started",
       "label": "2026-10-15｜28W監視終了・29W監視開始",
