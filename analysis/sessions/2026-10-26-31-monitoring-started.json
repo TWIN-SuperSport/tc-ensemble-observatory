@@ -202,5 +202,141 @@
       "clusterCount": 2
     },
     "archivePath": "history/2026102506-202610JTWC30W.json"
+  },
+  "deploymentRefresh": {
+    "checkedAt": "2026-10-25T21:38:45.380094Z",
+    "reason": "公開承認待ちの間に更新された旧対象12Z履歴を保持し、新対象12Zを実取得して再検証。",
+    "init": "2026102512",
+    "downloadedFields": 651,
+    "trackingIdentity": {
+      "status": "verified",
+      "source": "JTWC warning",
+      "sourceStormId": "30W",
+      "seed": {
+        "lat": 13.4,
+        "lon": 163.9
+      },
+      "initialMedianDistanceKm": 78.7,
+      "initialMedianMslpHpa": 998.3,
+      "maxMedianDistanceKm": 600.0,
+      "maxMedianMslpHpa": 1008.0
+    },
+    "summary": {
+      "members": 31,
+      "cleanMembers": 16,
+      "noiseMembers": 4,
+      "terminatedMembers": 11,
+      "validMembers": 27,
+      "clusteredMembers": 21,
+      "availableMembersByLead": [
+        {
+          "fhour": 0,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 12,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 24,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 36,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 48,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 60,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 72,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 84,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 96,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 108,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 120,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 132,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 144,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 156,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 168,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 180,
+          "count": 27,
+          "total": 31
+        },
+        {
+          "fhour": 192,
+          "count": 26,
+          "total": 31
+        },
+        {
+          "fhour": 204,
+          "count": 25,
+          "total": 31
+        },
+        {
+          "fhour": 216,
+          "count": 21,
+          "total": 31
+        },
+        {
+          "fhour": 228,
+          "count": 18,
+          "total": 31
+        },
+        {
+          "fhour": 240,
+          "count": 16,
+          "total": 31
+        }
+      ],
+      "clusterCount": 2
+    },
+    "archivePath": "history/2026102512-202610JTWC30W.json"
   }
 }

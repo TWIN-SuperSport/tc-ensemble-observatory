@@ -18,7 +18,7 @@
     "気象庁30号（TC2636）は同日21時解析でLOW。監視解除は残存低気圧の影響終了を意味しない",
     "31メンバー取得・公式位置照合・品質検査・有効区間の追跡と定時更新周期を維持"
   ],
-  "checkedAt": "2026-10-25T15:14:51.306577Z",
+  "checkedAt": "2026-10-25T21:38:45.380094Z",
   "officialIssuedAt": "2026-10-25T15:00:00Z",
   "analysisState": "analysis_complete",
   "metaJa": "気象庁: 10月25日22:10 JST発表 / 21時解析。JTWC: 10月26日00時JST発表 / 25日21時解析",
@@ -40,7 +40,7 @@
   ],
   "archivedAnalysis": {
     "trackingTargetId": "2026-10-jtwc-29w",
-    "init": "2026102506",
-    "path": "history/2026102506.json"
+    "init": "2026102512",
+    "path": "history/2026102512.json"
   }
 }
