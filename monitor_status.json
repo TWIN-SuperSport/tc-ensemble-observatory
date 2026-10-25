@@ -1,58 +1,46 @@
 {
   "schemaVersion": 1,
   "state": "active",
-  "trackingTargetId": "2026-10-jtwc-29w",
+  "trackingTargetId": "2026-10-jtwc-30w",
   "targetAliases": [
-    "29W",
-    "WP29",
-    "96W",
-    "TWENTYNINE"
+    "WP30",
+    "30W",
+    "IN-FA",
+    "INFA"
   ],
-  "titleJa": "熱帯低気圧29W（旧96W）個別監視中",
-  "titleEn": "Monitoring Tropical Depression29W (formerly Invest96W)",
-  "badgeJa": "監視中 / 初回解析を検証中",
-  "conclusionJa": "28W（旧95W）の個別監視を終了し、別の擾乱29Wを監視対象に切り替えました。29Wの新しいGEFS解析は検証中です。過去の台風29号コグマ（JTWC27W）の保存済み解析は履歴として分離し、新対象の予測として表示しません。",
+  "titleJa": "台風31号インファ（JTWC30W）個別監視中",
+  "titleEn": "Monitoring Typhoon 31 In-fa (JTWC 30W)",
+  "badgeJa": "監視中 / 初回解析検証済み",
+  "conclusionJa": "台風30号チャンパー（JTWC29W）の個別監視を終了し、台風31号インファ（JTWC30W）へ切り替えました。新対象のGEFS実データを取得・検証済みです。旧対象の解析は履歴として保持し、31号の予測に再ラベルしません。",
   "signals": [
-    "現役対象: JTWC29W / WP292026。旧95W→28Wおよび台風29号コグマとは別の擾乱",
-    "JTWC警報002: 10月15日03:00 JSTの解析で10.4N・160.5E、最大風速30 kt（1分平均）",
-    "気象庁TC2636: 10月15日09:00 JSTの解析で10.8N・159.4E。台風番号は未付与",
-    "31メンバー取得・公式位置照合・正常20本以上など、従来の品質条件と定時更新周期を維持"
+    "気象庁31号（TC2637）とJTWC30Wは名称・位置から同一対象を確認",
+    "気象庁10月25日21時解析: 13.2N・164.9E。JTWC同時刻解析: 12.8N・164.5E",
+    "気象庁30号（TC2636）は同日21時解析でLOW。監視解除は残存低気圧の影響終了を意味しない",
+    "31メンバー取得・公式位置照合・品質検査・有効区間の追跡と定時更新周期を維持"
   ],
-  "checkedAt": "2026-10-15T02:30:27.693635Z",
-  "officialIssuedAt": "2026-10-14T21:00:00Z",
-  "analysisState": "analysis_pending_initial",
-  "metaJa": "JTWC: 10月15日06:00 JST発表 / 03:00 JST解析。気象庁: 10:20 JST発表 / 09:00 JST解析",
-  "nextJa": "29Wの初回解析を検証し、品質条件に合格した場合だけ新しい進路図とシナリオ比率を公開します。監視解除は28Wの消滅や影響終了の判定ではありません。",
+  "checkedAt": "2026-10-25T15:14:51.306577Z",
+  "officialIssuedAt": "2026-10-25T15:00:00Z",
+  "analysisState": "analysis_complete",
+  "metaJa": "気象庁: 10月25日22:10 JST発表 / 21時解析。JTWC: 10月26日00時JST発表 / 25日21時解析",
+  "nextJa": "既存の定時更新を継続します。途中終了した進路は延長せず、時点ごとの有効本数を表示します。",
   "sessionPath": "analysis.html",
   "sources": [
     {
-      "label": "JTWC29W / 警報002",
-      "note": "2026年10月15日06:00 JST発表",
-      "url": "https://www.metoc.navy.mil/jtwc/products/wp2926web.txt"
+      "label": "気象庁 台風31号インファ",
+      "url": "https://www.jma.go.jp/bosai/typhoon/data/TC2637/forecast.json"
     },
     {
-      "label": "気象庁TC2636 / 熱帯低気圧",
-      "note": "2026年10月15日10:20 JST発表",
-      "url": "https://www.jma.go.jp/bosai/typhoon/data/TC2636/forecast.json"
+      "label": "JTWC30W 警報009",
+      "url": "https://www.metoc.navy.mil/jtwc/products/wp3026web.txt"
     },
     {
       "label": "切替時の公式原文",
-      "note": "JTWC警報002・解析室に保存",
-      "url": "analysis/materials/2026-10-14-2100z-jtwc-29w-warning.txt"
+      "url": "analysis/materials/2026-10-25-1500z-jtwc-30w-warning.txt"
     }
   ],
-  "pendingAnalysis": {
-    "trackingTargetId": "2026-10-jtwc-29w",
-    "requestedInit": "2026101418",
-    "checkedAt": "2026-10-15T02:30:27.693635Z",
-    "status": "awaiting_analysis",
-    "reason": "target_changed",
-    "expectedMembers": 31,
-    "minimumCleanMembers": 20
-  },
   "archivedAnalysis": {
-    "trackingTargetId": "2026-10-invest-94w",
-    "init": "2026100506",
-    "path": "history/2026100506.json"
+    "trackingTargetId": "2026-10-jtwc-29w",
+    "init": "2026102506",
+    "path": "history/2026102506.json"
   }
 }
