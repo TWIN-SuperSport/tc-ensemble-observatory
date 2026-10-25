@@ -488,6 +488,11 @@ def self_test():
     assert result.wasSuccessful(), "Prefix-payload regression tests failed"
 
 
+def valid_archive_path(path):
+    """Accept writer-generated basenames only; never URLs or traversal paths."""
+    return isinstance(path, str) and re.fullmatch(r"[0-9]{10}(?:-[A-Z0-9]+)?\.json", path) is not None
+
+
 def main(base):
     assert base.startswith("https://"), "Expected public HTTPS Pages URL"
     expected = json.loads((ROOT / "data.json").read_text())
@@ -515,7 +520,7 @@ def main(base):
             for path in ("index.html", "app.js"):
                 assert hashlib.sha256(get(path, attempt)).digest() == hashlib.sha256((ROOT / path).read_bytes()).digest(), f"Stale {path}"
             data, latest, monitor, history = [json.loads(get(path, attempt)) for path in ("data.json", "latest_run.json", "monitor_status.json", "history/index.json")]
-            assert re.fullmatch(r"\d{10}\.json", history["latestPath"]), "Invalid published archive path"
+            assert valid_archive_path(history["latestPath"]), "Invalid published archive path"
             archive = json.loads(get("history/" + history["latestPath"], attempt))
             report = validate_payload(data, latest, monitor, history, target, str(expected["meta"]["init"]), expected_data=expected, archive=archive)
             assert expected_paths.issubset({run["path"] for run in history["runs"]}), "Published history entries missing"
