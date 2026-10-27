@@ -1,9 +1,9 @@
 {
-  "lastAttemptAt": "2026-10-27T02:23:28.285311Z",
-  "init": "2026102618",
+  "lastAttemptAt": "2026-10-27T04:50:33.150785Z",
+  "init": null,
   "publishedInit": "2026102618",
   "status": "success",
   "failureStage": null,
-  "downloadedFields": 651,
+  "downloadedFields": null,
   "message": "更新処理完了。予測の初期時刻と追跡有効本数を確認してください。"
 }
