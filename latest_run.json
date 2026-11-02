@@ -1,7 +1,7 @@
 {
   "model": "GEFS",
-  "init": "2026110112",
-  "checkedAt": "2026-11-01T21:22:15.963353Z",
+  "init": "2026110118",
+  "checkedAt": "2026-11-02T02:43:09.478961Z",
   "source": "NOAA GEFS / NOMADS",
   "status": "analysis_complete",
   "members": 31,
