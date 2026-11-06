@@ -10,17 +10,14 @@ This is an **unofficial, experimental visualization** made for exploring weather
 
 ## 現在の監視状態
 
-- 個別監視: **台風31号インファ（JTWC30W / WP302026、JMA TC2637）**
-- 2026年10月26日JST、依頼に基づき台風30号チャンパー（JTWC29W）から切替
-- JMA: 10月25日22:10 JST発表、21時解析13.2N・164.9E
-- JTWC警報009: 10月26日00時JST発表、25日21時解析12.8N・164.5E
-- 新世代 `trackingTargetId: 2026-10-jtwc-30w`。旧29Wの種位置・進路・名前を継承しない
-- 31メンバー取得・公式位置照合・品質検査と有効区間保持、定時更新周期は不変
-- 旧対象の全履歴を保持。同一初期時刻の新対象は別ファイルに保存し、再ラベルや上書きをしない
+- **2026年11月6日JSTから監視休止中**。台風32号への切替は行いません。
+- `monitor_status.json` の `state: standby` が現行の休止制御です。GitHub Actions の定時処理は状態確認のみ行い、GEFS の新規取得・解析をスキップします。
+- 保存済みの台風31号インファ（JTWC30W / WP302026）の解析と、旧対象の全履歴を閲覧用に保持します。データの再ラベルや削除は行いません。
+- `tracking_config.json` は最後の対象の解析設定として保持します。自動取得の実行可否は上記の休止制御で判断します。
+- 休止は台風の消滅や日本への影響がないことを意味しません。最新予報・防災判断には気象庁などの公式情報を確認してください。
+- 再開時は対象と公式位置を改めて確認して設定します。
 
-現行状態は `monitor_status.json`、設定は `tracking_config.json`。
-切替記録は `analysis/sessions/2026-10-26-31-monitoring-started.json`、公式原文とSHA-256は `analysis/materials/2026-10-25-31-switch-sources.json`。
-30号はJMAの10月25日21時解析でLOWへ変化。監視解除は残存低気圧の影響終了を意味しない。
+直前の対象切替記録は `analysis/sessions/2026-10-26-31-monitoring-started.json`、公式原文と SHA-256 は `analysis/materials/2026-10-25-31-switch-sources.json` に保持します。
 
 ### 海盆をまたぐInvestの扱い
 
